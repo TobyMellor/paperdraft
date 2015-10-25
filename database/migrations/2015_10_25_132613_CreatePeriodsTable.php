@@ -16,8 +16,8 @@ class CreatePeriodsTable extends Migration
             $table->increments('id');
 
             $table->string('period_day');
-            $table->integer('period_start');
-            $table->integer('period_end');
+            $table->varchar('period_start', 4);
+            $table->varchar('period_end', 4);
 
             $table->timestamps();
         });
@@ -31,16 +31,16 @@ class CreatePeriodsTable extends Migration
         ];
 
         $periodTimes = [
-            0825 => 0845,
-            0845 => 0930,
-            0930 => 1015,
-            1015 => 1100,
-            1115 => 1200,
-            1200 => 1240,
-            1240 => 1325,
-            1325 => 1410,
-            1410 => 1450,
-            1450 => 1530
+            '0825' => '0845',
+            '0845' => '0930',
+            '0930' => '1015',
+            '1015' => '1100',
+            '1115' => '1200',
+            '1200' => '1240',
+            '1240' => '1325',
+            '1325' => '1410',
+            '1410' => '1450',
+            '1450' => '1530'
         ];
 
         $periods = [];
