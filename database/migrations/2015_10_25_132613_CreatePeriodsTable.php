@@ -16,8 +16,8 @@ class CreatePeriodsTable extends Migration
             $table->increments('id');
 
             $table->string('period_day');
-            $table->varchar('period_start', 4);
-            $table->varchar('period_end', 4);
+            $table->string('period_start', 4);
+            $table->string('period_end', 4);
 
             $table->timestamps();
         });
