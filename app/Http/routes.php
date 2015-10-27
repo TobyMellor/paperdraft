@@ -12,6 +12,7 @@
 */
 
 Route::get('/dashboard', 'IndexController@getDashboard');
+Route::get('/dashboard/classes', 'IndexController@getClassesDashboard');
 
 Route::get('/login', 'UserController@getLogin');
 Route::post('/login', 'UserController@authenticateUser');

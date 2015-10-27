@@ -16,6 +16,16 @@ class IndexController extends Controller
      */
     public function getDashboard()
     {
-        return view('dashboard');
+        return view('dashboard.index');
+    }
+
+    /**
+     * Display the classes dashboard.
+     *
+     * @return \Illuminate\Http\View
+     */
+    public function getClassesDashboard()
+    {
+        return view('dashboard.classes');
     }
 }
