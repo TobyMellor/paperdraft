@@ -72,6 +72,13 @@ $(function() {
         aspectRatio: 4/3
     });
 
+    // 1:1 ratio
+    $('.crop-1-1').cropper({
+        aspectRatio: 1/1,
+        minWidth: 50,
+        minHeight: 50
+    });
+
 
     // Minimum zone size
     $('.crop-min').cropper({

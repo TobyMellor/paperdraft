@@ -16,6 +16,7 @@ class CreateStudentsTable extends Migration
             $table->increments('id');
 
             $table->string('name');
+            $table->boolean('pupil_premium');
 
             $table->integer('user_id')->unsigned();
             $table->foreign('user_id')
@@ -28,6 +29,7 @@ class CreateStudentsTable extends Migration
         DB::table('students')->insert([
             [
                 'name' => 'Toby Mellor',
+                'pupil_premium' => true,
                 'user_id' => 1
             ]
         ]);

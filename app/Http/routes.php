@@ -20,3 +20,8 @@ Route::post('/login', 'UserController@authenticateUser');
 Route::post('/register', 'UserController@storeUser');
 
 Route::get('/logout', 'UserController@getLogout');
+
+/*
+ * Routes used by forms
+ */
+Route::post('/student', 'StudentController@storeStudent');
