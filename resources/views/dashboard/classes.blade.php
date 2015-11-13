@@ -45,6 +45,7 @@
 								<span class="text-muted">
 									<small>Year 11<small>
 								</span>
+								<a class="btn bg-teal-400" href="#"><i class="icon-statistics position-left"></i> View Seating Plan</a>
 							</h6>
 							<div class="heading-elements">
 								<button class="btn btn-link daterange-ranges heading-btn text-semibold" type="button">
@@ -52,54 +53,6 @@
 								</button>
 		                	</div>
 						<a class="heading-elements-toggle"><i class="icon-menu"></i></a></div>
-
-						<div class="table-responsive">
-							<table class="table table-xlg text-nowrap">
-								<tbody>
-									<tr>
-										<td class="col-md-3">
-											<div class="media-left media-middle">
-												<a class="btn border-indigo-400 text-indigo-400 btn-flat btn-rounded btn-xs btn-icon" href="#"><i class="icon-users"></i></a>
-											</div>
-
-											<div class="media-left">
-												<h5 class="text-semibold no-margin">
-													32 <small class="display-block no-margin">students</small>
-												</h5>
-											</div>
-										</td>
-
-										<td class="col-md-3">
-											<div class="media-left media-middle">
-												<a class="btn border-indigo-400 text-indigo-400 btn-flat btn-rounded btn-xs btn-icon" href="#"><i class="icon-alarm-add"></i></a>
-											</div>
-
-											<div class="media-left">
-												<h5 class="text-semibold no-margin">
-													1,132 <small class="display-block no-margin">total tickets</small>
-												</h5>
-											</div>
-										</td>
-
-										<td class="col-md-3">
-											<div class="media-left media-middle">
-												<a class="btn border-indigo-400 text-indigo-400 btn-flat btn-rounded btn-xs btn-icon" href="#"><i class="icon-spinner11"></i></a>
-											</div>
-
-											<div class="media-left">
-												<h5 class="text-semibold no-margin">
-													06:25:00 <small class="display-block no-margin">response time</small>
-												</h5>
-											</div>
-										</td>
-
-										<td class="text-right col-md-2">
-											<a class="btn bg-teal-400" href="#"><i class="icon-statistics position-left"></i> View Seating Plan</a>
-										</td>
-									</tr>
-								</tbody>
-							</table>	
-						</div>
 
 						<div class="table-responsive">
 							<table class="table text-nowrap">
@@ -166,9 +119,6 @@
 						            <div class="col-md-12">
 						                <fieldset class="text-semibold">
 						                    <legend><i class="icon-user-plus position-left"></i> Add Student</legend>
-						                    <div class="form-group">
-												<input type="text" placeholder="Student Name" title="" data-popup="tooltip" class="form-control" data-original-title="Enter the students name">
-											</div>
 						                    <div class="tabbable tab-content-bordered">
 												<ul class="nav nav-tabs nav-tabs-highlight">
 													<li class="active">
@@ -208,19 +158,19 @@
 																<label class="display-block text-bold">Student Ability Tier</label>
 																<div class="radio">
 																	<label>
-																		<input type="radio" checked="checked" name="ability_cap_high">
+																		<input type="radio" checked="checked" name="ability_cap" value="high">
 																		High
 																	</label>
 																</div>
 																<div class="radio">
 																	<label>
-																		<input type="radio" name="ability_cap_medium">
+																		<input type="radio" name="ability_cap" value="medium">
 																		Medium
 																	</label>
 																</div>
 																<div class="radio">
 																	<label>
-																		<input type="radio" name="ability_cap_low">
+																		<input type="radio" name="ability_cap" value="low">
 																		Low
 																	</label>
 																</div>

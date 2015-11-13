@@ -21,7 +21,7 @@ class StudentController extends Controller
     /**
      * Store the student in the database.
      *
-     * @return null
+     * @return \Illuminate\Http\Redirect
      */
     public function storeStudent()
     {
@@ -30,17 +30,12 @@ class StudentController extends Controller
         $studentName = $request->input('student_name');
         $pupilPremium = $request->input('pupil_premium');
         $classId = $request->input('class_id');
+        $abilityCap = $request->input('ability_cap');
 
-        if($pupilPremium != 'on') {
-            $pupilPremium = 'off';
-        }
-
-        if($request->input('ability_cap_high') == 'on') {
-            $abilityCap = 'high';
-        } else if($request->input('ability_cap_medium') == 'on') {
-            $abilityCap = 'medium';
+        if($pupilPremium == 'on') {
+            $pupilPremium = true;
         } else {
-            $abilityCap = 'low';
+            $pupilPremium = false;
         }
 
         $currentAttainmentLevel = $request->input('current_attainment_level');
@@ -83,12 +78,37 @@ class StudentController extends Controller
             ->with('errorValidationResponse', $response);
     }
 
+    /**
+     * Get all students from a given class
+     *
+     * @return \Illuminate\Http\Redirect
+     */
+    public function getClassStudents($classId)
+    {
+        $student = Student::where('class_id', $classId)
+            ->where('teacher_id');
+    }
+
+    /**
+     * Get all students of a teacher
+     *
+     * @return \Illuminate\Http\Redirect
+     */
+    public function getStudents(){}
+
+    /**
+     * Get a specific student of a teacher
+     *
+     * @return \Illuminate\Http\Redirect
+     */
+    public function getStudent(){}
+
     protected function validator(array $data)
     {
         return Validator::make($data, [
             'student_name' => 'required|between:1,30',
             'class_id' => 'required|integer|exists:classes,id,user_id,' . Auth::user()->id,
-            'pupil_premium' => 'in:on,off',
+            'pupil_premium' => 'required|boolean',
             'ability_cap' => 'required|in:high,medium,low',
             'current_attainment_level' => 'required|in:A*,A,B,C,D,E,F,G,U',
             'target_attainment_level' => 'required|in:A*,A,B,C,D,E,F,G,U'

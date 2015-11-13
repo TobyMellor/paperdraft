@@ -22,8 +22,10 @@
         <!-- /core JS files -->
 
         <!-- Theme JS files -->
+        <script type="text/javascript" src="/assets/js/core/libraries/jquery_ui/interactions.min.js"></script>
+        <script type="text/javascript" src="/assets/js/pages/appearance_draggable_panels.js"></script>
+        <script type="text/javascript" src="/assets/js/core/libraries/jquery_ui/touch.min.js"></script>
         <script type="text/javascript" src="/assets/js/plugins/uploaders/fileinput.min.js"></script>
-
         <script type="text/javascript" src="/assets/js/core/app.js"></script>
         <script type="text/javascript" src="/assets/js/pages/uploader_bootstrap.js"></script>
     </head>

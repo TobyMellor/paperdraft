@@ -192,19 +192,207 @@
 							</div>
 						</div>
 					</div>
-					<!-- /editable inputs -->
 					<div class="panel panel-white">
 						<div class="panel-heading">
-							<h6 class="panel-title">Objects</h6>
+							<h6 class="panel-title">Students</h6>
 							<div class="heading-elements">
-								<form action="#" class="heading-form">
+								<form action="#" class="heading-form" style="margin-left: 0px; margin-right: -12px;">
 									<div class="form-group has-feedback">
-										<input type="search" placeholder="Search..." class="form-control">
+										<input type="search" placeholder="Search..." class="form-control" style="width: 180px;">
 										<div class="form-control-feedback">
 											<i class="icon-search4 text-size-base text-muted"></i>
 										</div>
 									</div>
 								</form>
+								<ul class="icons-list">
+			                		<li><a title="" data-popup="tooltip" data-action="move" href="#" data-original-title="Move" class="ui-sortable-handle"></a></li>
+			                		<li><a title="" data-popup="tooltip" data-action="collapse" data-original-title="Collapse" class=""></a></li>
+			                	</ul>
+							</div>
+						<a class="heading-elements-toggle"><i class="icon-menu"></i></a></div>
+						
+						<div class="panel-body">
+							<!-- student -->
+							<div class="col-lg-4 col-sm-6">
+								<div class="thumbnail">
+									<div class="thumb">
+										<img alt="" src="http://placehold.it/200x200">
+										<div class="caption-overflow">
+											<span>
+												<a class="btn border-white text-white btn-flat btn-icon btn-rounded" data-popup="lightbox" href="assets/images/demo/flat/1.png"><i class="icon-plus3"></i></a>
+											</span>
+										</div>
+									</div>
+
+									<div class="caption" style="padding-top: 5px; padding-bottom: 5px; padding-left: 5px;">
+										<h6 class="no-margin"><a href="#" class="text-default" style="font-size: 10px;">Toby Mellor</a></h6>
+									</div>
+								</div>
+							</div>
+							<!-- /student -->
+							<!-- student -->
+							<div class="col-lg-4 col-sm-6">
+								<div class="thumbnail">
+									<div class="thumb">
+										<img alt="" src="http://placehold.it/200x200">
+										<div class="caption-overflow">
+											<span>
+												<a class="btn border-white text-white btn-flat btn-icon btn-rounded" data-popup="lightbox" href="assets/images/demo/flat/1.png"><i class="icon-plus3"></i></a>
+											</span>
+										</div>
+									</div>
+
+									<div class="caption" style="padding-top: 5px; padding-bottom: 5px; padding-left: 5px;">
+										<h6 class="no-margin"><a href="#" class="text-default" style="font-size: 10px;">Test Student</a></h6>
+									</div>
+								</div>
+							</div>
+							<!-- /student -->
+							<!-- student -->
+							<div class="col-lg-4 col-sm-6">
+								<div class="thumbnail">
+									<div class="thumb">
+										<img alt="" src="http://placehold.it/200x200">
+										<div class="caption-overflow">
+											<span>
+												<a class="btn border-white text-white btn-flat btn-icon btn-rounded" data-popup="lightbox" href="assets/images/demo/flat/1.png"><i class="icon-plus3"></i></a>
+											</span>
+										</div>
+									</div>
+
+									<div class="caption" style="padding-top: 5px; padding-bottom: 5px; padding-left: 5px;">
+										<h6 class="no-margin"><a href="#" class="text-default" style="font-size: 10px;">Thomas Ev...</a></h6>
+									</div>
+								</div>
+							</div>
+							<!-- /student -->
+							<!-- student -->
+							<div class="col-lg-4 col-sm-6">
+								<div class="thumbnail">
+									<div class="thumb">
+										<img alt="" src="http://placehold.it/200x200">
+										<div class="caption-overflow">
+											<span>
+												<a class="btn border-white text-white btn-flat btn-icon btn-rounded" data-popup="lightbox" href="assets/images/demo/flat/1.png"><i class="icon-plus3"></i></a>
+											</span>
+										</div>
+									</div>
+
+									<div class="caption" style="padding-top: 5px; padding-bottom: 5px; padding-left: 5px;">
+										<h6 class="no-margin"><a href="#" class="text-default" style="font-size: 10px;">Toby Mellor</a></h6>
+									</div>
+								</div>
+							</div>
+							<!-- /student -->
+							<!-- student -->
+							<div class="col-lg-4 col-sm-6">
+								<div class="thumbnail">
+									<div class="thumb">
+										<img alt="" src="http://placehold.it/200x200">
+										<div class="caption-overflow">
+											<span>
+												<a class="btn border-white text-white btn-flat btn-icon btn-rounded" data-popup="lightbox" href="assets/images/demo/flat/1.png"><i class="icon-plus3"></i></a>
+											</span>
+										</div>
+									</div>
+
+									<div class="caption" style="padding-top: 5px; padding-bottom: 5px; padding-left: 5px;">
+										<h6 class="no-margin"><a href="#" class="text-default" style="font-size: 10px;">Test Student</a></h6>
+									</div>
+								</div>
+							</div>
+							<!-- /student -->
+							<!-- student -->
+							<div class="col-lg-4 col-sm-6">
+								<div class="thumbnail">
+									<div class="thumb">
+										<img alt="" src="http://placehold.it/200x200">
+										<div class="caption-overflow">
+											<span>
+												<a class="btn border-white text-white btn-flat btn-icon btn-rounded" data-popup="lightbox" href="assets/images/demo/flat/1.png"><i class="icon-plus3"></i></a>
+											</span>
+										</div>
+									</div>
+
+									<div class="caption" style="padding-top: 5px; padding-bottom: 5px; padding-left: 5px;">
+										<h6 class="no-margin"><a href="#" class="text-default" style="font-size: 10px;">Thomas Ev...</a></h6>
+									</div>
+								</div>
+							</div>
+							<!-- /student -->
+							<!-- student -->
+							<div class="col-lg-4 col-sm-6">
+								<div class="thumbnail">
+									<div class="thumb">
+										<img alt="" src="http://placehold.it/200x200">
+										<div class="caption-overflow">
+											<span>
+												<a class="btn border-white text-white btn-flat btn-icon btn-rounded" data-popup="lightbox" href="assets/images/demo/flat/1.png"><i class="icon-plus3"></i></a>
+											</span>
+										</div>
+									</div>
+
+									<div class="caption" style="padding-top: 5px; padding-bottom: 5px; padding-left: 5px;">
+										<h6 class="no-margin"><a href="#" class="text-default" style="font-size: 10px;">Toby Mellor</a></h6>
+									</div>
+								</div>
+							</div>
+							<!-- /student -->
+							<!-- student -->
+							<div class="col-lg-4 col-sm-6">
+								<div class="thumbnail">
+									<div class="thumb">
+										<img alt="" src="http://placehold.it/200x200">
+										<div class="caption-overflow">
+											<span>
+												<a class="btn border-white text-white btn-flat btn-icon btn-rounded" data-popup="lightbox" href="assets/images/demo/flat/1.png"><i class="icon-plus3"></i></a>
+											</span>
+										</div>
+									</div>
+
+									<div class="caption" style="padding-top: 5px; padding-bottom: 5px; padding-left: 5px;">
+										<h6 class="no-margin"><a href="#" class="text-default" style="font-size: 10px;">Test Student</a></h6>
+									</div>
+								</div>
+							</div>
+							<!-- /student -->
+							<!-- student -->
+							<div class="col-lg-4 col-sm-6">
+								<div class="thumbnail">
+									<div class="thumb">
+										<img alt="" src="http://placehold.it/200x200">
+										<div class="caption-overflow">
+											<span>
+												<a class="btn border-white text-white btn-flat btn-icon btn-rounded" data-popup="lightbox" href="assets/images/demo/flat/1.png"><i class="icon-plus3"></i></a>
+											</span>
+										</div>
+									</div>
+
+									<div class="caption" style="padding-top: 5px; padding-bottom: 5px; padding-left: 5px;">
+										<h6 class="no-margin"><a href="#" class="text-default" style="font-size: 10px;">Thomas Ev...</a></h6>
+									</div>
+								</div>
+							</div>
+							<!-- /student -->
+						</div>
+					</div>
+					<!-- /editable inputs -->
+					<div class="panel panel-white">
+						<div class="panel-heading">
+							<h6 class="panel-title">Objects</h6>
+							<div class="heading-elements">
+								<form action="#" class="heading-form" style="margin-left: 0px; margin-right: -12px;">
+									<div class="form-group has-feedback">
+										<input type="search" placeholder="Search..." class="form-control" style="width: 180px;">
+										<div class="form-control-feedback">
+											<i class="icon-search4 text-size-base text-muted"></i>
+										</div>
+									</div>
+								</form>
+								<ul class="icons-list">
+			                		<li><a title="" data-popup="tooltip" data-action="move" href="#" data-original-title="Move" class="ui-sortable-handle"></a></li>
+			                		<li><a title="" data-popup="tooltip" data-action="collapse" data-original-title="Collapse" class=""></a></li>
+			                	</ul>
 							</div>
 						<a class="heading-elements-toggle"><i class="icon-menu"></i></a></div>
 						
@@ -281,186 +469,6 @@
 								</div>
 							</div>
 							<!-- /object -->
-						</div>
-					</div>
-					<div class="panel panel-white">
-						<div class="panel-heading">
-							<h6 class="panel-title">Students</h6>
-							<div class="heading-elements">
-								<form action="#" class="heading-form">
-									<div class="form-group has-feedback">
-										<input type="search" placeholder="Search..." class="form-control">
-										<div class="form-control-feedback">
-											<i class="icon-search4 text-size-base text-muted"></i>
-										</div>
-									</div>
-								</form>
-							</div>
-						<a class="heading-elements-toggle"><i class="icon-menu"></i></a></div>
-						
-						<div class="panel-body">
-							<!-- student -->
-							<div class="col-lg-4 col-sm-6">
-								<div class="thumbnail">
-									<div class="thumb">
-										<img alt="" src="http://placehold.it/200x200">
-										<div class="caption-overflow">
-											<span>
-												<a class="btn border-white text-white btn-flat btn-icon btn-rounded" data-popup="lightbox" href="assets/images/demo/flat/1.png"><i class="icon-plus3"></i></a>
-											</span>
-										</div>
-									</div>
-
-									<div class="caption" style="padding-top: 5px; padding-bottom: 5px; padding-left: 5px;">
-										<h6 class="no-margin"><a href="#" class="text-default" style="font-size: 10px;">Toby Mellor</a></h6>
-									</div>
-								</div>
-							</div>
-							<!-- /student -->
-							<!-- student -->
-							<div class="col-lg-4 col-sm-6">
-								<div class="thumbnail">
-									<div class="thumb">
-										<img alt="" src="http://placehold.it/200x200">
-										<div class="caption-overflow">
-											<span>
-												<a class="btn border-white text-white btn-flat btn-icon btn-rounded" data-popup="lightbox" href="assets/images/demo/flat/1.png"><i class="icon-plus3"></i></a>
-											</span>
-										</div>
-									</div>
-
-									<div class="caption" style="padding-top: 5px; padding-bottom: 5px; padding-left: 5px;">
-										<h6 class="no-margin"><a href="#" class="text-default" style="font-size: 10px;">Test Student</a></h6>
-									</div>
-								</div>
-							</div>
-							<!-- /student -->
-							<!-- student -->
-							<div class="col-lg-4 col-sm-6">
-								<div class="thumbnail">
-									<div class="thumb">
-										<img alt="" src="http://placehold.it/200x200">
-										<div class="caption-overflow">
-											<span>
-												<a class="btn border-white text-white btn-flat btn-icon btn-rounded" data-popup="lightbox" href="assets/images/demo/flat/1.png"><i class="icon-plus3"></i></a>
-											</span>
-										</div>
-									</div>
-
-									<div class="caption" style="padding-top: 5px; padding-bottom: 5px; padding-left: 5px;">
-										<h6 class="no-margin"><a href="#" class="text-default" style="font-size: 10px;">Thomas Ev...</a></h6>
-									</div>
-								</div>
-							</div>
-							<!-- /student -->
-							<!-- student -->
-							<div class="col-lg-4 col-sm-6">
-								<div class="thumbnail">
-									<div class="thumb">
-										<img alt="" src="http://placehold.it/200x200">
-										<div class="caption-overflow">
-											<span>
-												<a class="btn border-white text-white btn-flat btn-icon btn-rounded" data-popup="lightbox" href="assets/images/demo/flat/1.png"><i class="icon-plus3"></i></a>
-											</span>
-										</div>
-									</div>
-
-									<div class="caption" style="padding-top: 5px; padding-bottom: 5px; padding-left: 5px;">
-										<h6 class="no-margin"><a href="#" class="text-default" style="font-size: 10px;">Toby Mellor</a></h6>
-									</div>
-								</div>
-							</div>
-							<!-- /student -->
-							<!-- student -->
-							<div class="col-lg-4 col-sm-6">
-								<div class="thumbnail">
-									<div class="thumb">
-										<img alt="" src="http://placehold.it/200x200">
-										<div class="caption-overflow">
-											<span>
-												<a class="btn border-white text-white btn-flat btn-icon btn-rounded" data-popup="lightbox" href="assets/images/demo/flat/1.png"><i class="icon-plus3"></i></a>
-											</span>
-										</div>
-									</div>
-
-									<div class="caption" style="padding-top: 5px; padding-bottom: 5px; padding-left: 5px;">
-										<h6 class="no-margin"><a href="#" class="text-default" style="font-size: 10px;">Test Student</a></h6>
-									</div>
-								</div>
-							</div>
-							<!-- /student -->
-							<!-- student -->
-							<div class="col-lg-4 col-sm-6">
-								<div class="thumbnail">
-									<div class="thumb">
-										<img alt="" src="http://placehold.it/200x200">
-										<div class="caption-overflow">
-											<span>
-												<a class="btn border-white text-white btn-flat btn-icon btn-rounded" data-popup="lightbox" href="assets/images/demo/flat/1.png"><i class="icon-plus3"></i></a>
-											</span>
-										</div>
-									</div>
-
-									<div class="caption" style="padding-top: 5px; padding-bottom: 5px; padding-left: 5px;">
-										<h6 class="no-margin"><a href="#" class="text-default" style="font-size: 10px;">Thomas Ev...</a></h6>
-									</div>
-								</div>
-							</div>
-							<!-- /student -->
-							<!-- student -->
-							<div class="col-lg-4 col-sm-6">
-								<div class="thumbnail">
-									<div class="thumb">
-										<img alt="" src="http://placehold.it/200x200">
-										<div class="caption-overflow">
-											<span>
-												<a class="btn border-white text-white btn-flat btn-icon btn-rounded" data-popup="lightbox" href="assets/images/demo/flat/1.png"><i class="icon-plus3"></i></a>
-											</span>
-										</div>
-									</div>
-
-									<div class="caption" style="padding-top: 5px; padding-bottom: 5px; padding-left: 5px;">
-										<h6 class="no-margin"><a href="#" class="text-default" style="font-size: 10px;">Toby Mellor</a></h6>
-									</div>
-								</div>
-							</div>
-							<!-- /student -->
-							<!-- student -->
-							<div class="col-lg-4 col-sm-6">
-								<div class="thumbnail">
-									<div class="thumb">
-										<img alt="" src="http://placehold.it/200x200">
-										<div class="caption-overflow">
-											<span>
-												<a class="btn border-white text-white btn-flat btn-icon btn-rounded" data-popup="lightbox" href="assets/images/demo/flat/1.png"><i class="icon-plus3"></i></a>
-											</span>
-										</div>
-									</div>
-
-									<div class="caption" style="padding-top: 5px; padding-bottom: 5px; padding-left: 5px;">
-										<h6 class="no-margin"><a href="#" class="text-default" style="font-size: 10px;">Test Student</a></h6>
-									</div>
-								</div>
-							</div>
-							<!-- /student -->
-							<!-- student -->
-							<div class="col-lg-4 col-sm-6">
-								<div class="thumbnail">
-									<div class="thumb">
-										<img alt="" src="http://placehold.it/200x200">
-										<div class="caption-overflow">
-											<span>
-												<a class="btn border-white text-white btn-flat btn-icon btn-rounded" data-popup="lightbox" href="assets/images/demo/flat/1.png"><i class="icon-plus3"></i></a>
-											</span>
-										</div>
-									</div>
-
-									<div class="caption" style="padding-top: 5px; padding-bottom: 5px; padding-left: 5px;">
-										<h6 class="no-margin"><a href="#" class="text-default" style="font-size: 10px;">Thomas Ev...</a></h6>
-									</div>
-								</div>
-							</div>
-							<!-- /student -->
 						</div>
 					</div>
 				</div>
