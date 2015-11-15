@@ -67,46 +67,50 @@
 									</tr>
 								</thead>
 								<tbody>
-									<tr>
-										<td>
-											<div class="media-left media-middle">
-												<a class="btn bg-teal-400 btn-rounded btn-icon btn-xs" href="#">
-													<span class="letter-icon">A</span>
-												</a>
-											</div>
+									@if(isset($classStudents))
+                                        @foreach($classStudents as $classStudent)
+                                    		<tr>
+												<td>
+													<div class="media-left media-middle">
+														<a class="btn bg-teal-400 btn-rounded btn-icon btn-xs" href="#">
+															<span class="letter-icon">A</span>
+														</a>
+													</div>
 
-											<div class="media-body">
-												<a class="display-inline-block text-default text-semibold letter-icon-title" href="#">Toby Mellor</a>
-												<div class="text-muted text-size-small"><span class="status-mark border-blue position-left"></span> Active</div>
-											</div>
-										</td>
-										<td class="text-center">
-											<h6 class="no-margin">B</h6>
-										</td>
-										<td class="text-center">
-											<h6 class="no-margin">A</h6>
-										</td>
-										<td class="text-center">
-											<i class="icon-checkmark3 text-success"></i>
-										</td>
-										<td class="text-center">
-											<h6 class="no-margin">H</h6>
-										</td>
-										<td class="text-center">
-											<ul class="icons-list">
-												<li class="dropdown">
-													<a data-toggle="dropdown" class="dropdown-toggle" href="#"><i class="icon-menu7"></i></a>
-													<ul class="dropdown-menu dropdown-menu-right">
-														<li><a href="#"><i class="icon-undo"></i> Quick reply</a></li>
-														<li><a href="#"><i class="icon-history"></i> Full history</a></li>
-														<li class="divider"></li>
-														<li><a href="#"><i class="icon-checkmark3 text-success"></i> Resolve issue</a></li>
-														<li><a href="#"><i class="icon-cross2 text-danger"></i> Close issue</a></li>
+													<div class="media-body">
+														<a class="display-inline-block text-default text-semibold letter-icon-title" href="#">{{ $classStudent->student->name }}</a>
+														<div class="text-muted text-size-small"><span class="status-mark border-blue position-left"></span> Active</div>
+													</div>
+												</td>
+												<td class="text-center">
+													<h6 class="no-margin">{{ $classStudent->current_attainment_level }}</h6>
+												</td>
+												<td class="text-center">
+													<h6 class="no-margin">{{ $classStudent->target_attainment_level }}</h6>
+												</td>
+												<td class="text-center">
+													<i class="@if($classStudent->student->pupil_premium) icon-checkmark3 text-success @else icon-cross2 text-danger-400 @endif"></i>
+												</td>
+												<td class="text-center">
+													<h6 class="no-margin">{{ $classStudent->ability_cap }}</h6>
+												</td>
+												<td class="text-center">
+													<ul class="icons-list">
+														<li class="dropdown">
+															<a data-toggle="dropdown" class="dropdown-toggle" href="#"><i class="icon-menu7"></i></a>
+															<ul class="dropdown-menu dropdown-menu-right">
+																<li><a href="#"><i class="icon-undo"></i> Quick reply</a></li>
+																<li><a href="#"><i class="icon-history"></i> Full history</a></li>
+																<li class="divider"></li>
+																<li><a href="#"><i class="icon-checkmark3 text-success"></i> Resolve issue</a></li>
+																<li><a href="#"><i class="icon-cross2 text-danger"></i> Close issue</a></li>
+															</ul>
+														</li>
 													</ul>
-												</li>
-											</ul>
-										</td>
-									</tr>
+												</td>
+											</tr>
+										@endforeach
+									@endif
 								</tbody>
 							</table>
 						</div>
@@ -158,19 +162,19 @@
 																<label class="display-block text-bold">Student Ability Tier</label>
 																<div class="radio">
 																	<label>
-																		<input type="radio" checked="checked" name="ability_cap" value="high">
+																		<input type="radio" checked="checked" name="ability_cap" value="H">
 																		High
 																	</label>
 																</div>
 																<div class="radio">
 																	<label>
-																		<input type="radio" name="ability_cap" value="medium">
+																		<input type="radio" name="ability_cap" value="M">
 																		Medium
 																	</label>
 																</div>
 																<div class="radio">
 																	<label>
-																		<input type="radio" name="ability_cap" value="low">
+																		<input type="radio" name="ability_cap" value="L">
 																		Low
 																	</label>
 																</div>
@@ -246,9 +250,13 @@
 				<div class="col-md-4">
 					<div class="tabbable">
 						<ul class="nav nav-pills nav-stacked">
-							<li class="active"><a data-toggle="tab" href="#stacked-labels-pill1"><i class="icon-book position-left"></i> Year 11</a></li>
-							<li style="background-color:#FFF; border:solid #DDD; border-radius: 3px; border-width: 1px; border- box-shadow: 0 1px 1px rgba(0, 0, 0, 0.05);"><a data-toggle="tab" href="#stacked-labels-pill2"><i class="icon-book2 position-left"></i> <span class="label label-info pull-right">New</span> Year 12</a></li>
-							<li style="background-color:#FFF; border:solid #DDD; border-radius: 3px; border-width: 1px; border- box-shadow: 0 1px 1px rgba(0, 0, 0, 0.05);"><a data-toggle="tab" href="#stacked-labels-pill2"><i class="icon-book3 position-left"></i>Year 7</a></li>
+							@if(isset($classes))
+								{{ $classCount = 0 }}
+                                @foreach($classes as $class)
+									{{ $classCount++ }}
+									<li @if($classCount == 1) class="active" @endif style="background-color:#FFF; border:solid #DDD; border-radius: 3px; border-width: 1px; border- box-shadow: 0 1px 1px rgba(0, 0, 0, 0.05);"><a data-toggle="tab"><i class="icon-book position-left"></i> {{ $class->class_name }}</a></li>
+								@endforeach
+							@endif
 						</ul>
 					</div>
 				</div>

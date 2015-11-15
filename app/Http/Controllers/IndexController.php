@@ -24,8 +24,15 @@ class IndexController extends Controller
      *
      * @return \Illuminate\Http\View
      */
-    public function getClassesDashboard()
+    public function getClassesDashboard(
+        ClassController $classController,
+        StudentController $studentController
+    )
     {
-        return view('dashboard.classes');
+        $classes = $classController->getClasses();
+        $classStudents = $studentController->getClassStudents($classes->first()->id);
+        return view('dashboard.classes')
+            ->with('classStudents', $classStudents)
+            ->with('classes', $classes);
     }
 }

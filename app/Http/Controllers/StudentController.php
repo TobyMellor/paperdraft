@@ -63,6 +63,7 @@ class StudentController extends Controller
             ClassStudent::create([
                 'student_id' => $student->id,
                 'class_id' => $classId,
+                'ability_cap' => $abilityCap,
                 'current_attainment_level' => $currentAttainmentLevel,
                 'target_attainment_level' => $targetAttainmentLevel,
             ]);
@@ -80,13 +81,14 @@ class StudentController extends Controller
 
     /**
      * Get all students from a given class
+     * TODO: Check if user owns class
      *
      * @return \Illuminate\Http\Redirect
      */
     public function getClassStudents($classId)
     {
-        $student = Student::where('class_id', $classId)
-            ->where('teacher_id');
+        $classStudents = ClassStudent::where('class_id', $classId)->get();
+        return $classStudents;
     }
 
     /**
@@ -94,14 +96,23 @@ class StudentController extends Controller
      *
      * @return \Illuminate\Http\Redirect
      */
-    public function getStudents(){}
+    public function getStudents()
+    {
+        $students = Student::where('user_id', Auth::user()->id)->get();
+        return $students;
+    }
 
     /**
      * Get a specific student of a teacher
+     * TODO: Check if user owns student
      *
      * @return \Illuminate\Http\Redirect
      */
-    public function getStudent(){}
+    public function getStudent($studentId)
+    {
+        $student = Student::where('id', $studentId)->first();
+        return $student;
+    }
 
     protected function validator(array $data)
     {
@@ -109,7 +120,7 @@ class StudentController extends Controller
             'student_name' => 'required|between:1,30',
             'class_id' => 'required|integer|exists:classes,id,user_id,' . Auth::user()->id,
             'pupil_premium' => 'required|boolean',
-            'ability_cap' => 'required|in:high,medium,low',
+            'ability_cap' => 'required|in:H,M,L',
             'current_attainment_level' => 'required|in:A*,A,B,C,D,E,F,G,U',
             'target_attainment_level' => 'required|in:A*,A,B,C,D,E,F,G,U'
         ]);

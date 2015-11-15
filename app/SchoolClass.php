@@ -4,14 +4,14 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Student extends Model
+class SchoolClass extends Model
 {
     /**
      * The database table used by the model.
      *
      * @var string
      */
-    protected $table = 'students';
+    protected $table = 'classes';
 
     /**
      * The attributes that are mass assignable.
@@ -19,8 +19,8 @@ class Student extends Model
      * @var array
      */
     protected $fillable = [
-        'name',
-        'pupil_premium',
-        'user_id'
+        'user_id',
+        'period_id',
+        'class_name',
     ];
 }

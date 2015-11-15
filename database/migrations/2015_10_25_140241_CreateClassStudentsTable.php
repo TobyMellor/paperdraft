@@ -25,6 +25,7 @@ class CreateClassStudentsTable extends Migration
                 ->references('id')
                 ->on('classes');
 
+            $table->string('ability_cap');
             $table->string('current_attainment_level');
             $table->string('target_attainment_level');
 
@@ -35,6 +36,7 @@ class CreateClassStudentsTable extends Migration
             [
                 'student_id' => 1,
                 'class_id' => 1,
+                'ability_cap' => 'H',
                 'current_attainment_level' => 'A',
                 'target_attainment_level' => 'A*'
             ]
