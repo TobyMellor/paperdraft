@@ -85,9 +85,14 @@ class StudentController extends Controller
      *
      * @return \Illuminate\Http\Redirect
      */
-    public function getClassStudents($classId)
+    public function getClassStudents($classId, $paginate = null)
     {
-        $classStudents = ClassStudent::where('class_id', $classId)->get();
+        $classStudents = ClassStudent::where('class_id', $classId);
+        if($paginate != null) {
+            $classStudents = $classStudents->paginate($paginate);
+        } else {
+            $classStudents = $classStudents->get();
+        }
         return $classStudents;
     }
 
