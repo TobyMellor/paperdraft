@@ -71,28 +71,27 @@
 								}
 								.drag-item, .outside-drag-item {
 								    position: absolute;
-								    background-image: url('assets/images/objects/desk-1.png');
-								    background-size: 32px;
-								    width:32px;height:32px;
-								    cursor:move;
+								    background-image: url('assets/images/objects/teacher-desk-1.png');
+								    background-size: 64px;
+								    width: 64px ;
+								    height: 64px;
+								    cursor: move;
 								}
 								.drop-target {
 									left: 0px; top: 0px;
 								    position: absolute;
-								    width: 960px; height: 960px;
-								    border:dashed 1px orange;
-								    background:whitesmoke url('assets/images/objects/grid_64.png') repeat;
+								    width: 736px;
+								    height: 736px;
+								    border: dashed 1px orange;
+								    background: whitesmoke url('assets/images/objects/grid_64.png') repeat;
 								    background-size: 32px 32px;
 								    
 								}
 							</style>
 						<div class="panel-body" style="height:960px; overflow-x: scroll;">
 							<div class="drop-target">
-							    <div class="drag-item"></div>
-							    <div class="drag-item"></div>
-							    <div class="drag-item"></div>
-							    <div class="drag-item"></div>
-							    <div class="drag-item"></div>
+							    <div class="drag-item" object-id="1"></div>
+							    <div class="drag-item" object-id="2"></div>
 							</div>
 						</div>
 					</div>
@@ -110,11 +109,12 @@
 						</ul>
 					</div>
 					<div class="panel panel-white">
+						<div id="selected-id" style="display: none;"></div>
 						<div class="panel-heading">
 							<h6 class="panel-title">
 								Selected Object
 								<span class="text-muted">
-									<small>Student Desk</small>
+									<small class="selected-name">Student Desk</small>
 								</span>
 							</h6>
 							<div class="heading-elements">
@@ -138,13 +138,13 @@
 							<div class="col-lg-3 col-sm-6">
 								<div class="thumbnail" style="margin-top: 5px;">
 									<div class="thumb">
-										<img src="assets/images/objects/desk-1.png" alt="" class="no-antialias">
+										<img id="selected-image" src="assets/images/objects/desk-1.png" alt="" class="no-antialias">
 									</div>
 								</div>
 							</div>
 							<div class="col-lg-9 col-sm-6">
 								<h5 class="no-margin">
-									Student Desk
+									<name class="selected-name">Student Desk</name>
 									<small>Settings</small>
 								</h4>
 								{{-- <a href="#" id="type-range" data-type="range" data-inputclass="form-control" data-pk="1" data-title="Range">Size</a> --}}
@@ -159,17 +159,17 @@
 										<tr>
 											<td>Size</td>
 											<td>
-												<input class="form-control" type="range" max="4" min="0" name="range">
+												<input id="selected-size" class="form-control" type="range" max="3" min="1" name="range">
 											</td>
 										</tr>
 										<tr>
 											<td>Rotation</td>
 											<td>
-												<button class="btn btn-default btn-sm" type="button" style="padding: 3px 6px;">
+												<button id="selected-rotation-left" class="btn btn-default btn-sm" type="button" style="padding: 3px 6px;">
 													<i class="icon-reply position-left"></i>
 													Left 90˚
 												</button>
-												<button class="btn btn-default btn-sm" type="button" style="padding: 3px 6px; margin-top: 10px;">
+												<button id="selected-rotation-right" class="btn btn-default btn-sm" type="button" style="padding: 3px 6px; margin-top: 10px;">
 													<i class="icon-forward position-left"></i>
 													Right 90˚
 												</button>
@@ -177,7 +177,7 @@
 										</tr>
 										<tr>
 											<td>Location</td>
-											<td>
+											<td id="selected-position">
 												<strong>X:</strong> 1<br />
 												<strong>Y:</strong> 6
 											</td>
@@ -185,7 +185,7 @@
 										<tr>
 											<td>Action</td>
 											<td>
-												<button class="btn btn-danger btn-sm" type="button" style="padding: 3px 6px;">
+												<button id="selected-delete" class="btn btn-danger btn-sm" type="button" style="padding: 3px 6px;">
 													Delete
 													<i class="icon-diff-removed position-right"></i>
 												</button>
@@ -343,7 +343,7 @@
 
 			<!-- Footer -->
 			<div class="footer text-muted">
-				&copy; 2015. SeatingPlanner by Toby Mellor
+				&copy; 2015 SeatingPlanner by Toby Mellor
 			</div>
 			<!-- /footer -->
 		</div>
@@ -355,16 +355,106 @@
 @section('scripts')
 
 	<script>
+		$(document).ready(function() {
+			$('.drag-item').click(function() {
+				updateSelected($(this));
+			});
+			$('#selected-size').on('click', function() {
+				console.log('yo');
+				var value = $('#selected-size').val();
+				var width;
+				var height;
+
+				if(value == 1) {
+					width = 32;
+					height = 32;
+				} else if(value == 2) {
+					width = 64;
+					height = 64;
+				} else {
+					width = 128;
+					height = 128;
+				}
+
+				console.log($('#selected-id').html());
+
+			    $('div[object-id="' + $('#selected-id').html() + '"]')
+			    	.css('width', width)
+			    	.css('height', height)
+			    	.css('background-size', width);
+			});
+		});
+
+  		var token = '{{ csrf_token() }}';
+    	var objects = {
+    		'1': {
+    			'name': 'Teacher Desk',
+    			'width': 64,
+    			'height': 32,
+    			'image': 'http://seatingplanner.dev/assets/images/objects/teacher-desk-1.png'
+	    	},
+    		'2': {
+    			'name': 'Student Desk',
+    			'width': 64,
+    			'height': 64,
+    			'image': 'http://seatingplanner.dev/assets/images/objects/desk-1.png'
+	    	}
+	    }
+
+	    var objectLocations;
+
 	    $(".drag-item").draggable({
 	        grid: [32, 32],
 	        containment: '.drop-target',
 	        drag: function(){
-	            var position = $(this).position();
-	            var xPos = position.left;
-	            var yPos = position.top;
-	            console.log('x: ' + xPos / 32 + ' | y: ' + yPos / 32);
+	        	//TODO: Only update if position has changed
+	            updateSelected($(this));
 	        }
 	    });
+
+	    function saveObjects(){}
+
+	    function updateSelected(object) {
+	    	var objectId = object.attr('object-id');
+
+	    	var objectHeight = object.height();
+	    	var objectWidth = object.width();
+	    	var value;
+
+            var position = object.position();
+            var xPos = position.left / 32;
+            var yPos = position.top / 32;
+
+	    	if(objectHeight == objectWidth) {
+	    		if(objectHeight == 32) {
+	    			value = 1;
+	    		} else if(objectHeight == 64) {
+	    			value = 2;
+	    		} else {
+	    			value = 3;
+	    		}
+	    	}
+
+	    	console.log(value);
+
+	    	$('#selected-size').val(value);
+
+            $('#selected-position').html('\
+            	<td>\
+					<strong>X:</strong> ' + xPos + '<br>\
+					<strong>Y:</strong> ' + yPos + '\
+				</td>\
+			');
+
+			$('#selected-image').attr('src', object.css('background-image').replace('url("','').replace('")',''));
+
+			$('.selected-name').text(objects[objectId]['name']);
+
+			console.log('changing selected id to' + objectId);
+			$('#selected-id').text(objectId);
+	    }
+
+	    function deleteSelected(){}
 	</script>
 
 @stop

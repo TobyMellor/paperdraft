@@ -266,7 +266,7 @@
 
 			<!-- Footer -->
 			<div class="footer text-muted">
-				&copy; 2015. SeatingPlanner by Toby Mellor
+				&copy; 2015 SeatingPlanner by Toby Mellor
 			</div>
 			<!-- /footer -->
 		</div>
