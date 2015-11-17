@@ -71,10 +71,6 @@
 								}
 								.drag-item, .outside-drag-item {
 								    position: absolute;
-								    background-image: url('assets/images/objects/teacher-desk-1.png');
-								    background-size: 64px;
-								    width: 64px ;
-								    height: 64px;
 								    cursor: move;
 								}
 								.drop-target {
@@ -90,8 +86,6 @@
 							</style>
 						<div class="panel-body" style="height:960px; overflow-x: scroll;">
 							<div class="drop-target">
-							    <div class="drag-item" object-id="1"></div>
-							    <div class="drag-item" object-id="2"></div>
 							</div>
 						</div>
 					</div>
@@ -356,11 +350,15 @@
 
 	<script>
 		$(document).ready(function() {
-			$('.drag-item').click(function() {
+			$('.drop-target').on('click', '.drag-item', function(){
 				updateSelected($(this));
 			});
-			$('#selected-size').on('click', function() {
-				console.log('yo');
+
+			$('#selected-delete').click(function() {
+				deleteSelected($('#selected-id').html());
+			})
+
+			$('#selected-size').on('change', function() {
 				var value = $('#selected-size').val();
 				var width;
 				var height;
@@ -376,9 +374,7 @@
 					height = 128;
 				}
 
-				console.log($('#selected-id').html());
-
-			    $('div[object-id="' + $('#selected-id').html() + '"]')
+			    $('div[active-object-id="' + $('#selected-id').html() + '"]')
 			    	.css('width', width)
 			    	.css('height', height)
 			    	.css('background-size', width);
@@ -386,75 +382,118 @@
 		});
 
   		var token = '{{ csrf_token() }}';
-    	var objects = {
-    		'1': {
-    			'name': 'Teacher Desk',
-    			'width': 64,
-    			'height': 32,
-    			'image': 'http://seatingplanner.dev/assets/images/objects/teacher-desk-1.png'
-	    	},
-    		'2': {
-    			'name': 'Student Desk',
-    			'width': 64,
-    			'height': 64,
-    			'image': 'http://seatingplanner.dev/assets/images/objects/desk-1.png'
-	    	}
+	    var objects = [];
+    	var activeObjects = []
+
+	    loadObjects();
+
+	    function loadObjects() {
+	    	$.ajax({
+                url: '/object',
+                type: 'GET',
+                data: {
+                    _token: token
+                }
+            }).done(function(data) {
+            	for (var dataObjects in data) {
+			        if (data.hasOwnProperty(dataObjects)) {
+			            var object = data[dataObjects];
+
+			            objects[object['id']] = {
+			            	'object_name': object['object_name'],
+			            	'object_height': object['object_height'],
+			            	'object_width': object['object_width'],
+			            	'object_location': object['object_location']
+			            };
+			        }
+			    }
+            	loadActiveObjects();
+            });
 	    }
 
-	    var objectLocations;
+	    function loadActiveObjects() {
+            $.ajax({
+                url: '/class-object',
+                type: 'GET',
+                data: {
+                    _token: token
+                }
+            }).done(function(data) {
+		    	for (var activeObject in data) {
+			        if (data.hasOwnProperty(activeObject)) {
+			            var activeObject = data[activeObject];
+			            var objectId = activeObject['object_id'];
+			            var objectPositionX = activeObject['object_position_x'] * 32;
+			            var objectPositionY = activeObject['object_position_y'] * 32;
+			            var objectLocation = objects[objectId]['object_location'];
+			            var objectWidth = objects[objectId]['object_width'];
+			            var objectHeight = objects[objectId]['object_height'];
 
-	    $(".drag-item").draggable({
-	        grid: [32, 32],
-	        containment: '.drop-target',
-	        drag: function(){
-	        	//TODO: Only update if position has changed
-	            updateSelected($(this));
-	        }
-	    });
+			            $('.drop-target').append('\
+			            	<div class="drag-item" active-object-id="' + objectId + '" style="left: ' + objectPositionX + 'px; top: ' + objectPositionY + 'px; background-image: url(\'/assets/images/objects/' + objectLocation + '\'); background-size: ' + objectWidth + 'px; height: ' + objectHeight + 'px; width: ' + objectWidth + 'px;"></div>\
+			            ');
 
-	    function saveObjects(){}
+			            activeObjects[objectId] = {
+			            	'object_position_x': objectPositionX,
+			            	'object_position_y': objectPositionY
+			            };
+			        }
+			    }
 
-	    function updateSelected(object) {
-	    	var objectId = object.attr('object-id');
+			    $(".drag-item").draggable({
+			        grid: [32, 32],
+			        containment: '.drop-target',
+			        drag: function(){
+			        	//TODO: Only update if position has changed
+			            updateSelected($(this));
+			        }
+			    });
+            });
+	    }
 
-	    	var objectHeight = object.height();
-	    	var objectWidth = object.width();
+	    function createActiveObject(){}
+
+	    //TODO: Save to database on window close
+	    function saveActiveObjects(){}
+
+	    function updateSelected(activeObject) {
+	    	var activeObjectId = activeObject.attr('active-object-id');
+
+	    	var activeObjectHeight = activeObject.height();
+	    	var activeObjectWidth = activeObject.width();
 	    	var value;
 
-            var position = object.position();
+            var position = activeObject.position();
             var xPos = position.left / 32;
             var yPos = position.top / 32;
 
-	    	if(objectHeight == objectWidth) {
-	    		if(objectHeight == 32) {
+	    	if(activeObjectHeight == activeObjectWidth) {
+	    		if(activeObjectHeight == 32) {
 	    			value = 1;
-	    		} else if(objectHeight == 64) {
+	    		} else if(activeObjectHeight == 64) {
 	    			value = 2;
 	    		} else {
 	    			value = 3;
 	    		}
 	    	}
 
-	    	console.log(value);
-
 	    	$('#selected-size').val(value);
-
             $('#selected-position').html('\
             	<td>\
 					<strong>X:</strong> ' + xPos + '<br>\
 					<strong>Y:</strong> ' + yPos + '\
 				</td>\
 			');
-
-			$('#selected-image').attr('src', object.css('background-image').replace('url("','').replace('")',''));
-
-			$('.selected-name').text(objects[objectId]['name']);
-
-			console.log('changing selected id to' + objectId);
-			$('#selected-id').text(objectId);
+			$('#selected-image').attr('src', '/assets/images/objects/' + objects[activeObjectId]['object_location']);
+			$('.selected-name').text(objects[activeObjectId]['object_name']);
+			$('#selected-id').text(activeObjectId);
 	    }
 
-	    function deleteSelected(){}
+	    function deleteSelected(activeObjectId) {
+	    	$('div[active-object-id="' + activeObjectId + '"]').fadeOut();
+	    	delete activeObjects[activeObjectId];
+	    	//TODO: Delete from database
+	    }
 	</script>
 
 @stop

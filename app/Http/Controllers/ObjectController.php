@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Object;
+use App\ClassObject;
 
 use Auth;
 use Validator;
@@ -30,6 +31,21 @@ class ObjectController extends Controller
             $objects = Object::all();
         }
         return $objects;
+    }
+
+    /**
+     * Get all class objects
+     *
+     * @return \Illuminate\Http\Redirect
+     */
+    public function getClassObjects($paginate = null)
+    {
+        if($paginate != null) {
+            $classObjects = ClassObject::paginate();
+        } else {
+            $classObjects = ClassObject::all();
+        }
+        return $classObjects;
     }
 
     protected function validator(array $data)
