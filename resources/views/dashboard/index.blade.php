@@ -52,7 +52,7 @@
 								</ul>
 								<ul class="icons-list" style="margin-top: 11px;">
 									<li>
-										<a data-action="reload"></a>
+										<i class="glyphicon glyphicon-floppy-save" id="save-button"></i>
 									</li>
 								</ul>
 							</div>
@@ -84,7 +84,7 @@
 								    
 								}
 							</style>
-						<div class="panel-body" style="height:960px; overflow-x: scroll;">
+						<div class="panel-body" style="height: 736px; overflow-x: scroll;">
 							<div class="drop-target">
 							</div>
 						</div>
@@ -356,7 +356,11 @@
 
 			$('#selected-delete').click(function() {
 				deleteSelected($('#selected-id').html());
-			})
+			});
+
+			$('#save-button').click(function() {
+				saveActiveObjects();
+			});
 
 			$('#selected-size').on('change', function() {
 				var value = $('#selected-size').val();
@@ -434,8 +438,8 @@
 			            ');
 
 			            activeObjects[objectId] = {
-			            	'object_position_x': objectPositionX,
-			            	'object_position_y': objectPositionY
+			            	'object_position_x': objectPositionX / 32,
+			            	'object_position_y': objectPositionY / 32
 			            };
 			        }
 			    }
@@ -454,7 +458,28 @@
 	    function createActiveObject(){}
 
 	    //TODO: Save to database on window close
-	    function saveActiveObjects(){}
+	    //TODO: What happens if you save multiple times in one session?
+	    function saveActiveObjects()
+	    {
+			for (var i = 0; i < activeObjects.length; i++) {
+				if (activeObjects[i] != null) {
+					 activeObjects[i]['object_id'] = i;
+				}
+			}
+
+			activeObjects = activeObjects.filter(function(n){ return n != undefined }); 
+
+	    	$.ajax({
+                url: '/object',
+                type: 'POST',
+                data: {
+                    _token: token,
+                    objects: activeObjects
+                }
+            }).done(function(data) {
+            	console.log(data);
+            });
+	    }
 
 	    function updateSelected(activeObject) {
 	    	var activeObjectId = activeObject.attr('active-object-id');
@@ -464,8 +489,13 @@
 	    	var value;
 
             var position = activeObject.position();
-            var xPos = position.left / 32;
-            var yPos = position.top / 32;
+            var objectPositionX = position.left / 32;
+            var objectPositionY = position.top / 32;
+
+            activeObjects[activeObjectId] = {
+            	'object_position_x': objectPositionX,
+            	'object_position_y': objectPositionY
+            };
 
 	    	if(activeObjectHeight == activeObjectWidth) {
 	    		if(activeObjectHeight == 32) {
@@ -480,8 +510,8 @@
 	    	$('#selected-size').val(value);
             $('#selected-position').html('\
             	<td>\
-					<strong>X:</strong> ' + xPos + '<br>\
-					<strong>Y:</strong> ' + yPos + '\
+					<strong>X:</strong> ' + objectPositionX + '<br>\
+					<strong>Y:</strong> ' + objectPositionY + '\
 				</td>\
 			');
 			$('#selected-image').attr('src', '/assets/images/objects/' + objects[activeObjectId]['object_location']);

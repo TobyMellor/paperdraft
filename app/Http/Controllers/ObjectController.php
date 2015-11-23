@@ -19,6 +19,25 @@ class ObjectController extends Controller
     }
 
     /**
+     * Store the objects in the database.
+     *
+     * @return \Illuminate\Http\Redirect
+     */
+    public function storeObjects()
+    {
+        $request = $this->request;
+
+        $objects = $request->input('objects');
+
+        foreach($objects as $object) {
+            ClassObject::where('id', $object['object_id'])->update([
+                'object_position_y' => $object['object_position_y'],
+                'object_position_x' => $object['object_position_x']
+            ]);
+        }
+    }
+
+    /**
      * Get all objects
      *
      * @return \Illuminate\Http\Redirect
