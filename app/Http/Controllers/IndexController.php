@@ -16,14 +16,18 @@ class IndexController extends Controller
      */
     public function getDashboard(
         ClassController $classController,
-        StudentController $studentController
+        StudentController $studentController,
+        ObjectController $objectController
     )
     {
         $classes = $classController->getClasses();
         $classStudents = $studentController->getClassStudents($classes->first()->id, 9);
+        $objects = $objectController->getObjects(9);
+
         return view('dashboard.index')
             ->with('classStudents', $classStudents)
-            ->with('classes', $classes);
+            ->with('classes', $classes)
+            ->with('objects', $objects);
     }
 
     /**

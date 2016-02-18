@@ -27,14 +27,31 @@ class ObjectController extends Controller
     {
         $request = $this->request;
         $objects = $request->input('objects');
+        $classId = $request->input('class_id');
 
-        foreach ($objects as $object) {
-            echo 'Storing: ' . $object['object_id'] . ' -- Y: ' . $object['object_position_y'] . ' -- X: ' . $object['object_position_x'] . '<br />';
-            ClassObject::where('id', $object['object_id'])->update([
-                'object_position_y' => $object['object_position_y'],
-                'object_position_x' => $object['object_position_x']
-            ]);
+        foreach ($objects as $key => $object) {
+            if ($object['active_object_id'] != null) {
+                ClassObject::where('id', $object['active_object_id'])
+                    ->where('class_id', $classId)
+                    ->update([
+                        'object_position_y' => $object['object_position_y'],
+                        'object_position_x' => $object['object_position_x']
+                    ]
+                );
+            } else {
+                $classObject = new ClassObject;
+
+                $classObject->object_id = $object['object_id'];
+                $classObject->class_id = $classId;
+                $classObject->object_position_x = $object['object_position_x'];
+                $classObject->object_position_y = $object['object_position_y'];
+
+                $classObject->save();
+
+                $objects[$key]['active_object_id'] = $classObject->id;
+            }
         }
+        return $objects;
     }
 
     /**

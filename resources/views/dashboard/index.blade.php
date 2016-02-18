@@ -156,6 +156,7 @@
 												<input id="selected-size" class="form-control" type="range" max="3" min="1" name="range">
 											</td>
 										</tr>
+										<!--
 										<tr>
 											<td>Rotation</td>
 											<td>
@@ -169,6 +170,7 @@
 												</button>
 											</td>
 										</tr>
+										-->
 										<tr>
 											<td>Location</td>
 											<td id="selected-position">
@@ -256,78 +258,26 @@
 						<a class="heading-elements-toggle"><i class="icon-menu"></i></a></div>
 						
 						<div class="panel-body">
-							<!-- object -->
-							<div class="col-lg-4 col-sm-6">
-								<div class="thumbnail">
-									<div class="thumb">
-										<img class="no-antialias" alt="" src="assets/images/objects/desk-1.png">
-										<div class="caption-overflow">
-											<span>
-												<a class="btn border-white text-white btn-flat btn-icon btn-rounded" data-popup="lightbox" href="assets/images/demo/flat/1.png"><i class="icon-plus3"></i></a>
-											</span>
+							@if(isset($objects))
+								@foreach($objects as $object)
+									<div class="col-lg-4 col-sm-6">
+										<div class="thumbnail">
+											<div class="thumb">
+												<img class="no-antialias" src="assets/images/objects/{{ $object->object_location }}">
+												<div class="caption-overflow">
+													<span>
+														<a class="btn border-white text-white btn-flat btn-icon btn-rounded create-active-object" href="javascript:;" object-id={{ $object->id }}><i class="icon-plus3"></i></a>
+													</span>
+												</div>
+											</div>
+
+											<div class="caption" style="padding-top: 5px; padding-bottom: 5px; padding-left: 5px;">
+												<h6 class="no-margin"><a href="#" class="text-default" style="font-size: 10px;">{{ $object->object_name }}</a></h6>
+											</div>
 										</div>
 									</div>
-
-									<div class="caption" style="padding-top: 5px; padding-bottom: 5px; padding-left: 5px;">
-										<h6 class="no-margin"><a href="#" class="text-default" style="font-size: 10px;">Student Desk</a></h6>
-									</div>
-								</div>
-							</div>
-							<!-- /object -->
-							<!-- object -->
-							<div class="col-lg-4 col-sm-6">
-								<div class="thumbnail">
-									<div class="thumb">
-										<img class="no-antialias" alt="" src="assets/images/objects/sofa-1.png">
-										<div class="caption-overflow">
-											<span>
-												<a class="btn border-white text-white btn-flat btn-icon btn-rounded" data-popup="lightbox" href="assets/images/demo/flat/1.png"><i class="icon-plus3"></i></a>
-											</span>
-										</div>
-									</div>
-
-									<div class="caption" style="padding-top: 5px; padding-bottom: 5px; padding-left: 5px;">
-										<h6 class="no-margin"><a href="#" class="text-default" style="font-size: 10px;">Sofa</a></h6>
-									</div>
-								</div>
-							</div>
-							<!-- /object -->
-							<!-- object -->
-							<div class="col-lg-4 col-sm-6">
-								<div class="thumbnail">
-									<div class="thumb">
-										<img class="no-antialias" alt="" src="assets/images/objects/chair-1.png">
-										<div class="caption-overflow">
-											<span>
-												<a class="btn border-white text-white btn-flat btn-icon btn-rounded" data-popup="lightbox" href="assets/images/demo/flat/1.png"><i class="icon-plus3"></i></a>
-											</span>
-										</div>
-									</div>
-
-									<div class="caption" style="padding-top: 5px; padding-bottom: 5px; padding-left: 5px;">
-										<h6 class="no-margin"><a href="#" class="text-default" style="font-size: 10px;">Chair</a></h6>
-									</div>
-								</div>
-							</div>
-							<!-- /object -->
-							<!-- object -->
-							<div class="col-lg-4 col-sm-6">
-								<div class="thumbnail">
-									<div class="thumb">
-										<img class="no-antialias" alt="" src="assets/images/objects/teacher-desk-1.png">
-										<div class="caption-overflow">
-											<span>
-												<a class="btn border-white text-white btn-flat btn-icon btn-rounded" data-popup="lightbox" href="assets/images/demo/flat/1.png"><i class="icon-plus3"></i></a>
-											</span>
-										</div>
-									</div>
-
-									<div class="caption" style="padding-top: 5px; padding-bottom: 5px; padding-left: 5px;">
-										<h6 class="no-margin"><a href="#" class="text-default" style="font-size: 10px;">Teacher Desk</a></h6>
-									</div>
-								</div>
-							</div>
-							<!-- /object -->
+								@endforeach
+							@endif
 						</div>
 					</div>
 				</div>
@@ -337,7 +287,7 @@
 
 			<!-- Footer -->
 			<div class="footer text-muted">
-				&copy; 2015 SeatingPlanner by Toby Mellor
+				&copy; 2016 SeatingPlanner by Toby Mellor
 			</div>
 			<!-- /footer -->
 		</div>
@@ -362,6 +312,7 @@
 				saveActiveObjects();
 			});
 
+			//TODO: Implement size saving
 			$('#selected-size').on('change', function() {
 				var value = $('#selected-size').val();
 				var width;
@@ -383,13 +334,41 @@
 			    	.css('height', height)
 			    	.css('background-size', width);
 			});
+
+			$('.create-active-object').click(function() {
+				var objectId = parseInt($(this).attr('object-id'));
+
+				createActiveObject(objectId, 0, 0);
+			});
 		});
 
   		var token = '{{ csrf_token() }}';
 	    var objects = [];
     	var activeObjects = []
 
+    	//TODO: Allow for multiple classes
+    	var classId = 1;
+
 	    loadObjects();
+
+	    function createActiveObject(objectId, objectPositionX, objectPositionY) {
+	    	activeObjects[activeObjects.length] = {
+            	'object_id': objectId,
+            	'active_object_id': null,
+            	'object_position_x': objectPositionX,
+            	'object_position_y': objectPositionY
+	    	}
+
+	    	var object = objects[activeObjects[activeObjects.length - 1]['object_id']];
+	    	var objectLocation = object['object_location'];
+	    	var objectWidth = object['object_width'];
+	    	var objectHeight = object['object_height'];
+			            
+            $('.drop-target').append('\
+            	<div class="drag-item" active-object-id="' + (activeObjects.length - 1) + '" style="left: ' + objectPositionX + 'px; top: ' + objectPositionY + 'px; background-image: url(\'/assets/images/objects/' + objectLocation + '\'); background-size: ' + objectWidth + 'px; height: ' + objectHeight + 'px; width: ' + objectWidth + 'px;"></div>\
+            ');
+			initializeDraggable();
+	    }
 
 	    function loadObjects() {
 	    	$.ajax({
@@ -427,68 +406,64 @@
 			        if (data.hasOwnProperty(activeObject)) {
 			            var activeObject = data[activeObject];
 			            var objectId = activeObject['object_id'];
+			            var activeObjectId = activeObject['id']
 			            var objectPositionX = activeObject['object_position_x'] * 32;
 			            var objectPositionY = activeObject['object_position_y'] * 32;
 			            var objectLocation = objects[objectId]['object_location'];
 			            var objectWidth = objects[objectId]['object_width'];
 			            var objectHeight = objects[objectId]['object_height'];
 
-			            $('.drop-target').append('\
-			            	<div class="drag-item" active-object-id="' + objectId + '" style="left: ' + objectPositionX + 'px; top: ' + objectPositionY + 'px; background-image: url(\'/assets/images/objects/' + objectLocation + '\'); background-size: ' + objectWidth + 'px; height: ' + objectHeight + 'px; width: ' + objectWidth + 'px;"></div>\
-			            ');
-
-			            activeObjects[objectId] = {
+			            activeObjects[activeObjects.length] = {
+			            	'object_id': objectId,
+			            	'active_object_id': activeObjectId,
 			            	'object_position_x': objectPositionX / 32,
 			            	'object_position_y': objectPositionY / 32
 			            };
+
+			            $('.drop-target').append('\
+			            	<div class="drag-item" active-object-id="' + (activeObjects.length - 1) + '" style="left: ' + objectPositionX + 'px; top: ' + objectPositionY + 'px; background-image: url(\'/assets/images/objects/' + objectLocation + '\'); background-size: ' + objectWidth + 'px; height: ' + objectHeight + 'px; width: ' + objectWidth + 'px;"></div>\
+			            ');
 			        }
 			    }
-
-			    $(".drag-item").draggable({
-			        grid: [32, 32],
-			        containment: '.drop-target',
-			        drag: function(){
-			        	var activeObjectId = $(this).attr('active-object-id');
-			        	var objectPositionX = $(this).position().left / 32;
-			        	var objectPositionY = $(this).position().top / 32;
-
-			        	//TODO: ID on class_objects NOT object_id on class_objects
-			        	//TODO: Disallow moving objects into positions with other objects within them
-			        	//TODO: Connect objects that are next to eachother
-
-			        	if(objectPositionX != activeObjects[activeObjectId]['object_position_x']
-			        			|| objectPositionY != activeObjects[activeObjectId]['object_position_y']) {
-							updateSelected($(this));
-			        	}
-			        }
-			    });
+			    initializeDraggable();
             });
 	    }
 
-	    function createActiveObject(){}
+	    function initializeDraggable()
+	    {
+	    	$(".drag-item").draggable({
+		        grid: [32, 32],
+		        containment: '.drop-target',
+		        drag: function(){
+		        	var activeObjectId = $(this).attr('active-object-id');
+		        	var objectPositionX = $(this).position().left / 32;
+		        	var objectPositionY = $(this).position().top / 32;
+
+		        	//TODO: Disallow moving objects into positions with other objects within them
+		        	//TODO: Connect objects that are next to eachother
+
+		        	if(objectPositionX != activeObjects[activeObjectId]['object_position_x']
+		        			|| objectPositionY != activeObjects[activeObjectId]['object_position_y']) {
+						updateSelected($(this));
+		        	}
+		        }
+		    });
+	    }
 
 	    //TODO: Save to database on window close
 	    //TODO: What happens if you save multiple times in one session?
 	    function saveActiveObjects()
 	    {
-	    	//Concatenates objects in array
-			for (var i = 0; i < activeObjects.length; i++) {
-				if (activeObjects[i] != null) {
-					 activeObjects[i]['object_id'] = i;
-				}
-			}
-
-			activeObjectsConcatenated = activeObjects.filter(function(n){ return n != undefined });
-
 	    	$.ajax({
                 url: '/object',
                 type: 'POST',
                 data: {
                     _token: token,
-                    objects: activeObjectsConcatenated
+                    objects: activeObjects,
+                    class_id: classId
                 }
-            }).done(function(data) {
-            	console.log(data);
+            }).done(function(returnedActiveObjects) {
+            	activeObjects = returnedActiveObjects;
             });
 	    }
 
@@ -503,11 +478,10 @@
             var objectPositionX = position.left / 32;
             var objectPositionY = position.top / 32;
 
-            activeObjects[activeObjectId] = {
-            	'object_position_x': objectPositionX,
-            	'object_position_y': objectPositionY
-            };
+            activeObjects[activeObjectId]['object_position_x'] = objectPositionX;
+            activeObjects[activeObjectId]['object_position_y'] = objectPositionY;
 
+            //TODO: There's definately a better way of doing this.
 	    	if(activeObjectHeight == activeObjectWidth) {
 	    		if(activeObjectHeight == 32) {
 	    			value = 1;
@@ -525,8 +499,8 @@
 					<strong>Y:</strong> ' + objectPositionY + '\
 				</td>\
 			');
-			$('#selected-image').attr('src', '/assets/images/objects/' + objects[activeObjectId]['object_location']);
-			$('.selected-name').text(objects[activeObjectId]['object_name']);
+			$('#selected-image').attr('src', '/assets/images/objects/' + objects[activeObjects[activeObjectId]['object_id']]['object_location']);
+			$('.selected-name').text(objects[activeObjects[activeObjectId]['object_id']]['object_name']);
 			$('#selected-id').text(activeObjectId);
 	    }
 
