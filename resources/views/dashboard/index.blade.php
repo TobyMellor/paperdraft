@@ -52,7 +52,7 @@
 								</ul>
 								<ul class="icons-list" style="margin-top: 11px;">
 									<li>
-										<i class="glyphicon glyphicon-floppy-save" id="save-button"></i>
+										<i class="glyphicon glyphicon-floppy-save" id="save-button" style="cursor: pointer;"></i>
 									</li>
 								</ul>
 							</div>
@@ -448,8 +448,18 @@
 			        grid: [32, 32],
 			        containment: '.drop-target',
 			        drag: function(){
-			        	//TODO: Only update if position has changed
-			            updateSelected($(this));
+			        	var activeObjectId = $(this).attr('active-object-id');
+			        	var objectPositionX = $(this).position().left / 32;
+			        	var objectPositionY = $(this).position().top / 32;
+
+			        	//TODO: ID on class_objects NOT object_id on class_objects
+			        	//TODO: Disallow moving objects into positions with other objects within them
+			        	//TODO: Connect objects that are next to eachother
+
+			        	if(objectPositionX != activeObjects[activeObjectId]['object_position_x']
+			        			|| objectPositionY != activeObjects[activeObjectId]['object_position_y']) {
+							updateSelected($(this));
+			        	}
 			        }
 			    });
             });
@@ -461,20 +471,21 @@
 	    //TODO: What happens if you save multiple times in one session?
 	    function saveActiveObjects()
 	    {
+	    	//Concatenates objects in array
 			for (var i = 0; i < activeObjects.length; i++) {
 				if (activeObjects[i] != null) {
 					 activeObjects[i]['object_id'] = i;
 				}
 			}
 
-			activeObjects = activeObjects.filter(function(n){ return n != undefined }); 
+			activeObjectsConcatenated = activeObjects.filter(function(n){ return n != undefined });
 
 	    	$.ajax({
                 url: '/object',
                 type: 'POST',
                 data: {
                     _token: token,
-                    objects: activeObjects
+                    objects: activeObjectsConcatenated
                 }
             }).done(function(data) {
             	console.log(data);

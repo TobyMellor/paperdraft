@@ -26,10 +26,10 @@ class ObjectController extends Controller
     public function storeObjects()
     {
         $request = $this->request;
-
         $objects = $request->input('objects');
 
-        foreach($objects as $object) {
+        foreach ($objects as $object) {
+            echo 'Storing: ' . $object['object_id'] . ' -- Y: ' . $object['object_position_y'] . ' -- X: ' . $object['object_position_x'] . '<br />';
             ClassObject::where('id', $object['object_id'])->update([
                 'object_position_y' => $object['object_position_y'],
                 'object_position_x' => $object['object_position_x']
@@ -44,7 +44,7 @@ class ObjectController extends Controller
      */
     public function getObjects($paginate = null)
     {
-        if($paginate != null) {
+        if ($paginate != null) {
             $objects = Object::paginate();
         } else {
             $objects = Object::all();
@@ -59,7 +59,7 @@ class ObjectController extends Controller
      */
     public function getClassObjects($paginate = null)
     {
-        if($paginate != null) {
+        if ($paginate != null) {
             $classObjects = ClassObject::paginate();
         } else {
             $classObjects = ClassObject::all();
