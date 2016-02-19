@@ -33,8 +33,6 @@
 			</div>
 		</div>
 		<!-- /page header -->
-
-
 		<!-- Content area -->
 		<div class="content">
 			<div class="row row-sortable">
@@ -153,13 +151,13 @@
 							@endif
 						</ul>
 					</div>
+					<div id="selected-id" style="display: none;"></div>
 					<div class="panel panel-white">
-						<div id="selected-id" style="display: none;"></div>
 						<div class="panel-heading">
 							<h6 class="panel-title">
 								Selected Object
 								<span class="text-muted">
-									<small class="selected-name">Student Desk</small>
+									<small class="selected-name">Loading...</small>
 								</span>
 							</h6>
 							<div class="heading-elements">
@@ -179,7 +177,7 @@
 							<a class="heading-elements-toggle"><i class="icon-menu"></i></a>
 						</div>
 						
-						<div class="panel-body">
+						<div class="panel-body" style="display: none;">
 							<div class="col-lg-3 col-sm-6">
 								<div class="thumbnail" style="margin-top: 5px;">
 									<div class="thumb">
@@ -225,6 +223,9 @@
 									</tbody>
 								</table>
 							</div>
+						</div>
+						<div class="panel-body" style="display: none;" id="selected-no-objects">
+							There is no objects on the canvas. Start by clicking on an object in the objects panel below.
 						</div>
 					</div>
 					<!-- /editable inputs -->
@@ -273,7 +274,6 @@
 				</div>
 			</div>
 			<!-- /dashboard content -->
-
 
 			<!-- Footer -->
 			<div class="footer text-muted">
@@ -354,6 +354,8 @@
 
     	var classId = parseInt($('.class-button:first').attr('class-id'));
 
+    	var hasObjects = false;
+
 	    loadObjects();
 
 	    function createActiveObject(objectId, objectPositionX, objectPositionY)
@@ -374,6 +376,7 @@
             	<div class="drag-item" active-object-id="' + (activeObjects.length - 1) + '" style="left: ' + objectPositionX + 'px; top: ' + objectPositionY + 'px; background-image: url(\'/assets/images/objects/' + objectLocation + '\'); background-size: ' + objectWidth + 'px; height: ' + objectHeight + 'px; width: ' + objectWidth + 'px;"></div>\
             ');
 			initializeDraggable();
+			updateSelected($('div[active-object-id="' + (activeObjects.length - 1) + '"]'))
 	    }
 
 	    function loadObjects()
@@ -436,6 +439,14 @@
 			    }
 			    $('.drop-target').children().fadeIn();
 			    initializeDraggable();
+
+			    if (typeof activeObjects[0] !== "undefined") {
+			    	updateSelected($('div[active-object-id="0"]'));
+			    } else {
+			    	hasObjects = false;
+			    	$('#selected-no-objects').parent().children().fadeOut();
+			    	$('#selected-no-objects').fadeIn();
+			    }
             });
 	    }
 
@@ -461,7 +472,6 @@
 	    }
 
 	    //TODO: Save to database on window close
-	    //TODO: What happens if you save multiple times in one session?
 	    function saveActiveObjects()
 	    {
 	    	$.ajax({
@@ -479,6 +489,11 @@
 
 	    function updateSelected(activeObject)
 	    {
+	    	if(!hasObjects) {
+	    		hasObjects = true;
+		    	$('#selected-no-objects').parent().children().fadeIn();
+		    	$('#selected-no-objects').hide();
+	    	}
 	    	//TODO: Set a default for the selected panel
 	    	var activeObjectId = activeObject.attr('active-object-id');
 
