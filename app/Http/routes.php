@@ -24,7 +24,8 @@ Route::get('/logout', 'UserController@getLogout');
  */
 Route::post('/student', 'StudentController@storeStudent');
 
-Route::post('/object', 'ObjectController@storeObjects');
-// Route::post('/class-object', 'ObjectController@storeClassObject');
 Route::get('/object', 'ObjectController@getObjects');
+
+Route::post('/class-object', 'ObjectController@storeClassObjects');
 Route::get('/class-object', 'ObjectController@getClassObjects');
+Route::delete('/class-object', 'ObjectController@deleteClassObject');

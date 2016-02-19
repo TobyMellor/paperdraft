@@ -96,17 +96,59 @@
 				</div>
 				<div class="col-md-4">
 					<div class="tabbable">
-						<ul class="nav nav-pills nav-stacked">
+						<style>
+							.nav-pills-bordered > li > a {
+							    background-color: #fff;
+							}
+							.nav-pills > li > .btn-group {
+							    position: absolute;
+							    right: 0;
+							    top: 0;
+							}
+							.nav-pills > li > .btn-group > .btn {
+							    padding: 10px 15px;
+							    border-radius: 0 3px 3px 0;
+							}
+							.class-button {
+								background-color: #fcfcfc !important;
+							    border-color: #ddd !important;
+							    color: #333 !important;
+							}
+							.class-button-active {
+								background-color: #2196f3 !important;
+								border-radius: 5px !important;
+								border: 1px solid #2196f3 !important;
+								color: #fff !important;
+							}
+							.class-options {
+								background-color: #fcfcfc !important;
+							    border-color: #ddd !important;
+							    color: #333 !important;
+								padding: 9px 10px 9px 15px !important;
+							}
+							.class-options-active {
+								padding: 9px 10px 9px 15px !important;
+								background-color: #0e7ed5 !important;
+							}
+						</style>
+						<ul class="nav nav-pills nav-pills-bordered nav-stacked">
 							@if(isset($classes))
 						        @foreach($classes as $key => $class)
-									<li @if($key == 0) class="active" @endif style="background-color:#FFF; border:solid #DDD; border-radius: 3px; border-width: 1px; border- box-shadow: 0 1px 1px rgba(0, 0, 0, 0.05);">
-										<a>
-											<b class="dropdown-toggle" data-toggle="dropdown" style="position: absolute; float: right; right: 0px; top: 0px; background-color: #2980b9; padding: 9px 12px; border-radius: 0px 5px 5px 0px;">
-												<i class="icon-menu7"></i>
-											</b>
-											{{ $class->class_name }}
-										</a>
-									</li>
+								    <li>
+								        <a href="javascript:;" class="class-button @if($key == 0) class-button-active @endif" class-id="{{ $class->id }}">{{ $class->class_name }}</a>
+									    <div class="btn-group">
+									        <a href="javascript:;" class="btn btn-primary btn-icon dropdown-toggle @if($key == 0) class-options-active @else class-options @endif" data-toggle="dropdown" class-id="{{ $class->id }}">
+									            <i class="icon-menu7"></i>
+									            <span class="caret"></span>
+									        </a>
+									        <ul class="dropdown-menu dropdown-menu-right">
+									            <li><a href="#">Duplicate Class (soon)</a></li>
+									            <li><a href="#">Edit Class</a></li>
+									            <li class="divider"></li>
+									            <li><a href="#">Delete Class</a></li>
+									        </ul>
+									    </div> 
+								    </li>
 								@endforeach
 							@endif
 						</ul>
@@ -150,7 +192,6 @@
 									<name class="selected-name">Student Desk</name>
 									<small>Settings</small>
 								</h4>
-								{{-- <a href="#" id="type-range" data-type="range" data-inputclass="form-control" data-pk="1" data-title="Range">Size</a> --}}
 								<table class="table table-bordered table-striped">
 									<thead>
 										<tr>
@@ -165,21 +206,6 @@
 												<input id="selected-size" class="form-control" type="range" max="3" min="1" name="range">
 											</td>
 										</tr>
-										<!--
-										<tr>
-											<td>Rotation</td>
-											<td>
-												<button id="selected-rotation-left" class="btn btn-default btn-sm" type="button" style="padding: 3px 6px;">
-													<i class="icon-reply position-left"></i>
-													Left 90˚
-												</button>
-												<button id="selected-rotation-right" class="btn btn-default btn-sm" type="button" style="padding: 3px 6px; margin-top: 10px;">
-													<i class="icon-forward position-left"></i>
-													Right 90˚
-												</button>
-											</td>
-										</tr>
-										-->
 										<tr>
 											<td>Location</td>
 											<td id="selected-position">
@@ -304,18 +330,34 @@
 
 				createActiveObject(objectId, 0, 0);
 			});
+
+			$('.class-button').click(function() {
+				$('.class-button.class-button-active').removeClass('class-button-active');
+				$(this).addClass('class-button-active');
+
+				$('.class-options-active').removeClass('class-options-active').addClass('class-options');
+				$(this).parent()
+					.children().eq(1)
+					.children().eq(0)
+					.addClass('class-options-active')
+					.removeClass('class-options');
+
+				classId = parseInt($(this).attr('class-id'));
+				clearSession();
+				loadActiveObjects(classId);
+			})
 		});
 
   		var token = '{{ csrf_token() }}';
 	    var objects = [];
-    	var activeObjects = []
+    	var activeObjects = [];
 
-    	//TODO: Allow for multiple classes
-    	var classId = 1;
+    	var classId = parseInt($('.class-button:first').attr('class-id'));
 
 	    loadObjects();
 
-	    function createActiveObject(objectId, objectPositionX, objectPositionY) {
+	    function createActiveObject(objectId, objectPositionX, objectPositionY)
+	    {
 	    	activeObjects[activeObjects.length] = {
             	'object_id': objectId,
             	'active_object_id': null,
@@ -334,7 +376,8 @@
 			initializeDraggable();
 	    }
 
-	    function loadObjects() {
+	    function loadObjects()
+	    {
 	    	$.ajax({
                 url: '/object',
                 type: 'GET',
@@ -354,16 +397,18 @@
 			            };
 			        }
 			    }
-            	loadActiveObjects();
+        		loadActiveObjects(classId);
             });
 	    }
 
-	    function loadActiveObjects() {
+	    function loadActiveObjects(classId)
+	    {
             $.ajax({
                 url: '/class-object',
                 type: 'GET',
                 data: {
-                    _token: token
+                    _token: token,
+                    class_id: classId
                 }
             }).done(function(data) {
 		    	for (var activeObject in data) {
@@ -385,10 +430,11 @@
 			            };
 
 			            $('.drop-target').append('\
-			            	<div class="drag-item" active-object-id="' + (activeObjects.length - 1) + '" style="left: ' + objectPositionX + 'px; top: ' + objectPositionY + 'px; background-image: url(\'/assets/images/objects/' + objectLocation + '\'); background-size: ' + objectWidth + 'px; height: ' + objectHeight + 'px; width: ' + objectWidth + 'px;"></div>\
+			            	<div class="drag-item " active-object-id="' + (activeObjects.length - 1) + '" style="display: none; left: ' + objectPositionX + 'px; top: ' + objectPositionY + 'px; background-image: url(\'/assets/images/objects/' + objectLocation + '\'); background-size: ' + objectWidth + 'px; height: ' + objectHeight + 'px; width: ' + objectWidth + 'px;"></div>\
 			            ');
 			        }
 			    }
+			    $('.drop-target').children().fadeIn();
 			    initializeDraggable();
             });
 	    }
@@ -419,7 +465,7 @@
 	    function saveActiveObjects()
 	    {
 	    	$.ajax({
-                url: '/object',
+                url: '/class-object',
                 type: 'POST',
                 data: {
                     _token: token,
@@ -431,7 +477,8 @@
             });
 	    }
 
-	    function updateSelected(activeObject) {
+	    function updateSelected(activeObject)
+	    {
 	    	//TODO: Set a default for the selected panel
 	    	var activeObjectId = activeObject.attr('active-object-id');
 
@@ -440,8 +487,8 @@
 	    	var value;
 
             var position = activeObject.position();
-            var objectPositionX = position.left / 32;
-            var objectPositionY = position.top / 32;
+            var objectPositionX = Math.round(position.left / 32);
+            var objectPositionY = Math.round(position.top / 32);
 
             activeObjects[activeObjectId]['object_position_x'] = objectPositionX;
             activeObjects[activeObjectId]['object_position_y'] = objectPositionY;
@@ -472,10 +519,29 @@
 			activeObject.addClass('outline-highlight');
 	    }
 
-	    function deleteSelected(activeObjectId) {
+	    function deleteSelected(activeObjectId)
+	    {
 	    	$('div[active-object-id="' + activeObjectId + '"]').fadeOut();
-	    	delete activeObjects[activeObjectId];
-	    	//TODO: Delete from database
+	    	$.ajax({
+                url: '/class-object',
+                type: 'DELETE',
+                data: {
+                    _token: token,
+                    class_object: activeObjects[activeObjectId],
+                    class_id: classId
+                }
+            }).done(function(data) {
+	    		delete activeObjects[activeObjectId];
+            });
+	    }
+
+	    function clearSession()
+	    {
+	    	var activeClassObjects = $('.drop-target').children();
+	    	activeClassObjects.fadeOut(1000, function() {
+	    		$(this).remove();
+	    	});
+	    	activeObjects = []
 	    }
 	</script>
 

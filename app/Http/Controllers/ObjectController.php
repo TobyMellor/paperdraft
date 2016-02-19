@@ -19,11 +19,11 @@ class ObjectController extends Controller
     }
 
     /**
-     * Store the objects in the database.
+     * Store the class objects in the database.
      *
      * @return \Illuminate\Http\Redirect
      */
-    public function storeObjects()
+    public function storeClassObjects()
     {
         $request = $this->request;
         $objects = $request->input('objects');
@@ -74,14 +74,25 @@ class ObjectController extends Controller
      *
      * @return \Illuminate\Http\Redirect
      */
-    public function getClassObjects($paginate = null)
+    public function getClassObjects()
     {
-        if ($paginate != null) {
-            $classObjects = ClassObject::paginate();
-        } else {
-            $classObjects = ClassObject::all();
-        }
+        $request = $this->request;
+        $classId = $request->input('class_id');
+
+        $classObjects = ClassObject::where('class_id', $classId)
+            ->get();
         return $classObjects;
+    }
+
+    public function deleteClassObject()
+    {
+        $request = $this->request;
+        $classObject = $request->input('class_object');
+        $classId = $request->input('class_id');
+
+        ClassObject::where('class_id', $classId)
+            ->where('id', $classObject['active_object_id'])
+            ->delete();
     }
 
     protected function validator(array $data)
