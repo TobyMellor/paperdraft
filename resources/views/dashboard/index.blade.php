@@ -207,8 +207,7 @@
 										<tr>
 											<td>Location</td>
 											<td id="selected-position">
-												<strong>X:</strong> 1<br />
-												<strong>Y:</strong> 6
+												<strong>X:</strong> 1, <strong>Y:</strong> 6<br />
 											</td>
 										</tr>
 										<tr>
@@ -461,14 +460,72 @@
 		        	var objectPositionY = $(this).position().top / 32;
 
 		        	//TODO: Disallow moving objects into positions with other objects within them
-		        	//TODO: Connect objects that are next to eachother
-
+		        	//TODO: Something is not being updated here, too many updates. '||' probably.
 		        	if(objectPositionX != activeObjects[activeObjectId]['object_position_x']
 		        			|| objectPositionY != activeObjects[activeObjectId]['object_position_y']) {
 						updateSelected($(this));
+			        	updateConnectedObjects($(this), activeObjectId, []);
 		        	}
 		        }
 		    });
+	    }
+
+	    function updateConnectedObjects(activeObject, activeObjectId, checkExemptions)
+	    {
+	    	//TODO: If width of canvas is varying, don't 'hard-code' the max values (e.g. 23)
+        	//TODO: Probably a cleaner way of doing this, maybe loop through?
+        	var objectPositionX = activeObjects[activeObjectId]['object_position_x'];
+        	var objectPositionY = activeObjects[activeObjectId]['object_position_y'];
+
+        	if(activeObjects[activeObjectId]['object_id'] == 1) {
+        		if(objectPositionY > 0 && checkExemptions.indexOf('top') == -1)
+        			var activeObjectIdTop = getObjectByPosition(objectPositionX, (objectPositionY - 1));
+        		if(objectPositionX < 23 && checkExemptions.indexOf('right') == -1)
+        			var activeObjectIdRight = getObjectByPosition(objectPositionX + 1, objectPositionY);
+        		if(objectPositionY < 23 && checkExemptions.indexOf('bottom') == -1)
+        			var activeObjectIdBottom = getObjectByPosition(objectPositionX, objectPositionY + 1);
+        		if(objectPositionX > 0 && checkExemptions.indexOf('left') == -1)
+        			var activeObjectIdLeft = getObjectByPosition(objectPositionX - 1, objectPositionY);
+
+        		var adjacentObjects = [];
+
+        		if(activeObjectIdTop != null && checkExemptions.indexOf('top') == -1) {
+        			adjacentObjects.push('top');
+        			checkExemptions.push('top');
+        			updateConnectedObjects($('div[active-object-id=' + activeObjectIdTop + ']'), activeObjectIdTop, checkExemptions);
+        		}
+        		if(activeObjectIdRight != null && checkExemptions.indexOf('top') == -1) {
+        			adjacentObjects.push('right');
+        			checkExemptions.push('right');
+        			updateConnectedObjects($('div[active-object-id=' + activeObjectIdRight + ']'), activeObjectIdRight, checkExemptions);
+        		}
+        		if(activeObjectIdBottom != null && checkExemptions.indexOf('top') == -1) {
+        			adjacentObjects.push('bottom');
+        			checkExemptions.push('bottom');
+        			updateConnectedObjects($('div[active-object-id=' + activeObjectIdBottom + ']'), activeObjectIdBottom, checkExemptions);
+        		}
+        		if(activeObjectIdLeft != null && checkExemptions.indexOf('top') == -1) {
+        			adjacentObjects.push('left');
+        			checkExemptions.push('left');
+        			updateConnectedObjects($('div[active-object-id=' + activeObjectIdLeft + ']'), activeObjectIdLeft, checkExemptions);
+        		}
+
+        		if(adjacentObjects.length > 0)
+        			activeObject.css('background-image', 'url(\'/assets/images/objects/desk-connected-' + adjacentObjects.join('-') + '.png\')');
+        		else if(activeObject.css('background-image').indexOf('desk-connected-') > -1)
+        			activeObject.css('background-image', 'url(\'/assets/images/objects/' + objects[activeObjects[activeObjectId]['object_id']]['object_location'] + '\')');
+        	}	
+	    }
+
+	    function getObjectByPosition(objectPositionX, objectPositionY)
+	    {
+	    	for(i = 0; i < activeObjects.length; i++) {
+	    		if(objectPositionX == activeObjects[i]['object_position_x']
+	    			&& objectPositionY == activeObjects[i]['object_position_y']) {
+		    		return i;
+	    		}
+	    	}
+	    	return null;
 	    }
 
 	    //TODO: Save to database on window close
@@ -522,8 +579,7 @@
 	    	$('#selected-size').val(value);
             $('#selected-position').html('\
             	<td>\
-					<strong>X:</strong> ' + objectPositionX + '<br>\
-					<strong>Y:</strong> ' + objectPositionY + '\
+					<strong>X:</strong> ' + objectPositionX + ', <strong>Y:</strong> ' + objectPositionY + '<br>\
 				</td>\
 			');
 			$('#selected-image').attr('src', '/assets/images/objects/' + objects[activeObjects[activeObjectId]['object_id']]['object_location']);
