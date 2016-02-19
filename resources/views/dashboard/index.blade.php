@@ -83,6 +83,10 @@
 								    background-size: 32px 32px;
 								    
 								}
+								.outline-highlight {
+									-webkit-filter: drop-shadow(1px 1px 0 yellow) drop-shadow(-1px -1px 0 yellow);
+	    							filter:drop-shadow(1px 1px 0 yellow) drop-shadow(-1px -1px 0 yellow);
+    							}
 							</style>
 						<div class="panel-body" style="height: 736px; overflow-x: scroll;">
 							<div class="drop-target">
@@ -94,10 +98,15 @@
 					<div class="tabbable">
 						<ul class="nav nav-pills nav-stacked">
 							@if(isset($classes))
-								{{ $classCount = 0 }}
-                                @foreach($classes as $class)
-									{{ $classCount++ }}
-									<li @if($classCount == 1) class="active" @endif style="background-color:#FFF; border:solid #DDD; border-radius: 3px; border-width: 1px; border- box-shadow: 0 1px 1px rgba(0, 0, 0, 0.05);"><a data-toggle="tab"><i class="icon-book position-left"></i> {{ $class->class_name }}</a></li>
+						        @foreach($classes as $key => $class)
+									<li @if($key == 0) class="active" @endif style="background-color:#FFF; border:solid #DDD; border-radius: 3px; border-width: 1px; border- box-shadow: 0 1px 1px rgba(0, 0, 0, 0.05);">
+										<a>
+											<b class="dropdown-toggle" data-toggle="dropdown" style="position: absolute; float: right; right: 0px; top: 0px; background-color: #2980b9; padding: 9px 12px; border-radius: 0px 5px 5px 0px;">
+												<i class="icon-menu7"></i>
+											</b>
+											{{ $class->class_name }}
+										</a>
+									</li>
 								@endforeach
 							@endif
 						</ul>
@@ -190,51 +199,6 @@
 									</tbody>
 								</table>
 							</div>
-						</div>
-					</div>
-					<div class="panel panel-white">
-						<div class="panel-heading">
-							<h6 class="panel-title">Students</h6>
-							<div class="heading-elements">
-								<form action="#" class="heading-form" style="margin-left: 0px; margin-right: -12px;">
-									<div class="form-group has-feedback">
-										<input type="search" placeholder="Search..." class="form-control" style="width: 180px;">
-										<div class="form-control-feedback">
-											<i class="icon-search4 text-size-base text-muted"></i>
-										</div>
-									</div>
-								</form>
-								<ul class="icons-list">
-			                		<li><a title="" data-popup="tooltip" data-action="move" href="#" data-original-title="Move" class="ui-sortable-handle"></a></li>
-			                		<li><a title="" data-popup="tooltip" data-action="collapse" data-original-title="Collapse" class=""></a></li>
-			                	</ul>
-							</div>
-						<a class="heading-elements-toggle"><i class="icon-menu"></i></a></div>
-						
-						<div class="panel-body">
-							@if(isset($classStudents))
-								@foreach($classStudents as $classStudent)
-									<div class="col-lg-4 col-sm-6">
-										<div class="thumbnail">
-											<div class="thumb">
-												<img alt="" src="http://placehold.it/200x200">
-												<div class="caption-overflow">
-													<span>
-														<a class="btn border-white text-white btn-flat btn-icon btn-rounded" data-popup="lightbox" href="assets/images/demo/flat/1.png"><i class="icon-plus3"></i></a>
-													</span>
-												</div>
-											</div>
-
-											<div class="caption" style="padding: 5px;">
-												<p style="font-size: 10px; overflow: hidden; white-space: nowrap; width: 100%; text-overflow: ellipsis; margin-bottom: 0px;">{{ $classStudent->student->name }}</p>
-											</div>
-										</div>
-									</div>
-								@endforeach
-								<div class="text-center">
-									{!! $classStudents->render() !!}
-								</div>
-							@endif
 						</div>
 					</div>
 					<!-- /editable inputs -->
@@ -468,6 +432,7 @@
 	    }
 
 	    function updateSelected(activeObject) {
+	    	//TODO: Set a default for the selected panel
 	    	var activeObjectId = activeObject.attr('active-object-id');
 
 	    	var activeObjectHeight = activeObject.height();
@@ -502,6 +467,9 @@
 			$('#selected-image').attr('src', '/assets/images/objects/' + objects[activeObjects[activeObjectId]['object_id']]['object_location']);
 			$('.selected-name').text(objects[activeObjects[activeObjectId]['object_id']]['object_name']);
 			$('#selected-id').text(activeObjectId);
+
+			$('.drag-item').removeClass('outline-highlight');
+			activeObject.addClass('outline-highlight');
 	    }
 
 	    function deleteSelected(activeObjectId) {
