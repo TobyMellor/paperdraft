@@ -464,83 +464,70 @@
 		        	if(objectPositionX != activeObjects[activeObjectId]['object_position_x']
 		        			|| objectPositionY != activeObjects[activeObjectId]['object_position_y']) {
 						updateSelected($(this));
-			        	updateConnectedObjects($(this), activeObjectId, []);
+			        	updateConnectedObjects(objectPositionX, objectPositionY, []);
 		        	}
 		        }
 		    });
 	    }
 
-	    function updateConnectedObjects(activeObject, activeObjectId, checkExemptions)
+	    function updateConnectedObjects(objectPositionX, objectPositionY, checkExemptions)
 	    {
-	    	console.log(checkExemptions);
-	    	//TODO: If width of canvas is varying, don't 'hard-code' the max values (e.g. 23)
-        	//TODO: Probably a cleaner way of doing this, maybe loop through?
-        	var objectPositionX = activeObjects[activeObjectId]['object_position_x'];
-        	var objectPositionY = activeObjects[activeObjectId]['object_position_y'];
-        	var adjacentObjects = [];
+	    	var activeObjectId = getObjectByPosition(objectPositionX, objectPositionY);
+	    	var pushedIndex = checkExemptions.push([objectPositionX, objectPositionY, []]) - 1;
 
-        	if(activeObjects[activeObjectId]['object_id'] == 1) {
-        		if(objectPositionY > 0 && !isArrayInArray(checkExemptions, [objectPositionX, objectPositionY - 1])) {
-        			var activeObjectIdTop = getObjectByPosition(objectPositionX, (objectPositionY - 1));
-        		}
-        		if(objectPositionX < 23 && !isArrayInArray(checkExemptions, [objectPositionX + 1, objectPositionY])) {
-        			var activeObjectIdRight = getObjectByPosition(objectPositionX + 1, objectPositionY);
-        		}
-        		if(objectPositionY < 23 && !isArrayInArray(checkExemptions, [objectPositionX, objectPositionY + 1])) {
-        			var activeObjectIdBottom = getObjectByPosition(objectPositionX, objectPositionY + 1);
-        		}
-        		if(objectPositionX > 0 && !isArrayInArray(checkExemptions, [objectPositionX - 1, objectPositionY])) {
-        			var activeObjectIdLeft = getObjectByPosition(objectPositionX - 1, objectPositionY);
-        		}
+	    	if(activeObjects[activeObjectId]['object_id'] == 1) {
+	    		var directions = ['north', 'east', 'south', 'west'];
+	    		for(x = 0; x < directions.length; x++) {
+	    			var adjacentPosition = getAdjacentPosition(directions[x], objectPositionX, objectPositionY);
+	    			var hasAlreadyBeenChecked = isArrayInArray(checkExemptions, adjacentPosition);
+	        		if(adjacentPosition[0] > 0
+		        			&& adjacentPosition[0] < 23
+		        			&& adjacentPosition[1] > 0
+		        			&& adjacentPosition[1] < 23
+		        			&& !hasAlreadyBeenChecked) {
+	        			if(getObjectByPosition(adjacentPosition[0], adjacentPosition[1]) != null) {
+	        				checkExemptions[pushedIndex][2].push([directions[x], adjacentPosition[0], adjacentPosition[1]]);
+	        			}
+	        		} else if(hasAlreadyBeenChecked) {
+	        			checkExemptions[pushedIndex][2].push([directions[x], adjacentPosition[0], adjacentPosition[1]]);
+	        		}
+	    		}
 
-        		if(activeObjectIdTop != null) {
-        			adjacentObjects.push('top');
-        			checkExemptions.push([objectPositionX, objectPositionY]);
-        		} else if(isArrayInArray(checkExemptions, [objectPositionX, objectPositionY + 1])) {
-        			adjacentObjects.push('bottom');
-        		}
+	    		if(checkExemptions[pushedIndex][2].length > 0) {
+	    			var arrayOfKeys = [];
+	    			for(x = 0; x < checkExemptions[pushedIndex][2].length; x++) {
+	    				arrayOfKeys.push(checkExemptions[pushedIndex][2][x][0]);
+	    			}
 
-        		if(activeObjectIdRight != null) {
-        			adjacentObjects.push('right');
-        			checkExemptions.push([objectPositionX, objectPositionY]);
-        		} else if(isArrayInArray(checkExemptions, [objectPositionX - 1, objectPositionY])) {
-        			adjacentObjects.push('left');
-        		}
-
-        		if(activeObjectIdBottom != null) {
-        			adjacentObjects.push('bottom');
-        			checkExemptions.push([objectPositionX, objectPositionY]);
-        		} else if(isArrayInArray(checkExemptions, [objectPositionX, objectPositionY - 1])) {
-        			adjacentObjects.push('top');
-        		}
-
-        		if(activeObjectIdLeft != null) {
-        			adjacentObjects.push('left');
-        			checkExemptions.push([objectPositionX, objectPositionY]);
-        		} else if(isArrayInArray(checkExemptions, [objectPositionX + 1, objectPositionY])) {
-        			adjacentObjects.push('right');
-        		}
-
-        		if(adjacentObjects.length > 0) {
-        			activeObject.css('background-image', 'url(\'/assets/images/objects/desk-connected-' + adjacentObjects.join('-') + '.png\')');
-        			for(i = 0; i < adjacentObjects.length; i++) {
-        				if(adjacentObjects[i] == 'top' && activeObjectIdTop != null) {
-        					updateConnectedObjects($('div[active-object-id=' + activeObjectIdTop + ']'), activeObjectIdTop, checkExemptions);
+        			$('div[active-object-id=' + activeObjectId + ']').css('background-image', 'url(\'/assets/images/objects/desk-connected-' + arrayOfKeys.join('-') + '.png\')');
+        			for(x = 0; x < checkExemptions[pushedIndex][2].length; x++) {
+        				if(!isArrayInArray(checkExemptions, [checkExemptions[pushedIndex][2][x][1], checkExemptions[pushedIndex][2][x][2]])) {
+        					updateConnectedObjects(checkExemptions[pushedIndex][2][x][1], checkExemptions[pushedIndex][2][x][2], checkExemptions);
         				}
-        				else if(adjacentObjects[i] == 'right' && activeObjectIdRight != null) {
-        					updateConnectedObjects($('div[active-object-id=' + activeObjectIdRight + ']'), activeObjectIdRight, checkExemptions);
-        				}
-        				else if(adjacentObjects[i] == 'bottom' && activeObjectIdBottom != null) {
-        					updateConnectedObjects($('div[active-object-id=' + activeObjectIdBottom + ']'), activeObjectIdBottom, checkExemptions);
-        				}
-        				else if(adjacentObjects[i] == 'left' && activeObjectIdLeft != null) {
-        					updateConnectedObjects($('div[active-object-id=' + activeObjectIdLeft + ']'), activeObjectIdLeft, checkExemptions);
-        				}
-        			}
+					}
+	    		} else if($('div[active-object-id=' + activeObjectId + ']').css('background-image').indexOf('desk-connected-') > -1) {
+        			$('div[active-object-id=' + activeObjectId + ']').css('background-image', 'url(\'/assets/images/objects/' + objects[activeObjects[activeObjectId]['object_id']]['object_location'] + '\')');
         		}
-        		else if(activeObject.css('background-image').indexOf('desk-connected-') > -1)
-        			activeObject.css('background-image', 'url(\'/assets/images/objects/' + objects[activeObjects[activeObjectId]['object_id']]['object_location'] + '\')');
-        	}	
+	    	}
+	    }
+
+	    function getAdjacentPosition(direction, objectPositionX, objectPositionY)
+	    {
+	    	switch (direction) {
+			    case 'north':
+			        position = [objectPositionX, objectPositionY - 1];
+			        break;
+			    case 'east':
+			        position = [objectPositionX + 1, objectPositionY];
+			        break;
+			    case 'south':
+			        position = [objectPositionX, objectPositionY + 1];
+			        break;
+			    default:
+			        position = [objectPositionX - 1, objectPositionY];
+			        break;
+			} 
+	    	return position;
 	    }
 
 	    function isArrayInArray(arrayToSearch, arrayToFind)
