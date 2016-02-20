@@ -73,6 +73,7 @@
 								}
 								.drop-target {
 									left: 0px; top: 0px;
+									cursor: crosshair;
 								    position: absolute;
 								    width: 736px;
 								    height: 736px;
@@ -87,7 +88,7 @@
     							}
 							</style>
 						<div class="panel-body" style="height: 736px; overflow-x: scroll;">
-							<div class="drop-target">
+							<div class="drop-target" id="paper">
 							</div>
 						</div>
 					</div>
@@ -286,7 +287,8 @@
 
 @stop
 @section('scripts')
-
+    <script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/raphael/2.1.0/raphael-min.js"></script>
+    <script type="text/javascript" src="/assets/js/plugins/drag_selection.js"></script>
 	<script>
 		$(document).ready(function() {
 			$('.drop-target').on('click', '.drag-item', function(){
@@ -344,7 +346,7 @@
 				classId = parseInt($(this).attr('class-id'));
 				clearSession();
 				loadActiveObjects(classId);
-			})
+			});
 		});
 
   		var token = '{{ csrf_token() }}';
