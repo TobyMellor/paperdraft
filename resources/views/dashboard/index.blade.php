@@ -426,24 +426,47 @@
 
 	    function initializeDraggable()
 	    {
-	    	$(".drag-item").draggable({
-		        grid: [32, 32],
-		        containment: '.drop-target',
-		        drag: function(){
-		        	var activeObjectId = $(this).attr('active-object-id');
-		        	var objectPositionX = $(this).position().left / 32;
-		        	var objectPositionY = $(this).position().top / 32;
+			$('.drag-item').draggable({
+				grid: [32, 32],
+		    	containment: '.drop-target',
+			    drag: function(event, ui) {
+			        var currentLoc = $(this).position();
+			        var prevLoc = $(this).data('prevLoc');
+			        if (!prevLoc) {
+			            prevLoc = ui.originalPosition;
+			        }
 
-		        	//TODO: Disallow moving objects into positions with other objects within them
-		        	//TODO: Something is not being updated here, too many updates. '||' probably.
-		        	if(objectPositionX != activeObjects[activeObjectId]['object_position_x']
-		        			|| objectPositionY != activeObjects[activeObjectId]['object_position_y']) {
-						updateSelected([$(this)]);
-			        	updateConnectedObjects(objectPositionX, objectPositionY, []);
-		        	}
-		        }
-		    });
+			        var offsetLeft = currentLoc.left-prevLoc.left;
+			        var offsetTop = currentLoc.top-prevLoc.top;
+
+			        moveSelected(offsetLeft, offsetTop);
+			        $(this).data('prevLoc', currentLoc);
+			    }
+			});
 	    }
+
+		function moveSelected(offsetLeft, offsetTop){
+		    for(i = 0; i < selectedIds.length; i++) {
+		        $this = $('div[active-object-id=' + selectedIds[i] + ']');
+		        var position = $this.position();
+		        var leftPosition = position.left;
+		        var topPosition = position.top;
+
+		        $this.css('left', leftPosition + offsetLeft);
+		        $this.css('top', topPosition + offsetTop);
+
+	        	var activeObjectId = selectedIds[i];
+	        	var objectPositionX = $this.position().left / 32;
+	        	var objectPositionY = $this.position().top / 32;
+
+	        	//TODO: Disallow moving objects into positions with other objects within them
+	        	if(objectPositionX != activeObjects[activeObjectId]['object_position_x']
+	        			|| objectPositionY != activeObjects[activeObjectId]['object_position_y']) {
+					updateSelected([$this]);
+		        	updateConnectedObjects(objectPositionX, objectPositionY, []);
+	        	}
+		    }
+		}
 
 	    function updateConnectedObjects(objectPositionX, objectPositionY, checkExemptions)
 	    {
