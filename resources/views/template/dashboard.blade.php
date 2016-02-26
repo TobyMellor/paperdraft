@@ -27,10 +27,10 @@
         <script type="text/javascript" src="/assets/js/core/libraries/jquery_ui/touch.min.js"></script>
         <script type="text/javascript" src="/assets/js/core/libraries/jquery_ui/effects.min.js"></script>
         <script type="text/javascript" src="/assets/js/plugins/uploaders/fileinput.min.js"></script>
-        <script type="text/javascript" src="/assets/js/plugins/buttons/spin.min.js"></script>
-        <script type="text/javascript" src="/assets/js/plugins/buttons/ladda.min.js"></script>
+        <script type="text/javascript" src="assets/js/plugins/buttons/spin.min.js"></script>
+        <script type="text/javascript" src="assets/js/plugins/buttons/ladda.min.js"></script>
         <script type="text/javascript" src="/assets/js/core/app.js"></script>
-        <script type="text/javascript" src="/assets/js/pages/components_buttons.js"></script>
+        <script type="text/javascript" src="assets/js/pages/components_buttons.js"></script>
         <script type="text/javascript" src="/assets/js/pages/uploader_bootstrap.js"></script>
     </head>
 

@@ -73,7 +73,6 @@
 								}
 								.drop-target {
 									left: 0px; top: 0px;
-									cursor: crosshair;
 								    position: absolute;
 								    width: 736px;
 								    height: 736px;
@@ -88,7 +87,7 @@
     							}
 							</style>
 						<div class="panel-body" style="height: 736px; overflow-x: scroll;">
-							<div class="drop-target" id="paper">
+							<div class="drop-target">
 							</div>
 						</div>
 					</div>
@@ -152,9 +151,10 @@
 							@endif
 						</ul>
 					</div>
+					<div id="selected-id" style="display: none;"></div>
 					<div class="panel panel-white">
 						<div class="panel-heading">
-							<h6 class="panel-title" style="word-wrap: break-word; width: 90%;">
+							<h6 class="panel-title">
 								Selected Object
 								<span class="text-muted">
 									<small class="selected-name">Loading...</small>
@@ -198,6 +198,12 @@
 										</tr>
 									</thead>
 									<tbody>
+										<tr>
+											<td>Size</td>
+											<td>
+												<input id="selected-size" class="form-control" type="range" max="3" min="1" name="range">
+											</td>
+										</tr>
 										<tr>
 											<td>Location</td>
 											<td id="selected-position">
@@ -280,20 +286,42 @@
 
 @stop
 @section('scripts')
-    <script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/raphael/2.1.0/raphael-min.js"></script>
-    <script type="text/javascript" src="/assets/js/plugins/drag_selection.js"></script>
+
 	<script>
 		$(document).ready(function() {
 			$('.drop-target').on('click', '.drag-item', function(){
-				updateSelected([$(this)]);
+				updateSelected($(this));
 			});
 
 			$('#selected-delete').click(function() {
-				deleteSelected(selectedIds);
+				deleteSelected($('#selected-id').html());
 			});
 
 			$('#save-button').click(function() {
 				saveActiveObjects();
+			});
+
+			//TODO: Implement size saving
+			$('#selected-size').on('change', function() {
+				var value = $('#selected-size').val();
+				var width;
+				var height;
+
+				if(value == 1) {
+					width = 32;
+					height = 32;
+				} else if(value == 2) {
+					width = 64;
+					height = 64;
+				} else {
+					width = 128;
+					height = 128;
+				}
+
+			    $('div[active-object-id="' + $('#selected-id').html() + '"]')
+			    	.css('width', width)
+			    	.css('height', height)
+			    	.css('background-size', width);
 			});
 
 			$('.create-active-object').click(function() {
@@ -316,7 +344,7 @@
 				classId = parseInt($(this).attr('class-id'));
 				clearSession();
 				loadActiveObjects(classId);
-			});
+			})
 		});
 
   		var token = '{{ csrf_token() }}';
@@ -326,9 +354,6 @@
     	var classId = parseInt($('.class-button:first').attr('class-id'));
 
     	var hasObjects = false;
-
-    	var selectedIds = [];
-    	var selectedNames = [];
 
 	    loadObjects();
 
@@ -350,7 +375,7 @@
             	<div class="drag-item" active-object-id="' + (activeObjects.length - 1) + '" style="left: ' + objectPositionX + 'px; top: ' + objectPositionY + 'px; background-image: url(\'/assets/images/objects/' + objectLocation + '\'); background-size: ' + objectWidth + 'px; height: ' + objectHeight + 'px; width: ' + objectWidth + 'px;"></div>\
             ');
 			initializeDraggable();
-			updateSelected([$('div[active-object-id="' + (activeObjects.length - 1) + '"]')])
+			updateSelected($('div[active-object-id="' + (activeObjects.length - 1) + '"]'))
 	    }
 
 	    function loadObjects()
@@ -415,7 +440,7 @@
 			    initializeDraggable();
 
 			    if (typeof activeObjects[0] !== "undefined") {
-			    	updateSelected([$('div[active-object-id="0"]')]);
+			    	updateSelected($('div[active-object-id="0"]'));
 			    } else {
 			    	hasObjects = false;
 			    	$('#selected-no-objects').parent().children().fadeOut();
@@ -426,70 +451,31 @@
 
 	    function initializeDraggable()
 	    {
-			$('.drag-item').draggable({
-				grid: [32, 32],
-		    	containment: '.drop-target',
-			    drag: function(event, ui) {
-			        var currentLoc = $(this).position();
-			        var prevLoc = $(this).data('prevLoc');
-			        if (!prevLoc) {
-			            prevLoc = ui.originalPosition;
-			        }
+	    	$(".drag-item").draggable({
+		        grid: [32, 32],
+		        containment: '.drop-target',
+		        drag: function(){
+		        	var activeObjectId = $(this).attr('active-object-id');
+		        	var objectPositionX = $(this).position().left / 32;
+		        	var objectPositionY = $(this).position().top / 32;
 
-			        var offsetLeft = currentLoc.left-prevLoc.left;
-			        var offsetTop = currentLoc.top-prevLoc.top;
-
-			        moveSelected(offsetLeft, offsetTop);
-			        $(this).data('prevLoc', currentLoc);
-			    }
-			});
+		        	//TODO: Disallow moving objects into positions with other objects within them
+		        	//TODO: Something is not being updated here, too many updates. '||' probably.
+		        	if(objectPositionX != activeObjects[activeObjectId]['object_position_x']
+		        			|| objectPositionY != activeObjects[activeObjectId]['object_position_y']) {
+						updateSelected($(this));
+			        	updateConnectedObjects(objectPositionX, objectPositionY, []);
+		        	}
+		        }
+		    });
 	    }
 
-		function moveSelected(offsetLeft, offsetTop){
-			selectedIds2 = selectedIds;
-		    for(i = 0; i < selectedIds2.length; i++) {
-		        $this = $('div[active-object-id=' + selectedIds[i] + ']');
-		        var position = $this.position();
-		        var leftPosition = position.left;
-		        var topPosition = position.top;
-
-		        $this.css('left', leftPosition + offsetLeft);
-		        $this.css('top', topPosition + offsetTop);
-
-	        	var activeObjectId = selectedIds2[i];
-	        	var objectPositionX = $this.position().left / 32;
-	        	var objectPositionY = $this.position().top / 32;
-
-	        	var previousPositionX = activeObjects[activeObjectId]['object_position_x'];
-	        	var previousPositionY = activeObjects[activeObjectId]['object_position_y'];
-
-	        	if(objectPositionX != previousPositionX
-	        			|| objectPositionY != previousPositionY) {
-					updateSelected([$this]);
-		        	updateConnectedObjects(objectPositionX, objectPositionY, [], false);
-
-		        	if(activeObjects[activeObjectId]['object_id'] == 1) {
-			        	//Update previous positions
-			        	var directions = ['north'];
-			        	for(x = 0; x < directions.length; x++) {
-			        		var oldAdjacentPosition = getAdjacentPosition(directions[x], previousPositionX, previousPositionY);
-			        		updateConnectedObjects(oldAdjacentPosition[0], oldAdjacentPosition[1], [], true);
-			        	}
-		        	}
-	        	}
-		    }
-		}
-
-	    function updateConnectedObjects(objectPositionX, objectPositionY, checkExemptions, isPreviousPosition)
+	    function updateConnectedObjects(objectPositionX, objectPositionY, checkExemptions)
 	    {
-	    	console.log(isPreviousPosition);
-	    	console.log(objectPositionX);
-	    	console.log(objectPositionY);
-	    	if(!isPreviousPosition)
-	    		var activeObjectId = getObjectByPosition(objectPositionX, objectPositionY);
+	    	var activeObjectId = getObjectByPosition(objectPositionX, objectPositionY);
 	    	var pushedIndex = checkExemptions.push([objectPositionX, objectPositionY, []]) - 1;
 
-	    	if(isPreviousPosition || activeObjects[activeObjectId]['object_id'] == 1) {
+	    	if(activeObjects[activeObjectId]['object_id'] == 1) {
 	    		var directions = ['north', 'east', 'south', 'west'];
 	    		for(x = 0; x < directions.length; x++) {
 	    			var adjacentPosition = getAdjacentPosition(directions[x], objectPositionX, objectPositionY);
@@ -516,10 +502,10 @@
         			$('div[active-object-id=' + activeObjectId + ']').css('background-image', 'url(\'/assets/images/objects/desk-connected-' + arrayOfKeys.join('-') + '.png\')');
         			for(x = 0; x < checkExemptions[pushedIndex][2].length; x++) {
         				if(!isArrayInArray(checkExemptions, [checkExemptions[pushedIndex][2][x][1], checkExemptions[pushedIndex][2][x][2]])) {
-        					updateConnectedObjects(checkExemptions[pushedIndex][2][x][1], checkExemptions[pushedIndex][2][x][2], checkExemptions, false);
+        					updateConnectedObjects(checkExemptions[pushedIndex][2][x][1], checkExemptions[pushedIndex][2][x][2], checkExemptions);
         				}
 					}
-	    		} else if(!isPreviousPosition && $('div[active-object-id=' + activeObjectId + ']').css('background-image').indexOf('desk-connected-') > -1) {
+	    		} else if($('div[active-object-id=' + activeObjectId + ']').css('background-image').indexOf('desk-connected-') > -1) {
         			$('div[active-object-id=' + activeObjectId + ']').css('background-image', 'url(\'/assets/images/objects/' + objects[activeObjects[activeObjectId]['object_id']]['object_location'] + '\')');
         		}
 	    	}
@@ -566,6 +552,7 @@
 	    	return null;
 	    }
 
+	    //TODO: Save to database on window close
 	    function saveActiveObjects()
 	    {
 	    	$.ajax({
@@ -583,71 +570,64 @@
 
 	    function updateSelected(activeObject)
 	    {
-	    	clearSelected();
-
-	    	$('#selected-position').append('<td>');
-
-	    	for(i = 0; i < activeObject.length; i++) {
-		    	var activeObjectId = activeObject[i].attr('active-object-id');
-
-	            var position = activeObject[i].position();
-	            var objectPositionX = position.left / 32;
-	            var objectPositionY = position.top / 32;
-
-	            activeObjects[activeObjectId]['object_position_x'] = objectPositionX;
-	            activeObjects[activeObjectId]['object_position_y'] = objectPositionY;
-
-				selectedIds.push(activeObjectId);
-
-				if(i <= 2) {
-					selectedNames.push(objects[activeObjects[activeObjectId]['object_id']]['object_name']);
-		            $('#selected-position').append('\
-							<strong>X:</strong> ' + objectPositionX + ', <strong>Y:</strong> ' + objectPositionY + '<br>\
-					');
-					$('#selected-image').attr('src', '/assets/images/objects/' + objects[activeObjects[activeObjectId]['object_id']]['object_location']);
-				} else if(i == 3) {
-					selectedNames.push('[' + (activeObject.length - i) + ' more]')
-				}
-				
-				activeObject[i].addClass('outline-highlight');
-			}
-
-			$('.selected-name').text(selectedNames.join(', '));
-	    	$('#selected-position').append('</td>');
-	    }
-
-	    function clearSelected()
-	    {
 	    	if(!hasObjects) {
 	    		hasObjects = true;
 		    	$('#selected-no-objects').parent().children().fadeIn();
 		    	$('#selected-no-objects').hide();
 	    	}
+	    	//TODO: Set a default for the selected panel
+	    	var activeObjectId = activeObject.attr('active-object-id');
 
-	    	selectedIds = [];
-	    	selectedNames = [];
+	    	var activeObjectHeight = activeObject.height();
+	    	var activeObjectWidth = activeObject.width();
+	    	var value;
 
-	    	$('#selected-position').empty();
-	    	$('.selected-name').empty();
+            var position = activeObject.position();
+            var objectPositionX = Math.round(position.left / 32);
+            var objectPositionY = Math.round(position.top / 32);
+
+            activeObjects[activeObjectId]['object_position_x'] = objectPositionX;
+            activeObjects[activeObjectId]['object_position_y'] = objectPositionY;
+
+            //TODO: There's definately a better way of doing this.
+	    	if(activeObjectHeight == activeObjectWidth) {
+	    		if(activeObjectHeight == 32) {
+	    			value = 1;
+	    		} else if(activeObjectHeight == 64) {
+	    			value = 2;
+	    		} else {
+	    			value = 3;
+	    		}
+	    	}
+
+	    	$('#selected-size').val(value);
+            $('#selected-position').html('\
+            	<td>\
+					<strong>X:</strong> ' + objectPositionX + ', <strong>Y:</strong> ' + objectPositionY + '<br>\
+				</td>\
+			');
+			$('#selected-image').attr('src', '/assets/images/objects/' + objects[activeObjects[activeObjectId]['object_id']]['object_location']);
+			$('.selected-name').text(objects[activeObjects[activeObjectId]['object_id']]['object_name']);
+			$('#selected-id').text(activeObjectId);
+
 			$('.drag-item').removeClass('outline-highlight');
+			activeObject.addClass('outline-highlight');
 	    }
 
-	    function deleteSelected(activeObjectIds)
+	    function deleteSelected(activeObjectId)
 	    {
-	    	for(i = 0; i < activeObjectIds.length; i++) {
-		    	$('div[active-object-id="' + activeObjectIds[i] + '"]').fadeOut();
-		    	$.ajax({
-	                url: '/class-object',
-	                type: 'DELETE',
-	                data: {
-	                    _token: token,
-	                    class_object: activeObjects[activeObjectIds[i]],
-	                    class_id: classId
-	                }
-	            }).done(function(data) {
-		    		delete activeObjects[activeObjectIds[i]];
-	            });
-        	}
+	    	$('div[active-object-id="' + activeObjectId + '"]').fadeOut();
+	    	$.ajax({
+                url: '/class-object',
+                type: 'DELETE',
+                data: {
+                    _token: token,
+                    class_object: activeObjects[activeObjectId],
+                    class_id: classId
+                }
+            }).done(function(data) {
+	    		delete activeObjects[activeObjectId];
+            });
 	    }
 
 	    function clearSession()
