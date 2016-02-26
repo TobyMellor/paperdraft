@@ -112,14 +112,14 @@
     
     document.onmouseup = function(event) {
         if(!isDragging) {
-            if (rect) {
+            if (!rect['removed']) {
                 rect.remove();
+
+                endX = getCoords(event)['x'] - $('.drop-target').offset()['left'];
+                endY = getCoords(event)['y'] - $('.drop-target').offset()['top'];
+
+                getActiveObjectsInsideSelection();
             }
-
-            endX = getCoords(event)['x'] - $('.drop-target').offset()['left'];
-            endY = getCoords(event)['y'] - $('.drop-target').offset()['top'];
-
-            getActiveObjectsInsideSelection();
         }
 
         document.onmousemove = null;

@@ -446,7 +446,8 @@
 	    }
 
 		function moveSelected(offsetLeft, offsetTop){
-		    for(i = 0; i < selectedIds.length; i++) {
+			selectedIds2 = selectedIds;
+		    for(i = 0; i < selectedIds2.length; i++) {
 		        $this = $('div[active-object-id=' + selectedIds[i] + ']');
 		        var position = $this.position();
 		        var leftPosition = position.left;
@@ -455,25 +456,40 @@
 		        $this.css('left', leftPosition + offsetLeft);
 		        $this.css('top', topPosition + offsetTop);
 
-	        	var activeObjectId = selectedIds[i];
+	        	var activeObjectId = selectedIds2[i];
 	        	var objectPositionX = $this.position().left / 32;
 	        	var objectPositionY = $this.position().top / 32;
 
-	        	//TODO: Disallow moving objects into positions with other objects within them
-	        	if(objectPositionX != activeObjects[activeObjectId]['object_position_x']
-	        			|| objectPositionY != activeObjects[activeObjectId]['object_position_y']) {
+	        	var previousPositionX = activeObjects[activeObjectId]['object_position_x'];
+	        	var previousPositionY = activeObjects[activeObjectId]['object_position_y'];
+
+	        	if(objectPositionX != previousPositionX
+	        			|| objectPositionY != previousPositionY) {
 					updateSelected([$this]);
-		        	updateConnectedObjects(objectPositionX, objectPositionY, []);
+		        	updateConnectedObjects(objectPositionX, objectPositionY, [], false);
+
+		        	if(activeObjects[activeObjectId]['object_id'] == 1) {
+			        	//Update previous positions
+			        	var directions = ['north'];
+			        	for(x = 0; x < directions.length; x++) {
+			        		var oldAdjacentPosition = getAdjacentPosition(directions[x], previousPositionX, previousPositionY);
+			        		updateConnectedObjects(oldAdjacentPosition[0], oldAdjacentPosition[1], [], true);
+			        	}
+		        	}
 	        	}
 		    }
 		}
 
-	    function updateConnectedObjects(objectPositionX, objectPositionY, checkExemptions)
+	    function updateConnectedObjects(objectPositionX, objectPositionY, checkExemptions, isPreviousPosition)
 	    {
-	    	var activeObjectId = getObjectByPosition(objectPositionX, objectPositionY);
+	    	console.log(isPreviousPosition);
+	    	console.log(objectPositionX);
+	    	console.log(objectPositionY);
+	    	if(!isPreviousPosition)
+	    		var activeObjectId = getObjectByPosition(objectPositionX, objectPositionY);
 	    	var pushedIndex = checkExemptions.push([objectPositionX, objectPositionY, []]) - 1;
 
-	    	if(activeObjects[activeObjectId]['object_id'] == 1) {
+	    	if(isPreviousPosition || activeObjects[activeObjectId]['object_id'] == 1) {
 	    		var directions = ['north', 'east', 'south', 'west'];
 	    		for(x = 0; x < directions.length; x++) {
 	    			var adjacentPosition = getAdjacentPosition(directions[x], objectPositionX, objectPositionY);
@@ -500,10 +516,10 @@
         			$('div[active-object-id=' + activeObjectId + ']').css('background-image', 'url(\'/assets/images/objects/desk-connected-' + arrayOfKeys.join('-') + '.png\')');
         			for(x = 0; x < checkExemptions[pushedIndex][2].length; x++) {
         				if(!isArrayInArray(checkExemptions, [checkExemptions[pushedIndex][2][x][1], checkExemptions[pushedIndex][2][x][2]])) {
-        					updateConnectedObjects(checkExemptions[pushedIndex][2][x][1], checkExemptions[pushedIndex][2][x][2], checkExemptions);
+        					updateConnectedObjects(checkExemptions[pushedIndex][2][x][1], checkExemptions[pushedIndex][2][x][2], checkExemptions, false);
         				}
 					}
-	    		} else if($('div[active-object-id=' + activeObjectId + ']').css('background-image').indexOf('desk-connected-') > -1) {
+	    		} else if(!isPreviousPosition && $('div[active-object-id=' + activeObjectId + ']').css('background-image').indexOf('desk-connected-') > -1) {
         			$('div[active-object-id=' + activeObjectId + ']').css('background-image', 'url(\'/assets/images/objects/' + objects[activeObjects[activeObjectId]['object_id']]['object_location'] + '\')');
         		}
 	    	}
@@ -550,7 +566,6 @@
 	    	return null;
 	    }
 
-	    //TODO: Save to database on window close
 	    function saveActiveObjects()
 	    {
 	    	$.ajax({
@@ -573,12 +588,11 @@
 	    	$('#selected-position').append('<td>');
 
 	    	for(i = 0; i < activeObject.length; i++) {
-		    	//TODO: Set a default for the selected panel
 		    	var activeObjectId = activeObject[i].attr('active-object-id');
 
 	            var position = activeObject[i].position();
-	            var objectPositionX = Math.round(position.left / 32);
-	            var objectPositionY = Math.round(position.top / 32);
+	            var objectPositionX = position.left / 32;
+	            var objectPositionY = position.top / 32;
 
 	            activeObjects[activeObjectId]['object_position_x'] = objectPositionX;
 	            activeObjects[activeObjectId]['object_position_y'] = objectPositionY;
