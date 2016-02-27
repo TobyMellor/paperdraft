@@ -29,13 +29,13 @@ class ObjectController extends Controller
         $objects = $request->input('objects');
         $classId = $request->input('class_id');
 
-        foreach ($objects as $key => $object) {
+        foreach (isset($object['active_object_id']) && $objects as $key => $object) {
             if ($object['active_object_id'] != null) {
                 ClassObject::where('id', $object['active_object_id'])
                     ->where('class_id', $classId)
                     ->update([
-                        'object_position_y' => $object['object_position_y'],
-                        'object_position_x' => $object['object_position_x']
+                        'object_position_x' => $object['object_position_x'],
+                        'object_position_y' => $object['object_position_y']
                     ]
                 );
             } else {
