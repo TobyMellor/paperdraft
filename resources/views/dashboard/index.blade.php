@@ -425,26 +425,33 @@
 		        containment: '.drop-target',
 		        drag: function(){
 		        	var activeObjectId = $(this).attr('active-object-id');
+
 		        	var objectPositionX = $(this).position().left / 32;
 		        	var objectPositionY = $(this).position().top / 32;
 
-		        	//TODO: Disallow moving objects into positions with other objects within them
-		        	//TODO: Something is not being updated here, too many updates. '||' probably.
-		        	if(objectPositionX != activeObjects[activeObjectId]['object_position_x']
-		        			|| objectPositionY != activeObjects[activeObjectId]['object_position_y']) {
+		        	var previousPositionX = activeObjects[activeObjectId]['object_position_x'];
+		        	var previousPositionY = activeObjects[activeObjectId]['object_position_y'];
+
+		        	if(objectPositionX != previousPositionX
+		        			|| objectPositionY != previousPositionY) {
 						updateSelected([$(this)]);
-			        	updateConnectedObjects(objectPositionX, objectPositionY, []);
+			        	updateConnectedObjects(objectPositionX, objectPositionY, [], null);
+
+			        	//Update everything in old location
+		        		updateConnectedObjects(previousPositionX, previousPositionY, [[objectPositionX, objectPositionY, []]], 0);
 		        	}
 		        }
 		    });
 	    }
 
-	    function updateConnectedObjects(objectPositionX, objectPositionY, checkExemptions)
+	    function updateConnectedObjects(objectPositionX, objectPositionY, checkExemptions, pushedIndex)
 	    {
 	    	var activeObjectId = getObjectByPosition(objectPositionX, objectPositionY);
-	    	var pushedIndex = checkExemptions.push([objectPositionX, objectPositionY, []]) - 1;
 
-	    	if(activeObjects[activeObjectId]['object_id'] == 1) {
+	    	if(pushedIndex == null)
+	    		var pushedIndex = checkExemptions.push([objectPositionX, objectPositionY, []]) - 1;
+
+	    	if(activeObjectId == null || activeObjects[activeObjectId]['object_id'] == 1) {
 	    		var directions = ['north', 'east', 'south', 'west'];
 	    		for(x = 0; x < directions.length; x++) {
 	    			var adjacentPosition = getAdjacentPosition(directions[x], objectPositionX, objectPositionY);
@@ -463,18 +470,23 @@
 	    		}
 
 	    		if(checkExemptions[pushedIndex][2].length > 0) {
+	    			//Gets directions from checkExemptions e.g. [["south", 1, 3], ["west", 0, 3]] => ["south", "west"] => "south-west"
 	    			var arrayOfKeys = [];
 	    			for(x = 0; x < checkExemptions[pushedIndex][2].length; x++) {
 	    				arrayOfKeys.push(checkExemptions[pushedIndex][2][x][0]);
 	    			}
 
-        			$('div[active-object-id=' + activeObjectId + ']').css('background-image', 'url(\'/assets/images/objects/desk-connected-' + arrayOfKeys.join('-') + '.png\')');
-        			for(x = 0; x < checkExemptions[pushedIndex][2].length; x++) {
+	    			if(activeObjectId != null) {
+        				$('div[active-object-id=' + activeObjectId + ']').css('background-image', 'url(\'/assets/images/objects/desk-connected-' + arrayOfKeys.join('-') + '.png\')');
+        			}
+
+        			for(let x = 0; x < checkExemptions[pushedIndex][2].length; x++) {
+        				checkExemptions
         				if(!isArrayInArray(checkExemptions, [checkExemptions[pushedIndex][2][x][1], checkExemptions[pushedIndex][2][x][2]])) {
-        					updateConnectedObjects(checkExemptions[pushedIndex][2][x][1], checkExemptions[pushedIndex][2][x][2], checkExemptions);
+        					updateConnectedObjects(checkExemptions[pushedIndex][2][x][1], checkExemptions[pushedIndex][2][x][2], checkExemptions, null);
         				}
 					}
-	    		} else if($('div[active-object-id=' + activeObjectId + ']').css('background-image').indexOf('desk-connected-') > -1) {
+	    		} else if(activeObjectId != null && $('div[active-object-id=' + activeObjectId + ']').css('background-image').indexOf('desk-connected-') > -1) {
         			$('div[active-object-id=' + activeObjectId + ']').css('background-image', 'url(\'/assets/images/objects/' + objects[activeObjects[activeObjectId]['object_id']]['object_location'] + '\')');
         		}
 	    	}

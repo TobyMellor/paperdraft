@@ -29,8 +29,8 @@ class ObjectController extends Controller
         $objects = $request->input('objects');
         $classId = $request->input('class_id');
 
-        foreach (isset($object['active_object_id']) && $objects as $key => $object) {
-            if ($object['active_object_id'] != null) {
+        foreach ($objects as $key => $object) {
+            if (isset($object['active_object_id']) && $object['active_object_id'] != null) {
                 ClassObject::where('id', $object['active_object_id'])
                     ->where('class_id', $classId)
                     ->update([
