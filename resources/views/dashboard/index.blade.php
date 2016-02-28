@@ -429,16 +429,18 @@
 		        	var objectPositionX = $(this).position().left / 32;
 		        	var objectPositionY = $(this).position().top / 32;
 
-		        	var previousPositionX = activeObjects[activeObjectId]['object_position_x'];
-		        	var previousPositionY = activeObjects[activeObjectId]['object_position_y'];
+		        	var previousPositionX = Math.floor(activeObjects[activeObjectId]['object_position_x']);
+		        	var previousPositionY = Math.floor(activeObjects[activeObjectId]['object_position_y']);
 
 		        	if(objectPositionX != previousPositionX
 		        			|| objectPositionY != previousPositionY) {
 						updateSelected([$(this)]);
-			        	updateConnectedObjects(objectPositionX, objectPositionY, [], null);
+			        	var checkExemptions = updateConnectedObjects(objectPositionX, objectPositionY, [], null);
 
 			        	//Update everything in old location
 		        		updateConnectedObjects(previousPositionX, previousPositionY, [[objectPositionX, objectPositionY, []]], 0);
+
+		        		checkForClusters(checkExemptions);
 		        	}
 		        }
 		    });
@@ -455,17 +457,17 @@
 	    		var directions = ['north', 'east', 'south', 'west'];
 	    		for(x = 0; x < directions.length; x++) {
 	    			var adjacentPosition = getAdjacentPosition(directions[x], objectPositionX, objectPositionY);
-	    			var hasAlreadyBeenChecked = isArrayInArray(checkExemptions, adjacentPosition);
+	    			var hasAlreadyBeenChecked = getArrayInArray(checkExemptions, adjacentPosition);
 	        		if(adjacentPosition[0] > 0
 		        			&& adjacentPosition[0] < 23
 		        			&& adjacentPosition[1] > 0
 		        			&& adjacentPosition[1] < 23
-		        			&& !hasAlreadyBeenChecked) {
+		        			&& hasAlreadyBeenChecked == -1) {
 	        			if(getObjectByPosition(adjacentPosition[0], adjacentPosition[1]) != null) {
-	        				checkExemptions[pushedIndex][2].push([directions[x], adjacentPosition[0], adjacentPosition[1]]);
+	        				checkExemptions[pushedIndex][2].push([adjacentPosition[0], adjacentPosition[1], directions[x]]);
 	        			}
-	        		} else if(hasAlreadyBeenChecked) {
-	        			checkExemptions[pushedIndex][2].push([directions[x], adjacentPosition[0], adjacentPosition[1]]);
+	        		} else if(hasAlreadyBeenChecked  != -1) {
+	        			checkExemptions[pushedIndex][2].push([adjacentPosition[0], adjacentPosition[1], directions[x]]);
 	        		}
 	    		}
 
@@ -473,7 +475,7 @@
 	    			//Gets directions from checkExemptions e.g. [["south", 1, 3], ["west", 0, 3]] => ["south", "west"] => "south-west"
 	    			var arrayOfKeys = [];
 	    			for(x = 0; x < checkExemptions[pushedIndex][2].length; x++) {
-	    				arrayOfKeys.push(checkExemptions[pushedIndex][2][x][0]);
+	    				arrayOfKeys.push(checkExemptions[pushedIndex][2][x][2]);
 	    			}
 
 	    			if(activeObjectId != null) {
@@ -482,14 +484,72 @@
 
         			for(let x = 0; x < checkExemptions[pushedIndex][2].length; x++) {
         				checkExemptions
-        				if(!isArrayInArray(checkExemptions, [checkExemptions[pushedIndex][2][x][1], checkExemptions[pushedIndex][2][x][2]])) {
-        					updateConnectedObjects(checkExemptions[pushedIndex][2][x][1], checkExemptions[pushedIndex][2][x][2], checkExemptions, null);
+        				if(getArrayInArray(checkExemptions, [checkExemptions[pushedIndex][2][x][0], checkExemptions[pushedIndex][2][x][1]]) == -1) {
+        					updateConnectedObjects(checkExemptions[pushedIndex][2][x][0], checkExemptions[pushedIndex][2][x][1], checkExemptions, null);
         				}
 					}
 	    		} else if(activeObjectId != null && $('div[active-object-id=' + activeObjectId + ']').css('background-image').indexOf('desk-connected-') > -1) {
         			$('div[active-object-id=' + activeObjectId + ']').css('background-image', 'url(\'/assets/images/objects/' + objects[activeObjects[activeObjectId]['object_id']]['object_location'] + '\')');
         		}
 	    	}
+	    	return checkExemptions;
+	    }
+
+	    function checkForClusters(checkExemptions)
+	    {
+	    	for(let i = 0; i < checkExemptions.length; i++) {
+
+	    		var cluster = checkCluster(checkExemptions, i);
+
+		    	if (cluster.length > 3) {
+		        	updateCluster(cluster, 1);
+		        }
+			}
+	    }
+
+	    function checkCluster(checkExemptions, i)
+		{
+			var clusters = [];
+		    var objectPositionX, objectPositionY;
+
+		    let objectPosition = checkExemptions[i];
+
+		    nestedLoop: {
+			    for (let i = 0; i <= 1; i++) {
+			        for (let x = 0; x <= 1; x++) {
+			            objectPositionX = objectPosition[0] + i;
+			            objectPositionY = objectPosition[1] + x;
+
+			            if (objectPositionX < 23 && objectPositionY < 23) {
+			                if (getArrayInArray(checkExemptions, [objectPositionX, objectPositionY]) != -1) {
+			                  	clusters.push([objectPositionX, objectPositionY]);
+			                } else {
+			                  	break nestedLoop;
+			                }
+			            } else {
+			              	break nestedLoop;
+			            }
+			        }
+			    }
+			}
+		    return clusters;
+		}
+
+	    function updateCluster(cluster, clusterSize)
+	    {
+			for (let i = 0; i < cluster.length; i++) {
+				var activeObjectId = getObjectByPosition(cluster[i][0], cluster[i][1]);
+
+				var activeObject = $('div[active-object-id=' + activeObjectId + ']');
+				var activeObjectBGImage = activeObject.css('background-image');
+
+				if(activeObjectBGImage.indexOf('-special-') == -1) {
+					activeObjectBGImage = activeObjectBGImage.split('desk-connected-');
+					activeObjectBGImage = activeObjectBGImage[0] + 'desk-connected-special-' + activeObjectBGImage[1];
+
+					activeObject.css('background-image', activeObjectBGImage);
+				}
+			}
 	    }
 
 	    function getAdjacentPosition(direction, objectPositionX, objectPositionY)
@@ -511,15 +571,15 @@
 	    	return position;
 	    }
 
-	    function isArrayInArray(arrayToSearch, arrayToFind)
+	    function getArrayInArray(arrayToSearch, arrayToFind)
 	    {
-	    	for(i = 0; i < arrayToSearch.length; i++) {
+	    	for(let i = 0; i < arrayToSearch.length; i++) {
 	    		if(arrayToSearch[i][0] == arrayToFind[0]
 	    			&& arrayToSearch[i][1] == arrayToFind[1]) {
-	    			return true;
+	    			return i;
 	    		}
 	    	}
-	    	return false;
+	    	return -1;
 	    }
 
 	    function getObjectByPosition(objectPositionX, objectPositionY)
