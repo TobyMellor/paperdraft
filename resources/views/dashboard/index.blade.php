@@ -317,7 +317,7 @@
 			});
 		});
 
-  		var token = '{{ csrf_token() }}';
+  		let token = '{{ csrf_token() }}';
 	    var objects = [];
     	var activeObjects = [];
     	var classId = parseInt($('.class-button:first').attr('class-id'));
@@ -497,32 +497,46 @@
 
 	    function checkForClusters(checkExemptions)
 	    {
+	    	var specialConnections = [];
 	    	for(let i = 0; i < checkExemptions.length; i++) {
 
 	    		var cluster = checkCluster(checkExemptions, i);
 
 		    	if (cluster.length > 3) {
-		        	updateCluster(cluster, 1);
+		        	specialConnections.push(updateCluster(cluster, 1, specialConnections));
 		        }
 			}
+
+	    	for(let i = 0; i < specialConnections.length; i++) {
+	    		var activeObjectId = getObjectByPosition(specialConnections[i][0], specialConnections[i][1]);
+	    		$('div[active-object-id=' + activeObjectId + ']').css('background-image', specialConnections[i][3]);
+	    	}
 	    }
 
 	    function checkCluster(checkExemptions, i)
 		{
 			var clusters = [];
-		    var objectPositionX, objectPositionY;
+		    var objectPositionX, objectPositionY, specialConnections;
 
 		    let objectPosition = checkExemptions[i];
 
 		    nestedLoop: {
 			    for (let i = 0; i <= 1; i++) {
 			        for (let x = 0; x <= 1; x++) {
-			            objectPositionX = objectPosition[0] + i;
-			            objectPositionY = objectPosition[1] + x;
+			            objectPositionX = objectPosition[0] + x;
+			            objectPositionY = objectPosition[1] + i;
 
 			            if (objectPositionX < 23 && objectPositionY < 23) {
 			                if (getArrayInArray(checkExemptions, [objectPositionX, objectPositionY]) != -1) {
-			                  	clusters.push([objectPositionX, objectPositionY]);
+			                	if(i == 0 && x == 0)
+			                		specialConnections = ['east', 'south'];
+			                	else if(i == 0 && x == 1)
+			                		specialConnections = ['south', 'west'];
+			                	else if(i == 1 && x == 0)
+			                		specialConnections = ['north', 'east'];
+			                	else
+			                		specialConnections = ['north', 'west'];
+			                  	clusters.push([objectPositionX, objectPositionY, specialConnections]);
 			                } else {
 			                  	break nestedLoop;
 			                }
@@ -535,21 +549,64 @@
 		    return clusters;
 		}
 
-	    function updateCluster(cluster, clusterSize)
+	    function updateCluster(cluster, clusterSize, specialConnections)
 	    {
 			for (let i = 0; i < cluster.length; i++) {
 				var activeObjectId = getObjectByPosition(cluster[i][0], cluster[i][1]);
 
 				var activeObject = $('div[active-object-id=' + activeObjectId + ']');
 				var activeObjectBGImage = activeObject.css('background-image');
+				var pushedIndex = getArrayInArray(specialConnections, [activeObjects[activeObjectId]['object_position_x'], activeObjects[activeObjectId]['object_position_y'], null]);
+				var startPosition = activeObjectBGImage.indexOf('desk-connected-');
+				var endPosition = activeObjectBGImage.indexOf('.png');
+				var connectedObjects = activeObjectBGImage.substring(startPosition, endPosition);
 
-				if(activeObjectBGImage.indexOf('-special-') == -1) {
-					activeObjectBGImage = activeObjectBGImage.split('desk-connected-');
-					activeObjectBGImage = activeObjectBGImage[0] + 'desk-connected-special-' + activeObjectBGImage[1];
-
-					activeObject.css('background-image', activeObjectBGImage);
+				if(pushedIndex == -1) {
+					var pushedIndex = specialConnections.push([activeObjects[activeObjectId]['object_position_x'], activeObjects[activeObjectId]['object_position_y'], []]) - 1;
 				}
+
+				cluster[i][2].forEach(function(entry){
+					//A bad way to sort directions to north, east, south, west
+					if(specialConnections[pushedIndex][2].indexOf(entry) == -1) {
+						if(entry == 'north') {
+							specialConnections[pushedIndex][2].unshift(entry);
+						} else if (entry == 'west') {
+							specialConnections[pushedIndex][2].push(entry);
+						} else {
+							if(entry == 'east') {
+								if(specialConnections[pushedIndex][2].indexOf('north') != -1) {
+									specialConnections[pushedIndex][2].splice(1, 0, entry);
+								} else {
+									specialConnections[pushedIndex][2].unshift(entry);
+								}
+							} else if(entry == 'south') {
+								if(specialConnections[pushedIndex][2].indexOf('west') != -1) {
+									specialConnections[pushedIndex][2].splice(specialConnections[pushedIndex][2].length - 1, 0, entry);
+								} else {
+									specialConnections[pushedIndex][2].push(entry);
+								}
+							}
+						}
+
+					}
+				});
+
+				connectedObjects = connectedObjects.split('-');
+
+				var x = connectedObjects.length
+				while (x--) {
+				    if(specialConnections[pushedIndex][2].indexOf(connectedObjects[x]) != -1) {
+						connectedObjects.splice(x, 1);
+					}
+				}
+
+				var newImageLocation = connectedObjects.join('-') + '-special-' + specialConnections[pushedIndex][2].join('-') + '.png")';
+
+				activeObjectBGImage = activeObjectBGImage.substr(0, activeObjectBGImage.indexOf('desk-connected-')) + newImageLocation;
+
+				specialConnections[pushedIndex][3] = activeObjectBGImage;
 			}
+			return specialConnections;
 	    }
 
 	    function getAdjacentPosition(direction, objectPositionX, objectPositionY)
@@ -584,6 +641,7 @@
 
 	    function getObjectByPosition(objectPositionX, objectPositionY)
 	    {
+	    	//TODO: Change to indexOf()
 	    	for(i = 0; i < activeObjects.length; i++) {
 	    		if(objectPositionX == activeObjects[i]['object_position_x']
 	    			&& objectPositionY == activeObjects[i]['object_position_y']) {
