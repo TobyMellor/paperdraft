@@ -323,7 +323,13 @@
 			    if ((e.which === 8 || e.which === 46) && !$(e.target).is('input, textarea')) {
 			        e.preventDefault();
 			        softDeleteActiveObjects(selectedIds);
+			    } else if((e.ctrlKey && e.keyCode == 0x56) || (e.metaKey && e.keyCode == 0x56)) {
+			        pasteActiveObject();
 			    }
+			}).bind('copy', function() {
+			   	copyActiveObject(false);
+			}).bind('cut', function() {
+			   	copyActiveObject(true);
 			});
 		});
 
@@ -334,7 +340,8 @@
 	    var objects = [],
 	    	activeObjects = [],
 	    	selectedIds = [],
-	    	softDeletedActiveObjects = [];
+	    	softDeletedActiveObjects = []
+	    	copyClipboard = [];
 
     	var classId = parseInt($('.class-button:first').attr('class-id'));
 
@@ -364,6 +371,8 @@
             ');
 			initializeDraggable();
 			updateSelected([$('div[active-object-id="' + (activeObjects.length - 1) + '"]')]);
+
+			return activeObjects[activeObjects.length - 1];
 	    }
 
 	    function initializeDraggable()
@@ -646,6 +655,28 @@
 	    		}
 	    	}
 	    	return -1;
+	    }
+
+	    function copyActiveObject(isCut)
+	    {
+	    	copyClipboard = [];
+	    	for(let i = 0; i < selectedIds.length; i++) {
+	    		if(isCut) {
+	    			$('div[active-object-id=' + selectedIds[i] + ']').fadeOut('slow', function(){
+						$(this).remove();
+						delete activeObjects[selectedIds[i]];
+					});
+	    		}
+	    		copyClipboard.push(activeObjects[selectedIds[i]]);
+	    	}
+	    }
+
+	    function pasteActiveObject()
+	    {
+	    	//TODO: Don't let it paste on an existing item.
+	    	for(let i = 0; i < copyClipboard.length; i++) {
+				copyClipboard[i] = createActiveObject(copyClipboard[i]['object_id'], (copyClipboard[i]['object_position_x'] + 1) * 32, (copyClipboard[i]['object_position_y'] + 1) * 32);
+	    	}
 	    }
 
 	    function updateCluster(cluster, clusterSize, specialConnections)
