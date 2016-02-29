@@ -23,11 +23,13 @@ class IndexController extends Controller
         $classes = $classController->getClasses();
         $classStudents = $studentController->getClassStudents($classes->first()->id, 9);
         $objects = $objectController->getObjects(9);
+        $assetsBasePath = '/assets/images/objects/';
 
         return view('dashboard.index')
             ->with('classStudents', $classStudents)
             ->with('classes', $classes)
-            ->with('objects', $objects);
+            ->with('objects', $objects)
+            ->with('assetsBasePath', $assetsBasePath);
     }
 
     /**

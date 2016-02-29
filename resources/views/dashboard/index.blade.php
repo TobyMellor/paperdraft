@@ -296,7 +296,6 @@
 
 			$('.create-active-object').click(function() {
 				var objectId = parseInt($(this).attr('object-id'));
-
 				createActiveObject(objectId, 0, 0);
 			});
 
@@ -318,11 +317,15 @@
 		});
 
   		let token = '{{ csrf_token() }}';
-	    var objects = [];
-    	var activeObjects = [];
+  		let assetsBasePath = '{{ $assetsBasePath }}';
+  		let directions = ['north', 'east', 'south', 'west'];
+
+	    var objects = [],
+	    	activeObjects = [],
+	    	selectedIds = [];
+
     	var classId = parseInt($('.class-button:first').attr('class-id'));
     	var hasObjects = false;
-		var selectedIds = [];
 
 	    loadObjects();
 
@@ -341,10 +344,92 @@
 	    	var objectHeight = object['object_height'];
 			            
             $('.drop-target').append('\
-            	<div class="drag-item" active-object-id="' + (activeObjects.length - 1) + '" style="left: ' + objectPositionX + 'px; top: ' + objectPositionY + 'px; background-image: url(\'/assets/images/objects/' + objectLocation + '\'); background-size: ' + objectWidth + 'px; height: ' + objectHeight + 'px; width: ' + objectWidth + 'px;"></div>\
+            	<div class="drag-item" active-object-id="' + (activeObjects.length - 1) + '" style="left: ' + objectPositionX + 'px; top: ' + objectPositionY + 'px; background-image: url(\'' + assetsBasePath + objectLocation + '\'); background-size: ' + objectWidth + 'px; height: ' + objectHeight + 'px; width: ' + objectWidth + 'px;"></div>\
             ');
 			initializeDraggable();
 			updateSelected([$('div[active-object-id="' + (activeObjects.length - 1) + '"]')]);
+	    }
+
+	    function initializeDraggable()
+	    {
+	    	$('.drag-item').draggable({
+		        grid: [32, 32],
+		        containment: '.drop-target',
+		        drag: function(){
+		        	var activeObjectId = $(this).attr('active-object-id');
+
+		        	var objectPositionX = $(this).position().left / 32;
+		        	var objectPositionY = $(this).position().top / 32;
+
+		        	var previousPositionX = Math.floor(activeObjects[activeObjectId]['object_position_x']);
+		        	var previousPositionY = Math.floor(activeObjects[activeObjectId]['object_position_y']);
+
+		        	if(objectPositionX != previousPositionX
+		        			|| objectPositionY != previousPositionY) {
+						updateSelected([$(this)]);
+			        	var checkExemptions = updateConnectedObjects(objectPositionX, objectPositionY, [], null, false);
+
+			        	//Update everything in old location
+			        	//TODO: Update direct connections only!
+		        		updateConnectedObjects(previousPositionX, previousPositionY, [[objectPositionX, objectPositionY, []]], 0, false);
+			        	checkForClusters(checkExemptions);
+		        	}
+		        }
+		    });
+	    }
+
+	    //TODO: Move back /w updates
+	    function updateConnectedObjects(objectPositionX, objectPositionY, checkExemptions, pushedIndex, direct)
+	    {
+	    	let activeObjectId = getObjectByPosition(objectPositionX, objectPositionY);
+	    	var pushedIndex,
+	    		adjacentPosition,
+	    		hasAlreadyBeenChecked;
+	    	var arrayOfKeys = [];
+
+	    	if(pushedIndex == null)
+	    		pushedIndex = checkExemptions.push([objectPositionX, objectPositionY, []]) - 1;
+
+	    	if(activeObjectId == -1 || activeObjects[activeObjectId]['object_id'] == 1) {
+	    		for(x = 0; x < directions.length; x++) {
+	    			adjacentPosition = getAdjacentPosition(directions[x], objectPositionX, objectPositionY);
+	    			hasAlreadyBeenChecked = getArrayInArray(checkExemptions, adjacentPosition);
+	        		if(adjacentPosition[0] > 0
+		        			&& adjacentPosition[0] < 23
+		        			&& adjacentPosition[1] > 0
+		        			&& adjacentPosition[1] < 23
+		        			&& hasAlreadyBeenChecked == -1) {
+	        			if(getObjectByPosition(adjacentPosition[0], adjacentPosition[1]) != -1) {
+	        				checkExemptions[pushedIndex][2].push([adjacentPosition[0], adjacentPosition[1], directions[x], pushedIndex > 0 ? true : false]);
+	        			}
+	        		} else if(hasAlreadyBeenChecked  != -1) {
+	        			checkExemptions[pushedIndex][2].push([adjacentPosition[0], adjacentPosition[1], directions[x], pushedIndex > 0 ? true : false]);
+	        		}
+	    		}
+
+	    		if(checkExemptions[pushedIndex][2].length > 0) {
+	    			//Gets directions from checkExemptions e.g. [["south", 1, 3], ["west", 0, 3]] => ["south", "west"] => "south-west"
+	    			arrayOfKeys = [];
+	    			for(x = 0; x < checkExemptions[pushedIndex][2].length; x++) {
+	    				arrayOfKeys.push(checkExemptions[pushedIndex][2][x][2]);
+	    			}
+
+	    			if(activeObjectId != null) {
+        				$('div[active-object-id=' + activeObjectId + ']').css('background-image', 'url(\'' + assetsBasePath + '/desk-connected-' + arrayOfKeys.join('-') + '.png\')');
+        			}
+
+        			if(!direct || !checkExemptions[pushedIndex][2][0][3]) {
+	        			for(let x = 0; x < checkExemptions[pushedIndex][2].length; x++) {
+	        				if(getArrayInArray(checkExemptions, [checkExemptions[pushedIndex][2][x][0], checkExemptions[pushedIndex][2][x][1]]) == -1) {
+	        					updateConnectedObjects(checkExemptions[pushedIndex][2][x][0], checkExemptions[pushedIndex][2][x][1], checkExemptions, null, direct);
+	        				}
+						}
+					}
+	    		} else if(activeObjectId != null && $('div[active-object-id=' + activeObjectId + ']').css('background-image').indexOf('desk-connected-') > -1) {
+        			$('div[active-object-id=' + activeObjectId + ']').css('background-image', 'url(\'' + assetsBasePath + objects[activeObjects[activeObjectId]['object_id']]['object_location'] + '\')');
+        		}
+	    	}
+	    	return checkExemptions;
 	    }
 
 	    function loadObjects()
@@ -408,7 +493,7 @@
 			    $('.drop-target').children().fadeIn();
 			    initializeDraggable();
 
-			    if (typeof activeObjects[0] !== "undefined") {
+			    if (typeof activeObjects[0] !== 'undefined') {
 			    	updateSelected([$('div[active-object-id="0"]')]);
 			    } else {
 			    	hasObjects = false;
@@ -418,87 +503,14 @@
             });
 	    }
 
-	    function initializeDraggable()
-	    {
-	    	$(".drag-item").draggable({
-		        grid: [32, 32],
-		        containment: '.drop-target',
-		        drag: function(){
-		        	var activeObjectId = $(this).attr('active-object-id');
-
-		        	var objectPositionX = $(this).position().left / 32;
-		        	var objectPositionY = $(this).position().top / 32;
-
-		        	var previousPositionX = Math.floor(activeObjects[activeObjectId]['object_position_x']);
-		        	var previousPositionY = Math.floor(activeObjects[activeObjectId]['object_position_y']);
-
-		        	if(objectPositionX != previousPositionX
-		        			|| objectPositionY != previousPositionY) {
-						updateSelected([$(this)]);
-			        	var checkExemptions = updateConnectedObjects(objectPositionX, objectPositionY, [], null);
-
-			        	//Update everything in old location
-			        	//TODO: Update direct connections only!
-		        		updateConnectedObjects(previousPositionX, previousPositionY, [[objectPositionX, objectPositionY, []]], 0);
-
-		        		checkForClusters(checkExemptions);
-		        	}
-		        }
-		    });
-	    }
-
-	    function updateConnectedObjects(objectPositionX, objectPositionY, checkExemptions, pushedIndex)
-	    {
-	    	var activeObjectId = getObjectByPosition(objectPositionX, objectPositionY);
-
-	    	if(pushedIndex == null)
-	    		var pushedIndex = checkExemptions.push([objectPositionX, objectPositionY, []]) - 1;
-
-	    	if(activeObjectId == null || activeObjects[activeObjectId]['object_id'] == 1) {
-	    		var directions = ['north', 'east', 'south', 'west'];
-	    		for(x = 0; x < directions.length; x++) {
-	    			var adjacentPosition = getAdjacentPosition(directions[x], objectPositionX, objectPositionY);
-	    			var hasAlreadyBeenChecked = getArrayInArray(checkExemptions, adjacentPosition);
-	        		if(adjacentPosition[0] > 0
-		        			&& adjacentPosition[0] < 23
-		        			&& adjacentPosition[1] > 0
-		        			&& adjacentPosition[1] < 23
-		        			&& hasAlreadyBeenChecked == -1) {
-	        			if(getObjectByPosition(adjacentPosition[0], adjacentPosition[1]) != null) {
-	        				checkExemptions[pushedIndex][2].push([adjacentPosition[0], adjacentPosition[1], directions[x]]);
-	        			}
-	        		} else if(hasAlreadyBeenChecked  != -1) {
-	        			checkExemptions[pushedIndex][2].push([adjacentPosition[0], adjacentPosition[1], directions[x]]);
-	        		}
-	    		}
-
-	    		if(checkExemptions[pushedIndex][2].length > 0) {
-	    			//Gets directions from checkExemptions e.g. [["south", 1, 3], ["west", 0, 3]] => ["south", "west"] => "south-west"
-	    			var arrayOfKeys = [];
-	    			for(x = 0; x < checkExemptions[pushedIndex][2].length; x++) {
-	    				arrayOfKeys.push(checkExemptions[pushedIndex][2][x][2]);
-	    			}
-
-	    			if(activeObjectId != null) {
-        				$('div[active-object-id=' + activeObjectId + ']').css('background-image', 'url(\'/assets/images/objects/desk-connected-' + arrayOfKeys.join('-') + '.png\')');
-        			}
-
-        			for(let x = 0; x < checkExemptions[pushedIndex][2].length; x++) {
-        				checkExemptions
-        				if(getArrayInArray(checkExemptions, [checkExemptions[pushedIndex][2][x][0], checkExemptions[pushedIndex][2][x][1]]) == -1) {
-        					updateConnectedObjects(checkExemptions[pushedIndex][2][x][0], checkExemptions[pushedIndex][2][x][1], checkExemptions, null);
-        				}
-					}
-	    		} else if(activeObjectId != null && $('div[active-object-id=' + activeObjectId + ']').css('background-image').indexOf('desk-connected-') > -1) {
-        			$('div[active-object-id=' + activeObjectId + ']').css('background-image', 'url(\'/assets/images/objects/' + objects[activeObjects[activeObjectId]['object_id']]['object_location'] + '\')');
-        		}
-	    	}
-	    	return checkExemptions;
-	    }
-
 	    function checkForClusters(checkExemptions)
 	    {
-	    	var specialConnections = [];
+	    	var specialConnections = [],
+	    		betweenClusterCheck = [];
+	    	var activeObjectId,
+	    		activeObject,
+	    		activeObjectBGImage;
+
 	    	for(let i = 0; i < checkExemptions.length; i++) {
 
 	    		var cluster = checkCluster(checkExemptions, i);
@@ -509,12 +521,12 @@
 			}
 
 	    	for(let i = 0; i < specialConnections.length; i++) {
-	    		var activeObjectId = getObjectByPosition(specialConnections[i][0], specialConnections[i][1]);
-				var activeObject = $('div[active-object-id=' + activeObjectId + ']');
-				var activeObjectBGImage = activeObject.css('background-image');
+	    		activeObjectId = getObjectByPosition(specialConnections[i][0], specialConnections[i][1]);
+				activeObject = $('div[active-object-id=' + activeObjectId + ']');
+				activeObjectBGImage = activeObject.css('background-image');
 
 	    		if(specialConnections[i][3] == true) {
-	    			var betweenClusterCheck = [];
+	    			betweenClusterCheck = [];
 					if(getArrayInArray(specialConnections, [(specialConnections[i][0] - 1), (specialConnections[i][1] - 1)]) != -1) {
 						betweenClusterCheck.push('north_west');
 					}
@@ -534,7 +546,7 @@
 					if(betweenClusterCheck.length == 4)
 						betweenClusterCheck = ['special', 'north', 'east', 'south', 'west'];
 
-					specialConnections[i][3] = activeObjectBGImage.substr(0, activeObjectBGImage.indexOf('desk-connected-')) + 'desk-connected-' + betweenClusterCheck.join('-') + '.png")';
+					specialConnections[i][3] = 'url("' + assetsBasePath + 'desk-connected-' + betweenClusterCheck.join('-') + '.png")';
 	    		}
 	    		$('div[active-object-id=' + activeObjectId + ']').css('background-image', specialConnections[i][3]);
 	    	}
@@ -576,68 +588,6 @@
 		    return clusters;
 		}
 
-	    function updateCluster(cluster, clusterSize, specialConnections)
-	    {
-			for (let i = 0; i < cluster.length; i++) {
-				var activeObjectId = getObjectByPosition(cluster[i][0], cluster[i][1]);
-
-				var activeObject = $('div[active-object-id=' + activeObjectId + ']');
-				var activeObjectBGImage = activeObject.css('background-image');
-				var pushedIndex = getArrayInArray(specialConnections, [activeObjects[activeObjectId]['object_position_x'], activeObjects[activeObjectId]['object_position_y']]);
-				var startPosition = activeObjectBGImage.indexOf('desk-connected-');
-				var endPosition = activeObjectBGImage.indexOf('.png');
-				var connectedObjects = activeObjectBGImage.substring(startPosition, endPosition);
-
-				if(pushedIndex == -1) {
-					var pushedIndex = specialConnections.push([activeObjects[activeObjectId]['object_position_x'], activeObjects[activeObjectId]['object_position_y'], []]) - 1;
-				}
-
-				cluster[i][2].forEach(function(entry){
-					//A bad way to sort directions to north, east, south, west
-					if(specialConnections[pushedIndex][2].indexOf(entry) == -1) {
-						if(entry == 'north') {
-							specialConnections[pushedIndex][2].unshift(entry);
-						} else if (entry == 'west') {
-							specialConnections[pushedIndex][2].push(entry);
-						} else {
-							if(entry == 'east') {
-								if(specialConnections[pushedIndex][2].indexOf('north') != -1) {
-									specialConnections[pushedIndex][2].splice(1, 0, entry);
-								} else {
-									specialConnections[pushedIndex][2].unshift(entry);
-								}
-							} else if(entry == 'south') {
-								if(specialConnections[pushedIndex][2].indexOf('west') != -1) {
-									specialConnections[pushedIndex][2].splice(specialConnections[pushedIndex][2].length - 1, 0, entry);
-								} else {
-									specialConnections[pushedIndex][2].push(entry);
-								}
-							}
-						}
-
-					}
-				});
-
-				connectedObjects = connectedObjects.split('-');
-
-				var x = connectedObjects.length
-				while (x--) {
-				    if(specialConnections[pushedIndex][2].indexOf(connectedObjects[x]) != -1) {
-						connectedObjects.splice(x, 1);
-					}
-				}
-
-				if(specialConnections[pushedIndex][2].length < 4) {
-					var newImageLocation = connectedObjects.join('-') + '-special-' + specialConnections[pushedIndex][2].join('-') + '.png")';
-
-					activeObjectBGImage = activeObjectBGImage.substr(0, activeObjectBGImage.indexOf('desk-connected-')) + newImageLocation;
-					specialConnections[pushedIndex][3] = activeObjectBGImage;
-				} else {
-					specialConnections[pushedIndex][3] = true;
-				}
-			}
-			return specialConnections;
-	    }
 
 	    function getAdjacentPosition(direction, objectPositionX, objectPositionY)
 	    {
@@ -653,7 +603,6 @@
 			        break;
 			    default:
 			        position = [objectPositionX - 1, objectPositionY];
-			        break;
 			} 
 	    	return position;
 	    }
@@ -671,30 +620,69 @@
 
 	    function getObjectByPosition(objectPositionX, objectPositionY)
 	    {
-	    	//TODO: Change to indexOf()
 	    	for(i = 0; i < activeObjects.length; i++) {
 	    		if(objectPositionX == activeObjects[i]['object_position_x']
-	    			&& objectPositionY == activeObjects[i]['object_position_y']) {
+	    				&& objectPositionY == activeObjects[i]['object_position_y']) {
 		    		return i;
 	    		}
 	    	}
-	    	return null;
+	    	return -1;
 	    }
 
-	    //TODO: Save to database on window close
-	    function saveActiveObjects()
+	    function updateCluster(cluster, clusterSize, specialConnections)
 	    {
-	    	$.ajax({
-                url: '/class-object',
-                type: 'POST',
-                data: {
-                    _token: token,
-                    objects: activeObjects,
-                    class_id: classId
-                }
-            }).done(function(returnedActiveObjects) {
-            	activeObjects = returnedActiveObjects;
-            });
+			var x,
+				newImageLocation,
+				pushedIndex;
+
+			for (let i = 0; i < cluster.length; i++) {
+				var activeObjectId = getObjectByPosition(cluster[i][0], cluster[i][1]);
+				var activeObject = $('div[active-object-id=' + activeObjectId + ']');
+				var activeObjectBGImage = activeObject.css('background-image');
+				var startPosition = activeObjectBGImage.indexOf('desk-connected-');
+				var endPosition = activeObjectBGImage.indexOf('.png');
+				var connectedObjects = activeObjectBGImage.substring(startPosition, endPosition);
+				pushedIndex = getArrayInArray(specialConnections, [activeObjects[activeObjectId]['object_position_x'], activeObjects[activeObjectId]['object_position_y']]);
+
+				if(pushedIndex == -1) {
+					pushedIndex = specialConnections.push([activeObjects[activeObjectId]['object_position_x'], activeObjects[activeObjectId]['object_position_y'], []]) - 1;
+				}
+
+				cluster[i][2].forEach(function(entry){
+					if(specialConnections[pushedIndex][2].indexOf(entry) == -1) {
+						specialConnections[pushedIndex][2].push(entry);
+					}
+				});
+
+				specialConnections[pushedIndex][2].forEach(function(entry, index) {
+					specialConnections[pushedIndex][2][index] = directions.indexOf(specialConnections[pushedIndex][2][index]);
+				});
+
+				specialConnections[pushedIndex][2].sort(function(a, b){ return a - b; });
+
+				specialConnections[pushedIndex][2].forEach(function(entry, index) {
+					specialConnections[pushedIndex][2][index] = directions[entry];
+				});
+
+				connectedObjects = connectedObjects.split('-');
+
+				x = connectedObjects.length
+				while (x--) {
+				    if(specialConnections[pushedIndex][2].indexOf(connectedObjects[x]) != -1) {
+						connectedObjects.splice(x, 1);
+					}
+				}
+
+				if(specialConnections[pushedIndex][2].length < 4) {
+					newImageLocation = connectedObjects.join('-') + '-special-' + specialConnections[pushedIndex][2].join('-');
+
+					activeObjectBGImage = 'url("' + assetsBasePath + newImageLocation + '.png")';
+					specialConnections[pushedIndex][3] = activeObjectBGImage;
+				} else {
+					specialConnections[pushedIndex][3] = true;
+				}
+			}
+			return specialConnections;
 	    }
 
 	    function updateSelected(activeObject)
@@ -720,7 +708,7 @@
 		            $('#selected-position').append('\
 							<strong>X:</strong> ' + objectPositionX + ', <strong>Y:</strong> ' + objectPositionY + '<br>\
 					');
-					$('#selected-image').attr('src', '/assets/images/objects/' + objects[activeObjects[activeObjectId]['object_id']]['object_location']);
+					$('#selected-image').attr('src', assetsBasePath + objects[activeObjects[activeObjectId]['object_id']]['object_location']);
 				} else if(i == 3) {
 					selectedNames.push('[' + (activeObject.length - i) + ' more]')
 				}
@@ -748,6 +736,22 @@
 			$('.drag-item').removeClass('outline-highlight');
 	    }
 
+	    //TODO: Save to database on window close
+	    function saveActiveObjects()
+	    {
+	    	$.ajax({
+                url: '/class-object',
+                type: 'POST',
+                data: {
+                    _token: token,
+                    objects: activeObjects,
+                    class_id: classId
+                }
+            }).done(function(returnedActiveObjects) {
+            	activeObjects = returnedActiveObjects;
+            });
+	    }
+
 	    function deleteSelected(activeObjectIds)
 	    {
 	    	for(i = 0; i < activeObjectIds.length; i++) {
@@ -772,7 +776,7 @@
 	    	activeClassObjects.fadeOut(1000, function() {
 	    		$(this).remove();
 	    	});
-	    	activeObjects = []
+	    	activeObjects = [];
 	    }
 	</script>
 
