@@ -180,7 +180,7 @@
 							<div class="col-lg-3 col-sm-6">
 								<div class="thumbnail" style="margin-top: 5px;">
 									<div class="thumb">
-										<img id="selected-image" src="assets/images/objects/desk-1.png" alt="" class="no-antialias">
+										<img id="selected-image" src="assets/images/objects/desk.png" alt="" class="no-antialias">
 									</div>
 								</div>
 							</div>
@@ -438,6 +438,7 @@
 			        	var checkExemptions = updateConnectedObjects(objectPositionX, objectPositionY, [], null);
 
 			        	//Update everything in old location
+			        	//TODO: Update direct connections only!
 		        		updateConnectedObjects(previousPositionX, previousPositionY, [[objectPositionX, objectPositionY, []]], 0);
 
 		        		checkForClusters(checkExemptions);
@@ -503,12 +504,38 @@
 	    		var cluster = checkCluster(checkExemptions, i);
 
 		    	if (cluster.length > 3) {
-		        	specialConnections.push(updateCluster(cluster, 1, specialConnections));
+		        	specialConnections = updateCluster(cluster, 1, specialConnections);
 		        }
 			}
 
 	    	for(let i = 0; i < specialConnections.length; i++) {
 	    		var activeObjectId = getObjectByPosition(specialConnections[i][0], specialConnections[i][1]);
+				var activeObject = $('div[active-object-id=' + activeObjectId + ']');
+				var activeObjectBGImage = activeObject.css('background-image');
+
+	    		if(specialConnections[i][3] == true) {
+	    			var betweenClusterCheck = [];
+					if(getArrayInArray(specialConnections, [(specialConnections[i][0] - 1), (specialConnections[i][1] - 1)]) != -1) {
+						betweenClusterCheck.push('north_west');
+					}
+
+					if(getArrayInArray(specialConnections, [(specialConnections[i][0] + 1), (specialConnections[i][1] - 1)]) != -1) {
+						betweenClusterCheck.push('north_east');
+					}
+
+					if(getArrayInArray(specialConnections, [(specialConnections[i][0] - 1), (specialConnections[i][1] + 1)]) != -1) {
+						betweenClusterCheck.push('south_west');
+					}
+
+					if(getArrayInArray(specialConnections, [(specialConnections[i][0] + 1), (specialConnections[i][1] + 1)]) != -1) {
+						betweenClusterCheck.push('south_east');
+					}
+
+					if(betweenClusterCheck.length == 4)
+						betweenClusterCheck = ['special', 'north', 'east', 'south', 'west'];
+
+					specialConnections[i][3] = activeObjectBGImage.substr(0, activeObjectBGImage.indexOf('desk-connected-')) + 'desk-connected-' + betweenClusterCheck.join('-') + '.png")';
+	    		}
 	    		$('div[active-object-id=' + activeObjectId + ']').css('background-image', specialConnections[i][3]);
 	    	}
 	    }
@@ -556,7 +583,7 @@
 
 				var activeObject = $('div[active-object-id=' + activeObjectId + ']');
 				var activeObjectBGImage = activeObject.css('background-image');
-				var pushedIndex = getArrayInArray(specialConnections, [activeObjects[activeObjectId]['object_position_x'], activeObjects[activeObjectId]['object_position_y'], null]);
+				var pushedIndex = getArrayInArray(specialConnections, [activeObjects[activeObjectId]['object_position_x'], activeObjects[activeObjectId]['object_position_y']]);
 				var startPosition = activeObjectBGImage.indexOf('desk-connected-');
 				var endPosition = activeObjectBGImage.indexOf('.png');
 				var connectedObjects = activeObjectBGImage.substring(startPosition, endPosition);
@@ -600,11 +627,14 @@
 					}
 				}
 
-				var newImageLocation = connectedObjects.join('-') + '-special-' + specialConnections[pushedIndex][2].join('-') + '.png")';
+				if(specialConnections[pushedIndex][2].length < 4) {
+					var newImageLocation = connectedObjects.join('-') + '-special-' + specialConnections[pushedIndex][2].join('-') + '.png")';
 
-				activeObjectBGImage = activeObjectBGImage.substr(0, activeObjectBGImage.indexOf('desk-connected-')) + newImageLocation;
-
-				specialConnections[pushedIndex][3] = activeObjectBGImage;
+					activeObjectBGImage = activeObjectBGImage.substr(0, activeObjectBGImage.indexOf('desk-connected-')) + newImageLocation;
+					specialConnections[pushedIndex][3] = activeObjectBGImage;
+				} else {
+					specialConnections[pushedIndex][3] = true;
+				}
 			}
 			return specialConnections;
 	    }
