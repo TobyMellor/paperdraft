@@ -82,8 +82,8 @@
 								    
 								}
 								.outline-highlight {
-									-webkit-filter: drop-shadow(1px 1px 0 yellow) drop-shadow(-1px -1px 0 yellow);
-	    							filter:drop-shadow(1px 1px 0 yellow) drop-shadow(-1px -1px 0 yellow);
+									-webkit-filter: drop-shadow(1px 1px 0 #26a69a) drop-shadow(-1px -1px 0 #26a69a);
+	    							filter:drop-shadow(1px 1px 0 #26a69a) drop-shadow(-1px -1px 0 #26a69a);
     							}
 							</style>
 						<div class="panel-body" style="height: 736px; overflow-x: scroll;">
@@ -318,6 +318,13 @@
 				clearSession();
 				loadActiveObjects(classId);
 			});
+
+			$(document).on('keydown', function (e) {
+			    if ((e.which === 8 || e.which === 46) && !$(e.target).is('input, textarea')) {
+			        e.preventDefault();
+			        softDeleteActiveObjects(selectedIds);
+			    }
+			});
 		});
 
   		let token = '{{ csrf_token() }}';
@@ -405,10 +412,10 @@
 	    		for(x = 0; x < directions.length; x++) {
 	    			adjacentPosition = getAdjacentPosition(directions[x], objectPositionX, objectPositionY);
 	    			hasAlreadyBeenChecked = getArrayInArray(checkExemptions, adjacentPosition);
-	        		if(adjacentPosition[0] > 0
-		        			&& adjacentPosition[0] < 23
-		        			&& adjacentPosition[1] > 0
-		        			&& adjacentPosition[1] < 23
+	        		if(adjacentPosition[0] >= 0
+		        			&& adjacentPosition[0] <= 23
+		        			&& adjacentPosition[1] >= 0
+		        			&& adjacentPosition[1] <= 23
 		        			&& hasAlreadyBeenChecked == -1) {
 	        			if(getObjectByPosition(adjacentPosition[0], adjacentPosition[1]) != -1) {
 	        				checkExemptions[pushedIndex][2].push([adjacentPosition[0], adjacentPosition[1], directions[x], pushedIndex > 0 ? true : false]);
@@ -632,7 +639,8 @@
 	    function getObjectByPosition(objectPositionX, objectPositionY)
 	    {
 	    	for(i = 0; i < activeObjects.length; i++) {
-	    		if(objectPositionX == activeObjects[i]['object_position_x']
+	    		if(typeof activeObjects[i] != 'undefined'
+	    				&& objectPositionX == activeObjects[i]['object_position_x']
 	    				&& objectPositionY == activeObjects[i]['object_position_y']) {
 		    		return i;
 	    		}
@@ -749,6 +757,7 @@
 
 	    function saveActiveObjects(message)
 	    {
+	    	console.log(activeObjects);
 	    	userConfirmation = message != null ? confirm(message) : true;
 	    	if(userConfirmation) {
 	    		deleteActiveObjects(softDeletedActiveObjects);
@@ -768,10 +777,13 @@
 
 	    function softDeleteActiveObjects(activeObjectIds)
 	    {
-	    	for(i = 0; i < activeObjectIds.length; i++) {
-		    	$('div[active-object-id="' + activeObjectIds[i] + '"]').fadeOut();
+	    	for(let i = 0; i < activeObjectIds.length; i++) {
+		    	var activeObject = $('div[active-object-id="' + activeObjectIds[i] + '"]');
 		    	softDeletedActiveObjects.push(activeObjects[activeObjectIds[i]]);
-		    	delete activeObjects[softDeletedActiveObjects[i]];
+		    	activeObject.fadeOut('slow', function(){
+					$(this).remove();
+					delete activeObjects[activeObjectIds[i]];
+				});
 	        }
 	    }
 

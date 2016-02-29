@@ -38,7 +38,7 @@ class ObjectController extends Controller
                         'object_position_y' => $object['object_position_y']
                     ]
                 );
-            } else {
+            } elseif(isset($object['object_id'])) {
                 $classObject = new ClassObject;
 
                 $classObject->object_id = $object['object_id'];
