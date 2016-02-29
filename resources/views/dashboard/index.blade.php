@@ -287,11 +287,11 @@
 			});
 
 			$('#selected-delete').click(function() {
-				deleteSelected(selectedIds);
+				softDeleteActiveObjects(selectedIds);
 			});
 
 			$('#save-button').click(function() {
-				saveActiveObjects();
+				saveActiveObjects(null);
 			});
 
 			$('.create-active-object').click(function() {
@@ -300,6 +300,10 @@
 			});
 
 			$('.class-button').click(function() {
+				if(hasChanged)
+					saveActiveObjects('Do you want to save the changes made to the seating plan for “' + $('.class-button.class-button-active').text() + '”?');
+				hasChanged = false;
+
 				$('.class-button.class-button-active').removeClass('class-button-active');
 				$(this).addClass('class-button-active');
 
@@ -322,15 +326,20 @@
 
 	    var objects = [],
 	    	activeObjects = [],
-	    	selectedIds = [];
+	    	selectedIds = [],
+	    	softDeletedActiveObjects = [];
 
     	var classId = parseInt($('.class-button:first').attr('class-id'));
-    	var hasObjects = false;
+
+    	var hasObjects = false,
+    		hasChanged = false;
 
 	    loadObjects();
 
 	    function createActiveObject(objectId, objectPositionX, objectPositionY)
 	    {
+	    	hasChanged = true;
+
 	    	activeObjects[activeObjects.length] = {
             	'object_id': objectId,
             	'active_object_id': null,
@@ -356,6 +365,8 @@
 		        grid: [32, 32],
 		        containment: '.drop-target',
 		        drag: function(){
+		        	hasChanged = true;
+
 		        	var activeObjectId = $(this).attr('active-object-id');
 
 		        	var objectPositionX = $(this).position().left / 32;
@@ -736,38 +747,49 @@
 			$('.drag-item').removeClass('outline-highlight');
 	    }
 
-	    //TODO: Save to database on window close
-	    function saveActiveObjects()
+	    function saveActiveObjects(message)
 	    {
-	    	$.ajax({
-                url: '/class-object',
-                type: 'POST',
-                data: {
-                    _token: token,
-                    objects: activeObjects,
-                    class_id: classId
-                }
-            }).done(function(returnedActiveObjects) {
-            	activeObjects = returnedActiveObjects;
-            });
+	    	userConfirmation = message != null ? confirm(message) : true;
+	    	if(userConfirmation) {
+	    		deleteActiveObjects(softDeletedActiveObjects);
+		    	$.ajax({
+	                url: '/class-object',
+	                type: 'POST',
+	                data: {
+	                    _token: token,
+	                    objects: activeObjects,
+	                    class_id: classId
+	                }
+	            }).done(function(returnedActiveObjects) {
+	            	activeObjects = returnedActiveObjects;
+	            });
+        	}
 	    }
 
-	    function deleteSelected(activeObjectIds)
+	    function softDeleteActiveObjects(activeObjectIds)
 	    {
 	    	for(i = 0; i < activeObjectIds.length; i++) {
 		    	$('div[active-object-id="' + activeObjectIds[i] + '"]').fadeOut();
+		    	softDeletedActiveObjects.push(activeObjects[activeObjectIds[i]]);
+		    	delete activeObjects[softDeletedActiveObjects[i]];
+	        }
+	    }
+
+	    function deleteActiveObjects(softDeletedActiveObjects)
+	    {
+	    	for(i = 0; i < softDeletedActiveObjects.length; i++) {
 		    	$.ajax({
 	                url: '/class-object',
 	                type: 'DELETE',
 	                data: {
 	                    _token: token,
-	                    class_object: activeObjects[activeObjectIds[i]],
+	                    class_object: softDeletedActiveObjects[i],
 	                    class_id: classId
 	                }
-	            }).done(function(data) {
-		    		delete activeObjects[activeObjectIds[i]];
 	            });
 	        }
+
+	        softDeletedActiveObjects = [];
 	    }
 
 	    function clearSession()
