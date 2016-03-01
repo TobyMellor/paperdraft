@@ -676,11 +676,62 @@
 
 	    function pasteActiveObject()
 	    {
-	    	//TODO: Don't let it paste on an existing item.
 	    	for(let i = 0; i < copyClipboard.length; i++) {
-				copyClipboard[i] = createActiveObject(copyClipboard[i]['object_id'], (copyClipboard[i]['object_position_x'] + 1) * 32, (copyClipboard[i]['object_position_y'] + 1) * 32);
+	    		var copiedObjectPositionX = copyClipboard[i]['object_position_x'];
+	    		var copiedObjectPositionY = copyClipboard[i]['object_position_y'];
+				var pastedObjectPositionX,
+					pastedObjectPositionY,
+					nearestEmptySpace;
+
+	    		if(getObjectByPosition(copiedObjectPositionX + 1, copiedObjectPositionY + 1) != -1) {
+		    		nearestEmptySpace = getNearestEmpty(copyClipboard[i]['object_position_x'], copyClipboard[i]['object_position_y'], 5, 5);
+		    		if(nearestEmptySpace == -1) {
+		    			alert('There is no space to paste the object at ' + copiedObjectPositionX + ', ' + copiedObjectPositionY);
+		    			break;
+		    		}
+					pastedObjectPositionX = nearestEmptySpace[0];
+					pastedObjectPositionY = nearestEmptySpace[1];
+				} else {
+					pastedObjectPositionX = copiedObjectPositionX + 1;
+					pastedObjectPositionY = copiedObjectPositionY + 1;
+				}
+				copyClipboard[i] = createActiveObject(copyClipboard[i]['object_id'], pastedObjectPositionX * 32, pastedObjectPositionY * 32);
 	    	}
 	    }
+
+	    function getNearestEmpty(objectPositionX, objectPositionY, maxCheckHeight, maxCheckWidth) {
+		    var x = 0,
+		        y = 0,
+		        delta = [0, -1],
+		        potentialEmptyX,
+		        potentialEmptyY;
+
+		    for (let i = 0; i < Math.pow(Math.max(maxCheckWidth, maxCheckHeight), 2); i++) {
+		        if ((-maxCheckWidth / 2 < x && x <= maxCheckWidth / 2) 
+		                && (-maxCheckHeight / 2 < y && y <= maxCheckHeight / 2)) {
+		        	potentialEmptyX = x + objectPositionX;
+		        	potentialEmptyY = y + objectPositionY;
+		        	if(potentialEmptyX >= 0
+		        			&& potentialEmptyY >= 0
+		        			&& potentialEmptyX <= 23
+		        			&& potentialEmptyY <= 23) {
+			        	if(getObjectByPosition(x + objectPositionX, y + objectPositionY) == -1) {
+			            	return [x + objectPositionX, y + objectPositionY];
+			        	}
+		        	}
+		        }
+
+		        if (x === y 
+		              || (x < 0 && x === -y) 
+		              || (x > 0 && x === 1 - y)){
+		            delta = [-delta[1], delta[0]]            
+		        }
+
+		        x += delta[0];
+		        y += delta[1];        
+		    }
+		    return -1;
+		}
 
 	    function updateCluster(cluster, clusterSize, specialConnections)
 	    {
