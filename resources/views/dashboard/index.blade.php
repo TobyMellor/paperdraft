@@ -343,6 +343,14 @@
 			   	copyActiveObject(false);
 			}).bind('cut', function() {
 			   	copyActiveObject(true);
+			}).keydown(function (e) {
+				if (e.ctrlKey || e.metaKey) {
+				    if (e.which == 90) {
+				    	undoActionHistory();
+				    } else if (e.which == 89) {
+				    	redoActionHistory();
+				    }
+				}
 			});
 		});
 
@@ -354,14 +362,44 @@
 	    	activeObjects = [],
 	    	selectedIds = [],
 	    	softDeletedActiveObjects = []
-	    	copyClipboard = [];
+	    	copyClipboard = []
+	    	actionHistory = [];
 
     	var classId = parseInt($('.class-button:first').attr('class-id'));
+
+    	var actionUndoCount = 1;
 
     	var hasObjects = false,
     		hasChanged = false;
 
 	    loadObjects();
+
+	    function storeActionHistory(activeObjectId)
+	    {
+	    	actionHistory.push([activeObjectId, [activeObjects[activeObjectId]['object_position_x'], activeObjects[activeObjectId]['object_position_y']]]);
+	    	actionUndoCount = 1;
+	    }
+
+	    function undoActionHistory()
+	    {
+	    	if(actionHistory.length - actionUndoCount - 1 >= 0) {
+	    		var action = actionHistory[actionHistory.length - actionUndoCount - 1];
+	    		var activeObject = activeObjects[action[0]];
+
+	    		activeObject['object_position_x'] = action[1][0];
+	    		activeObject['object_position_y'] = action[1][1];
+
+	    		$('div[active-object-id="' + action[0] + '"]').css({left: activeObject['object_position_x'] * 32, top: activeObject['object_position_y'] * 32});
+	    		actionUndoCount++;
+	    	} else {
+	    		alert('Nothing left to undo!');
+	    	}
+	    }
+
+	    function redoActionHistory()
+	    {
+	    	alert('Redo!');
+	    }
 
 	    function createActiveObject(objectId, objectPositionX, objectPositionY)
 	    {
@@ -396,7 +434,7 @@
 		        drag: function(){
 		        	hasChanged = true;
 
-		        	var activeObjectId = $(this).attr('active-object-id');
+		        	let activeObjectId = $(this).attr('active-object-id');
 
 		        	var objectPositionX = $(this).position().left / 32;
 		        	var objectPositionY = $(this).position().top / 32;
@@ -414,6 +452,14 @@
 		        		updateConnectedObjects(previousPositionX, previousPositionY, [[objectPositionX, objectPositionY, []]], 0, false);
 			        	checkForClusters(checkExemptions);
 		        	}
+		        },
+		        stop: function(){
+		        	let activeObjectId = $(this).attr('active-object-id');
+		        	storeActionHistory(activeObjectId);
+		        },
+		        create: function(){
+		        	let activeObjectId = $(this).attr('active-object-id');
+		        	storeActionHistory(activeObjectId);
 		        }
 		    });
 	    }
@@ -886,17 +932,19 @@
 
 	    function deleteActiveObjects(softDeletedActiveObjects)
 	    {
-	    	$.ajax({
-                url: '/class-object',
-                type: 'DELETE',
-                data: {
-                    _token: token,
-                    class_objects: softDeletedActiveObjects,
-                    class_id: classId
-                }
-            });
+	    	if(softDeletedActiveObjects.length > 0) {
+		    	$.ajax({
+	                url: '/class-object',
+	                type: 'DELETE',
+	                data: {
+	                    _token: token,
+	                    class_objects: softDeletedActiveObjects,
+	                    class_id: classId
+	                }
+	            });
 
-	        softDeletedActiveObjects = [];
+		        softDeletedActiveObjects = [];
+	    	}
 	    }
 
 	    function clearSession()
