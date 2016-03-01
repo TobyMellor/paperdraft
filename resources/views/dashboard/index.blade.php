@@ -296,7 +296,20 @@
 
 			$('.create-active-object').click(function() {
 				var objectId = parseInt($(this).attr('object-id'));
-				createActiveObject(objectId, 0, 0);
+				if(selectedIds.length > 0) {
+					var selectedObjectPositionX = activeObjects[selectedIds[0]]['object_position_x'];
+					var selectedObjectPositionY = activeObjects[selectedIds[0]]['object_position_y'];
+
+					var nearestEmptySpace = getNearestEmpty(selectedObjectPositionX, selectedObjectPositionY, 5, 5);
+
+					if(nearestEmptySpace == -1) {
+						createActiveObject(objectId, 0, 0);
+					} else {
+						createActiveObject(objectId, nearestEmptySpace[0] * 32, nearestEmptySpace[1] * 32);
+					}
+				} else {
+					createActiveObject(objectId, 0, 0);
+				}
 			});
 
 			$('.class-button').click(function() {
@@ -842,7 +855,6 @@
 
 	    function saveActiveObjects(message)
 	    {
-	    	console.log(activeObjects);
 	    	userConfirmation = message != null ? confirm(message) : true;
 	    	if(userConfirmation) {
 	    		deleteActiveObjects(softDeletedActiveObjects);
