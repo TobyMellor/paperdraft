@@ -84,15 +84,17 @@ class ObjectController extends Controller
         return $classObjects;
     }
 
-    public function deleteClassObject()
+    public function deleteClassObjects()
     {
         $request = $this->request;
-        $classObject = $request->input('class_object');
+        $classObjects = $request->input('class_objects');
         $classId = $request->input('class_id');
 
+        $classObjectIds = array_map(function($classObjects){ return $classObjects['active_object_id']; }, $classObjects);
+
         ClassObject::where('class_id', $classId)
-            ->where('id', $classObject['active_object_id'])
-            ->delete();
+            ->whereIn('id', $classObjectIds)
+            ->delete(); 
     }
 
     protected function validator(array $data)

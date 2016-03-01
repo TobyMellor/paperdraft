@@ -452,7 +452,7 @@
 	        				}
 						}
 					}
-	    		} else if(activeObjectId != null && $('div[active-object-id=' + activeObjectId + ']').css('background-image').indexOf('desk-connected-') > -1) {
+	    		} else if(activeObjectId != -1 && $('div[active-object-id=' + activeObjectId + ']').css('background-image').indexOf('desk-connected-') > -1) {
         			$('div[active-object-id=' + activeObjectId + ']').css('background-image', 'url(\'' + assetsBasePath + objects[activeObjects[activeObjectId]['object_id']]['object_location'] + '\')');
         		}
 	    	}
@@ -874,17 +874,15 @@
 
 	    function deleteActiveObjects(softDeletedActiveObjects)
 	    {
-	    	for(i = 0; i < softDeletedActiveObjects.length; i++) {
-		    	$.ajax({
-	                url: '/class-object',
-	                type: 'DELETE',
-	                data: {
-	                    _token: token,
-	                    class_object: softDeletedActiveObjects[i],
-	                    class_id: classId
-	                }
-	            });
-	        }
+	    	$.ajax({
+                url: '/class-object',
+                type: 'DELETE',
+                data: {
+                    _token: token,
+                    class_objects: softDeletedActiveObjects,
+                    class_id: classId
+                }
+            });
 
 	        softDeletedActiveObjects = [];
 	    }
