@@ -661,13 +661,16 @@
 	    {
 	    	copyClipboard = [];
 	    	for(let i = 0; i < selectedIds.length; i++) {
+	    		copyClipboard.push(activeObjects[selectedIds[i]]);
 	    		if(isCut) {
 	    			$('div[active-object-id=' + selectedIds[i] + ']').fadeOut('slow', function(){
 						$(this).remove();
 						delete activeObjects[selectedIds[i]];
+						clearSelected();
+						if(activeObjects.length > 0)
+							updateSelected([$('div[active-object-id=0]')]);
 					});
 	    		}
-	    		copyClipboard.push(activeObjects[selectedIds[i]]);
 	    	}
 	    }
 
