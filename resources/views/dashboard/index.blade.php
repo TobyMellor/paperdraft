@@ -377,19 +377,28 @@
 	    function storeActionHistory(activeObjectId)
 	    {
 	    	actionHistory.push([activeObjectId, [activeObjects[activeObjectId]['object_position_x'], activeObjects[activeObjectId]['object_position_y']]]);
-	    	actionUndoCount = 1;
+	    	if(actionUndoCount > 1) {
+	    		actionHistory.splice(actionHistory.length - actionUndoCount + 1, actionUndoCount);
+	    		actionUndoCount = 1;
+	    	}
 	    }
 
 	    function undoActionHistory()
 	    {
-	    	if(actionHistory.length - actionUndoCount - 1 >= 0) {
-	    		var action = actionHistory[actionHistory.length - actionUndoCount - 1];
+	    	if(actionHistory.length - actionUndoCount >= 0) {
+	    		var action = actionHistory[actionHistory.length - actionUndoCount];
 	    		var activeObject = activeObjects[action[0]];
+
+	    		if(actionUndoCount == 1) {
+	    			storeActionHistory(action[0]);
+	    			actionUndoCount++;
+	    		}
 
 	    		activeObject['object_position_x'] = action[1][0];
 	    		activeObject['object_position_y'] = action[1][1];
 
 	    		$('div[active-object-id="' + action[0] + '"]').css({left: activeObject['object_position_x'] * 32, top: activeObject['object_position_y'] * 32});
+
 	    		actionUndoCount++;
 	    	} else {
 	    		alert('Nothing left to undo!');
@@ -398,7 +407,18 @@
 
 	    function redoActionHistory()
 	    {
-	    	alert('Redo!');
+	    	if(actionUndoCount > 2) {
+	    		actionUndoCount--;
+	    		var action = actionHistory[actionHistory.length - actionUndoCount + 1];
+	    		var activeObject = activeObjects[action[0]];
+
+	    		activeObject['object_position_x'] = action[1][0];
+	    		activeObject['object_position_y'] = action[1][1];
+
+	    		$('div[active-object-id="' + action[0] + '"]').css({left: activeObject['object_position_x'] * 32, top: activeObject['object_position_y'] * 32});
+	    	} else {
+	    		alert('Nothing left to redo!');
+	    	}
 	    }
 
 	    function createActiveObject(objectId, objectPositionX, objectPositionY)
@@ -453,11 +473,7 @@
 			        	checkForClusters(checkExemptions);
 		        	}
 		        },
-		        stop: function(){
-		        	let activeObjectId = $(this).attr('active-object-id');
-		        	storeActionHistory(activeObjectId);
-		        },
-		        create: function(){
+		        start: function(){
 		        	let activeObjectId = $(this).attr('active-object-id');
 		        	storeActionHistory(activeObjectId);
 		        }
