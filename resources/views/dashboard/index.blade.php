@@ -742,8 +742,8 @@
 						$(this).remove();
 						delete activeObjects[selectedIds[i]];
 						clearSelected();
-						if(activeObjects.length > 0)
-							updateSelected([$('div[active-object-id=0]')]);
+						if($('.drop-target').children().length > 0)
+							updateSelected([$('div[active-object-id="' + $('.drop-target').children(0).attr('active-object-id') + '"]')]);
 					});
 	    		}
 	    	}
@@ -942,6 +942,11 @@
 		    	activeObject.fadeOut('slow', function(){
 					$(this).remove();
 					delete activeObjects[activeObjectIds[i]];
+					if(i == activeObjectIds.length - 1) {
+						if($('.drop-target').children().length > 0) {
+							updateSelected([$('div[active-object-id="' + $('.drop-target').children(0).attr('active-object-id') + '"]')]);
+						}
+					}
 				});
 	        }
 	    }
