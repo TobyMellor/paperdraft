@@ -470,7 +470,6 @@
 			        	//Update everything in old location
 			        	//TODO: Update direct connections only!
 		        		updateConnectedObjects(previousPositionX, previousPositionY, [[objectPositionX, objectPositionY, []]], 0, false);
-			        	checkForClusters(checkExemptions);
 		        	}
 		        },
 		        start: function(){
@@ -487,26 +486,44 @@
 	    	var pushedIndex,
 	    		adjacentPosition,
 	    		hasAlreadyBeenChecked;
-	    	var arrayOfKeys = [];
+	    	var arrayOfKeys = [],
+		    	adjacentDirections = [
+					['northwest', 'north', 'northeast'],
+					['west', null, 'east'],
+					['southwest', 'south', 'southeast']
+				];
 
 	    	if(pushedIndex == null)
 	    		pushedIndex = checkExemptions.push([objectPositionX, objectPositionY, []]) - 1;
 
 	    	if(activeObjectId == -1 || activeObjects[activeObjectId]['object_id'] == 1) {
-	    		for(x = 0; x < directions.length; x++) {
-	    			adjacentPosition = getAdjacentPosition(directions[x], objectPositionX, objectPositionY);
-	    			hasAlreadyBeenChecked = getArrayInArray(checkExemptions, adjacentPosition);
-	        		if(adjacentPosition[0] >= 0
-		        			&& adjacentPosition[0] <= 23
-		        			&& adjacentPosition[1] >= 0
-		        			&& adjacentPosition[1] <= 23
-		        			&& hasAlreadyBeenChecked == -1) {
-	        			if(getObjectByPosition(adjacentPosition[0], adjacentPosition[1]) != -1) {
-	        				checkExemptions[pushedIndex][2].push([adjacentPosition[0], adjacentPosition[1], directions[x], pushedIndex > 0 ? true : false]);
-	        			}
-	        		} else if(hasAlreadyBeenChecked  != -1) {
-	        			checkExemptions[pushedIndex][2].push([adjacentPosition[0], adjacentPosition[1], directions[x], pushedIndex > 0 ? true : false]);
-	        		}
+	    		if(objectPositionX - 1 >= 0
+	    				&& objectPositionX + 1 <= 23
+	    				&& objectPositionY - 1 >= 0
+	    				&& objectPositionY + 1 <= 23) {
+		    		for(let i = 0; i < 3; i++) {
+		    			for(let x = 0; x < 3; x++) {
+		    				if(i != 1 || x != 1) {
+			    				var checkPositionX = objectPositionX - 1 + x;
+			    				var checkPositionY = objectPositionY - 1 + i;
+
+				    			hasAlreadyBeenChecked = getArrayInArray(checkExemptions, [checkPositionX, checkPositionX]);
+
+					    		if(hasAlreadyBeenChecked == -1) {
+				        			if(getObjectByPosition(checkPositionX, checkPositionY) != -1) {
+				        				if(adjacentDirections[i][x].length == 9) {
+				        					if(getObjectByPosition(objectPositionX, checkPositionY) != -1 
+				        							&& getObjectByPosition(checkPositionX, objectPositionY) != -1) {
+				        						checkExemptions[pushedIndex][2].push([checkPositionX, checkPositionY, adjacentDirections[i][x], pushedIndex > 0 ? true : false]);
+				        					}
+				        				} else {
+				        					checkExemptions[pushedIndex][2].push([checkPositionX, checkPositionY, adjacentDirections[i][x], pushedIndex > 0 ? true : false]);
+				        				}
+				        			}
+			        			}
+		        			}
+		    			}
+		    		}
 	    		}
 
 	    		if(checkExemptions[pushedIndex][2].length > 0) {
@@ -517,7 +534,7 @@
 	    			}
 
 	    			if(activeObjectId != null) {
-        				$('div[active-object-id=' + activeObjectId + ']').css('background-image', 'url(\'' + assetsBasePath + '/desk-connected-' + arrayOfKeys.join('-') + '.png\')');
+        				$('div[active-object-id=' + activeObjectId + ']').css('background-image', 'url(\'' + assetsBasePath + 'desk-connected-' + arrayOfKeys.join('-') + '.png\')');
         			}
 
         			if(!direct || !checkExemptions[pushedIndex][2][0][3]) {
@@ -603,110 +620,6 @@
 			    	$('#selected-no-objects').fadeIn();
 			    }
             });
-	    }
-
-	    function checkForClusters(checkExemptions)
-	    {
-	    	var specialConnections = [],
-	    		betweenClusterCheck = [];
-	    	var activeObjectId,
-	    		activeObject,
-	    		activeObjectBGImage;
-
-	    	for(let i = 0; i < checkExemptions.length; i++) {
-
-	    		var cluster = checkCluster(checkExemptions, i);
-
-		    	if (cluster.length > 3) {
-		        	specialConnections = updateCluster(cluster, 1, specialConnections);
-		        }
-			}
-
-	    	for(let i = 0; i < specialConnections.length; i++) {
-	    		activeObjectId = getObjectByPosition(specialConnections[i][0], specialConnections[i][1]);
-				activeObject = $('div[active-object-id=' + activeObjectId + ']');
-				activeObjectBGImage = activeObject.css('background-image');
-
-	    		if(specialConnections[i][3] == true) {
-	    			betweenClusterCheck = [];
-					if(getArrayInArray(specialConnections, [(specialConnections[i][0] - 1), (specialConnections[i][1] - 1)]) != -1) {
-						betweenClusterCheck.push('north_west');
-					}
-
-					if(getArrayInArray(specialConnections, [(specialConnections[i][0] + 1), (specialConnections[i][1] - 1)]) != -1) {
-						betweenClusterCheck.push('north_east');
-					}
-
-					if(getArrayInArray(specialConnections, [(specialConnections[i][0] - 1), (specialConnections[i][1] + 1)]) != -1) {
-						betweenClusterCheck.push('south_west');
-					}
-
-					if(getArrayInArray(specialConnections, [(specialConnections[i][0] + 1), (specialConnections[i][1] + 1)]) != -1) {
-						betweenClusterCheck.push('south_east');
-					}
-
-					if(betweenClusterCheck.length == 4)
-						betweenClusterCheck = ['special', 'north', 'east', 'south', 'west'];
-
-					specialConnections[i][3] = 'url("' + assetsBasePath + 'desk-connected-' + betweenClusterCheck.join('-') + '.png")';
-	    		}
-	    		$('div[active-object-id=' + activeObjectId + ']').css('background-image', specialConnections[i][3]);
-	    	}
-	    }
-
-	    function checkCluster(checkExemptions, i)
-		{
-			var clusters = [];
-		    var objectPositionX, objectPositionY, specialConnections;
-
-		    let objectPosition = checkExemptions[i];
-
-		    nestedLoop: {
-			    for (let i = 0; i <= 1; i++) {
-			        for (let x = 0; x <= 1; x++) {
-			            objectPositionX = objectPosition[0] + x;
-			            objectPositionY = objectPosition[1] + i;
-
-			            if (objectPositionX < 23 && objectPositionY < 23) {
-			                if (getArrayInArray(checkExemptions, [objectPositionX, objectPositionY]) != -1) {
-			                	if(i == 0 && x == 0)
-			                		specialConnections = ['east', 'south'];
-			                	else if(i == 0 && x == 1)
-			                		specialConnections = ['south', 'west'];
-			                	else if(i == 1 && x == 0)
-			                		specialConnections = ['north', 'east'];
-			                	else
-			                		specialConnections = ['north', 'west'];
-			                  	clusters.push([objectPositionX, objectPositionY, specialConnections]);
-			                } else {
-			                  	break nestedLoop;
-			                }
-			            } else {
-			              	break nestedLoop;
-			            }
-			        }
-			    }
-			}
-		    return clusters;
-		}
-
-
-	    function getAdjacentPosition(direction, objectPositionX, objectPositionY)
-	    {
-	    	switch (direction) {
-			    case 'north':
-			        position = [objectPositionX, objectPositionY - 1];
-			        break;
-			    case 'east':
-			        position = [objectPositionX + 1, objectPositionY];
-			        break;
-			    case 'south':
-			        position = [objectPositionX, objectPositionY + 1];
-			        break;
-			    default:
-			        position = [objectPositionX - 1, objectPositionY];
-			} 
-	    	return position;
 	    }
 
 	    function getArrayInArray(arrayToSearch, arrayToFind)
@@ -807,62 +720,6 @@
 		    }
 		    return -1;
 		}
-
-	    function updateCluster(cluster, clusterSize, specialConnections)
-	    {
-			var x,
-				newImageLocation,
-				pushedIndex;
-
-			for (let i = 0; i < cluster.length; i++) {
-				var activeObjectId = getObjectByPosition(cluster[i][0], cluster[i][1]);
-				var activeObject = $('div[active-object-id=' + activeObjectId + ']');
-				var activeObjectBGImage = activeObject.css('background-image');
-				var startPosition = activeObjectBGImage.indexOf('desk-connected-');
-				var endPosition = activeObjectBGImage.indexOf('.png');
-				var connectedObjects = activeObjectBGImage.substring(startPosition, endPosition);
-				pushedIndex = getArrayInArray(specialConnections, [activeObjects[activeObjectId]['object_position_x'], activeObjects[activeObjectId]['object_position_y']]);
-
-				if(pushedIndex == -1) {
-					pushedIndex = specialConnections.push([activeObjects[activeObjectId]['object_position_x'], activeObjects[activeObjectId]['object_position_y'], []]) - 1;
-				}
-
-				cluster[i][2].forEach(function(entry){
-					if(specialConnections[pushedIndex][2].indexOf(entry) == -1) {
-						specialConnections[pushedIndex][2].push(entry);
-					}
-				});
-
-				specialConnections[pushedIndex][2].forEach(function(entry, index) {
-					specialConnections[pushedIndex][2][index] = directions.indexOf(specialConnections[pushedIndex][2][index]);
-				});
-
-				specialConnections[pushedIndex][2].sort(function(a, b){ return a - b; });
-
-				specialConnections[pushedIndex][2].forEach(function(entry, index) {
-					specialConnections[pushedIndex][2][index] = directions[entry];
-				});
-
-				connectedObjects = connectedObjects.split('-');
-
-				x = connectedObjects.length
-				while (x--) {
-				    if(specialConnections[pushedIndex][2].indexOf(connectedObjects[x]) != -1) {
-						connectedObjects.splice(x, 1);
-					}
-				}
-
-				if(specialConnections[pushedIndex][2].length < 4) {
-					newImageLocation = connectedObjects.join('-') + '-special-' + specialConnections[pushedIndex][2].join('-');
-
-					activeObjectBGImage = 'url("' + assetsBasePath + newImageLocation + '.png")';
-					specialConnections[pushedIndex][3] = activeObjectBGImage;
-				} else {
-					specialConnections[pushedIndex][3] = true;
-				}
-			}
-			return specialConnections;
-	    }
 
 	    function updateSelected(activeObject)
 	    {
