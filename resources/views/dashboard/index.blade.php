@@ -467,8 +467,6 @@
                         updateSelected([$(this)]);
                         updateConnectedObjects(objectPositionX, objectPositionY, [], null);
 
-                        //Update everything in old location
-                        //TODO: Update direct connections only!
                         updateConnectedObjects(previousPositionX, previousPositionY, [
                             [objectPositionX, objectPositionY, []]
                         ], 0);
@@ -488,7 +486,10 @@
         //TODO: Move back /w updates
         function updateConnectedObjects(objectPositionX, objectPositionY, checkExemptions, pushedIndex) {
             let activeObjectId = getObjectByPosition(objectPositionX, objectPositionY);
-            var hasAlreadyBeenChecked;
+
+            var hasAlreadyBeenChecked,
+                objectInCheckPosition;
+
             var arrayOfKeys = [],
                 adjacentDirections = [
                     ['northwest', 'north', 'northeast'],
@@ -510,9 +511,17 @@
                                 hasAlreadyBeenChecked = getArrayInArray(checkExemptions, [checkPositionX, checkPositionX]);
 
                                 if (hasAlreadyBeenChecked == -1) {
-                                    if (getObjectByPosition(checkPositionX, checkPositionY) != -1) {
+                                    objectInCheckPosition = getObjectByPosition(checkPositionX, checkPositionY);
+                                    if (objectInCheckPosition != -1 && activeObjects[objectInCheckPosition].object_id == 1) {
                                         if (adjacentDirections[i][x].length == 9) {
-                                            if (getObjectByPosition(objectPositionX, checkPositionY) != -1 && getObjectByPosition(checkPositionX, objectPositionY) != -1) {
+                                            objectInCheckPosition = [
+                                                getObjectByPosition(objectPositionX, checkPositionY),
+                                                getObjectByPosition(checkPositionX, objectPositionY)
+                                            ];
+                                            if (objectInCheckPosition[0] != -1 
+                                                    && activeObjects[objectInCheckPosition[0]].object_id == 1
+                                                    && objectInCheckPosition[1] != -1
+                                                    && activeObjects[objectInCheckPosition[1]].object_id == 1) {
                                                 checkExemptions[pushedIndex][2].push([checkPositionX, checkPositionY, adjacentDirections[i][x], pushedIndex > 0 ? true : false]);
                                             }
                                         } else {
