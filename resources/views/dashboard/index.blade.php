@@ -465,24 +465,28 @@
 
                     if (objectPositionX != previousPositionX || objectPositionY != previousPositionY) {
                         updateSelected([$(this)]);
-                        updateConnectedObjects(objectPositionX, objectPositionY, [], null, false);
+                        updateConnectedObjects(objectPositionX, objectPositionY, [], null);
 
                         //Update everything in old location
                         //TODO: Update direct connections only!
                         updateConnectedObjects(previousPositionX, previousPositionY, [
                             [objectPositionX, objectPositionY, []]
-                        ], 0, false);
+                        ], 0);
                     }
                 },
                 start: function() {
                     let activeObjectId = $(this).attr('active-object-id');
                     storeActionHistory(activeObjectId);
+                },
+                create: function() {
+                    let activeObjectId = $(this).attr('active-object-id');
+                    updateConnectedObjects(activeObjects[activeObjectId].object_position_x, activeObjects[activeObjectId].object_position_y, [], null);
                 }
             });
         }
 
         //TODO: Move back /w updates
-        function updateConnectedObjects(objectPositionX, objectPositionY, checkExemptions, pushedIndex, direct) {
+        function updateConnectedObjects(objectPositionX, objectPositionY, checkExemptions, pushedIndex) {
             let activeObjectId = getObjectByPosition(objectPositionX, objectPositionY);
             var hasAlreadyBeenChecked;
             var arrayOfKeys = [],
@@ -532,10 +536,10 @@
                         $('div[active-object-id=' + activeObjectId + ']').css('background-image', 'url(\'' + assetsBasePath + 'desk-connected-' + arrayOfKeys.join('-') + '.png\')');
                     }
 
-                    if (!direct || !checkExemptions[pushedIndex][2][0][3]) {
+                    if (!checkExemptions[pushedIndex][2][0][3]) {
                         for (let x = 0; x < checkExemptions[pushedIndex][2].length; x++) {
                             if (getArrayInArray(checkExemptions, [checkExemptions[pushedIndex][2][x][0], checkExemptions[pushedIndex][2][x][1]]) == -1) {
-                                updateConnectedObjects(checkExemptions[pushedIndex][2][x][0], checkExemptions[pushedIndex][2][x][1], checkExemptions, null, direct);
+                                updateConnectedObjects(checkExemptions[pushedIndex][2][x][0], checkExemptions[pushedIndex][2][x][1], checkExemptions, null);
                             }
                         }
                     }
@@ -603,8 +607,9 @@
                         );
                     }
                 }
-                $('.drop-target').children().fadeIn();
+
                 initializeDraggable();
+                $('.drop-target').children().fadeIn();
 
                 if (typeof activeObjects[0] !== 'undefined') {
                     updateSelected([$('div[active-object-id="0"]')]);
@@ -809,5 +814,4 @@
             activeObjects = [];
         }
     </script>
-
 @stop
