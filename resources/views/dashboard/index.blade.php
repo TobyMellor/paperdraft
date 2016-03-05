@@ -285,20 +285,24 @@
 
     <script>
         $(document).ready(function() {
-            $('.drop-target').on('mousedown', '.drag-item', function() {
+            $('.drop-target').on('mousedown', '.drag-item', function()
+            {
                 if(selectedIds.indexOf($(this).attr('active-object-id')) == -1)
                     updateSelected([$(this)]);
             });
 
-            $('#selected-delete').click(function() {
+            $('#selected-delete').click(function()
+            {
                 softDeleteActiveObjects(selectedIds);
             });
 
-            $('#save-button').click(function() {
+            $('#save-button').click(function()
+            {
                 saveActiveObjects(null);
             });
 
-            $('.create-active-object').click(function() {
+            $('.create-active-object').click(function()
+            {
                 var objectId = parseInt($(this).attr('object-id'));
                 if (selectedIds.length > 0) {
                     var selectedObjectPositionX = activeObjects[selectedIds[0]].object_position_y;
@@ -316,7 +320,8 @@
                 }
             });
 
-            $('.class-button').click(function() {
+            $('.class-button').click(function()
+            {
                 if (hasChanged)
                     saveActiveObjects('Do you want to save the changes made to the seating plan for “' + $('.class-button.class-button-active').text() + '”?');
                 hasChanged = false;
@@ -336,18 +341,22 @@
                 loadActiveObjects(classId);
             });
 
-            $(document).on('keydown', function(e) {
+            $(document).on('keydown', function(e)
+            {
                 if ((e.which === 8 || e.which === 46) && !$(e.target).is('input, textarea')) {
                     e.preventDefault();
                     softDeleteActiveObjects(selectedIds);
                 } else if ((e.ctrlKey && e.keyCode == 0x56) || (e.metaKey && e.keyCode == 0x56)) {
                     pasteActiveObject();
                 }
-            }).bind('copy', function() {
+            }).bind('copy', function()
+            {
                 copyActiveObject(false);
-            }).bind('cut', function() {
+            }).bind('cut', function()
+            {
                 copyActiveObject(true);
-            }).keydown(function(e) {
+            }).keydown(function(e)
+            {
                 if (e.ctrlKey || e.metaKey) {
                     if (e.which == 90) {
                         undoActionHistory();
@@ -363,6 +372,7 @@
 
         var objects = [],
             activeObjects = [],
+            activeObjectsGrid = [],
             selectedIds = [],
             selectedNames = [],
             softDeletedActiveObjects = [],
@@ -378,7 +388,8 @@
 
         loadObjects();
 
-        function storeActionHistory(activeObjectId) {
+        function storeActionHistory(activeObjectId)
+        {
             actionHistory.push([activeObjectId, [activeObjects[activeObjectId].object_position_x, activeObjects[activeObjectId].object_position_y]]);
             if (actionUndoCount > 1) {
                 actionHistory.splice(actionHistory.length - actionUndoCount + 1, actionUndoCount);
@@ -386,7 +397,8 @@
             }
         }
 
-        function undoActionHistory() {
+        function undoActionHistory()
+        {
             if (actionHistory.length - actionUndoCount >= 0) {
                 var action = actionHistory[actionHistory.length - actionUndoCount];
                 var activeObject = activeObjects[action[0]];
@@ -396,8 +408,7 @@
                     actionUndoCount++;
                 }
 
-                activeObject.object_position_x = action[1][0];
-                activeObject.object_position_y = action[1][1];
+                updateObjectByPosition(action[0], action[1][0], action[1][1]);
 
                 $('div[active-object-id="' + action[0] + '"]').css({
                     left: activeObject.object_position_x * 32,
@@ -410,14 +421,14 @@
             }
         }
 
-        function redoActionHistory() {
+        function redoActionHistory()
+        {
             if (actionUndoCount > 2) {
                 actionUndoCount--;
                 var action = actionHistory[actionHistory.length - actionUndoCount + 1];
                 var activeObject = activeObjects[action[0]];
 
-                activeObject.object_position_x = action[1][0];
-                activeObject.object_position_y = action[1][1];
+                updateObjectByPosition(action[0], action[1][0], action[1][1]);
 
                 $('div[active-object-id="' + action[0] + '"]').css({
                     left: activeObject.object_position_x * 32,
@@ -428,7 +439,8 @@
             }
         }
 
-        function createActiveObject(objectId, objectPositionX, objectPositionY) {
+        function createActiveObject(objectId, objectPositionX, objectPositionY)
+        {
             hasChanged = true;
 
             activeObjects[activeObjects.length] = {
@@ -523,8 +535,217 @@
             });
         }
 
-        //TODO: Move back /w updates
-        function updateConnectedObjects(objectPositionX, objectPositionY, checkExemptions, pushedIndex) {
+        
+
+        function generateGrid(size)
+        {
+            activeObjectsGrid = [];
+            for(let i = 0; i <= size; i++) {
+                activeObjectsGrid[activeObjectsGrid.push([]) - 1].length = size;
+                activeObjectsGrid[i].fill(-1);
+            }
+            for (let i = 0; i < activeObjects.length; i++) {
+                activeObjectsGrid[activeObjects[i].object_position_x][activeObjects[i].object_position_y] = i;
+            }
+        }
+
+        function loadObjects()
+        {
+            $.ajax({
+                url: '/object',
+                type: 'GET',
+                data: {
+                    _token: token
+                }
+            }).done(function(data) {
+                for (var dataObjects in data) {
+                    if (data.hasOwnProperty(dataObjects)) {
+                        var object = data[dataObjects];
+
+                        objects[object.id] = {
+                            'object_name': object.object_name,
+                            'object_height': object.object_height,
+                            'object_width': object.object_width,
+                            'object_location': object.object_location
+                        };
+                    }
+                }
+                loadActiveObjects(classId);
+            });
+        }
+
+        function loadActiveObjects(classId)
+        {
+            $.ajax({
+                url: '/class-object',
+                type: 'GET',
+                data: {
+                    _token: token,
+                    class_id: classId
+                }
+            }).done(function(data) {
+                for (var activeObject in data) {
+                    if (data.hasOwnProperty(activeObject)) {
+                        activeObject = data[activeObject];
+
+                        var objectId = activeObject.object_id;
+                        var activeObjectId = activeObject.id;
+                        var objectPositionX = activeObject.object_position_x * 32;
+                        var objectPositionY = activeObject.object_position_y * 32;
+                        var objectLocation = objects[objectId].object_location;
+                        var objectWidth = objects[objectId].object_width;
+                        var objectHeight = objects[objectId].object_height;
+
+                        activeObjects[activeObjects.length] = {
+                            'object_id': objectId,
+                            'active_object_id': activeObjectId,
+                            'object_position_x': objectPositionX / 32,
+                            'object_position_y': objectPositionY / 32
+                        };
+
+                        $('.drop-target').append(
+                            '<div class="drag-item " active-object-id="' + (activeObjects.length - 1) + '" style="display: none; left: ' + objectPositionX + 'px; top: ' + objectPositionY + 'px; background-image: url(\'/assets/images/objects/' + objectLocation + '\'); background-size: ' + objectWidth + 'px; height: ' + objectHeight + 'px; width: ' + objectWidth + 'px;"></div>'
+                        );
+                    }
+                }
+
+                generateGrid(23);
+
+                initializeDraggable();
+                $('.drop-target').children().fadeIn();
+
+                if (typeof activeObjects[0] !== 'undefined') {
+                    updateSelected([$('div[active-object-id="0"]')]);
+                } else {
+                    hasObjects = false;
+                    $('#selected-no-objects').parent().children().fadeOut();
+                    $('#selected-no-objects').fadeIn();
+                }
+            });
+        }
+
+        function getArrayInArray(arrayToSearch, arrayToFind)
+        {
+            for (let i = 0; i < arrayToSearch.length; i++) {
+                if (arrayToSearch[i][0] == arrayToFind[0] && arrayToSearch[i][1] == arrayToFind[1]) {
+                    return i;
+                }
+            }
+            return -1;
+        }
+
+        function getObjectByPosition(objectPositionX, objectPositionY)
+        {
+            return activeObjectsGrid[objectPositionX][objectPositionY];
+        }
+
+        function copyActiveObject(isCut)
+        {
+            copyClipboard = [];
+            for (let i = 0; i < selectedIds.length; i++) {
+                copyClipboard.push(activeObjects[selectedIds[i]]);
+                if (isCut) {
+                    $('div[active-object-id=' + selectedIds[i] + ']').fadeOut('slow', function() {
+                        $(this).remove();
+                        delete activeObjects[selectedIds[i]];
+                        clearSelected();
+                        if ($('.drop-target').children().length > 0)
+                            updateSelected([$('div[active-object-id="' + $('.drop-target').children(0).attr('active-object-id') + '"]')]);
+                    });
+                }
+            }
+        }
+
+        function pasteActiveObject()
+        {
+            for (let i = 0; i < copyClipboard.length; i++) {
+                var copiedObjectPositionX = copyClipboard[i].object_position_x;
+                var copiedObjectPositionY = copyClipboard[i].object_position_y;
+                var pastedObjectPositionX,
+                    pastedObjectPositionY,
+                    nearestEmptySpace;
+
+                if (getObjectByPosition(copiedObjectPositionX + 1, copiedObjectPositionY + 1) != -1) {
+                    nearestEmptySpace = getNearestEmpty(copyClipboard[i].object_position_x, copyClipboard[i].object_position_y, 5, 5);
+                    if (nearestEmptySpace == -1) {
+                        alert('There is no space to paste the object at ' + copiedObjectPositionX + ', ' + copiedObjectPositionY);
+                        break;
+                    }
+                    pastedObjectPositionX = nearestEmptySpace[0];
+                    pastedObjectPositionY = nearestEmptySpace[1];
+                } else {
+                    pastedObjectPositionX = copiedObjectPositionX + 1;
+                    pastedObjectPositionY = copiedObjectPositionY + 1;
+                }
+                copyClipboard[i] = createActiveObject(copyClipboard[i].object_id, pastedObjectPositionX * 32, pastedObjectPositionY * 32);
+            }
+        }
+
+        function getNearestEmpty(objectPositionX, objectPositionY, maxCheckHeight, maxCheckWidth)
+        {
+            var x = 0,
+                y = 0,
+                delta = [0, -1],
+                potentialEmptyX,
+                potentialEmptyY;
+
+            for (let i = 0; i < Math.pow(Math.max(maxCheckWidth, maxCheckHeight), 2); i++) {
+                if ((-maxCheckWidth / 2 < x && x <= maxCheckWidth / 2) && (-maxCheckHeight / 2 < y && y <= maxCheckHeight / 2)) {
+                    potentialEmptyX = x + objectPositionX;
+                    potentialEmptyY = y + objectPositionY;
+                    if (potentialEmptyX >= 0 && potentialEmptyY >= 0 && potentialEmptyX <= 23 && potentialEmptyY <= 23) {
+                        if (getObjectByPosition(x + objectPositionX, y + objectPositionY) == -1) {
+                            return [x + objectPositionX, y + objectPositionY];
+                        }
+                    }
+                }
+
+                if (x === y || (x < 0 && x === -y) || (x > 0 && x === 1 - y)) {
+                    delta = [-delta[1], delta[0]];
+                }
+
+                x += delta[0];
+                y += delta[1];
+            }
+            return -1;
+        }
+
+        function updateSelected(activeObject)
+        {
+            clearSelected();
+
+            $('#selected-position').append('<td>');
+
+            for (let i = 0; i < activeObject.length; i++) {
+                var activeObjectId = activeObject[i].attr('active-object-id');
+
+                var position = activeObject[i].position();
+                var objectPositionX = position.left / 32;
+                var objectPositionY = position.top / 32;
+
+                updateObjectByPosition(activeObjectId, objectPositionX, objectPositionY);
+
+                selectedIds.push(activeObjectId);
+
+                if (i <= 2) {
+                    selectedNames.push(objects[activeObjects[activeObjectId].object_id].object_name);
+                    $('#selected-position').append(
+                        '<strong>X:</strong> ' + objectPositionX + ', <strong>Y:</strong> ' + objectPositionY + '<br>'
+                    );
+                    $('#selected-image').attr('src', assetsBasePath + objects[activeObjects[activeObjectId].object_id].object_location);
+                } else if (i == 3) {
+                    selectedNames.push('[' + (activeObject.length - i) + ' more]');
+                }
+
+                activeObject[i].addClass('outline-highlight');
+            }
+
+            $('.selected-name').text(selectedNames.join(', '));
+            $('#selected-position').append('</td>');
+        }
+
+        function updateConnectedObjects(objectPositionX, objectPositionY, checkExemptions, pushedIndex)
+        {
             let activeObjectId = getObjectByPosition(objectPositionX, objectPositionY);
 
             var hasAlreadyBeenChecked,
@@ -599,198 +820,23 @@
             return checkExemptions;
         }
 
-        function loadObjects() {
-            $.ajax({
-                url: '/object',
-                type: 'GET',
-                data: {
-                    _token: token
-                }
-            }).done(function(data) {
-                for (var dataObjects in data) {
-                    if (data.hasOwnProperty(dataObjects)) {
-                        var object = data[dataObjects];
+        function updateObjectByPosition(activeObjectId, objectPositionX, objectPositionY) {
+            var previousPositionX = activeObjects[activeObjectId].object_position_x;
+            var previousPositionY = activeObjects[activeObjectId].object_position_y;
 
-                        objects[object.id] = {
-                            'object_name': object.object_name,
-                            'object_height': object.object_height,
-                            'object_width': object.object_width,
-                            'object_location': object.object_location
-                        };
-                    }
-                }
-                loadActiveObjects(classId);
-            });
-        }
+            activeObjectsGrid[previousPositionX][previousPositionY] = -1;
 
-        function loadActiveObjects(classId) {
-            $.ajax({
-                url: '/class-object',
-                type: 'GET',
-                data: {
-                    _token: token,
-                    class_id: classId
-                }
-            }).done(function(data) {
-                for (var activeObject in data) {
-                    if (data.hasOwnProperty(activeObject)) {
-                        activeObject = data[activeObject];
-
-                        var objectId = activeObject.object_id;
-                        var activeObjectId = activeObject.id;
-                        var objectPositionX = activeObject.object_position_x * 32;
-                        var objectPositionY = activeObject.object_position_y * 32;
-                        var objectLocation = objects[objectId].object_location;
-                        var objectWidth = objects[objectId].object_width;
-                        var objectHeight = objects[objectId].object_height;
-
-                        activeObjects[activeObjects.length] = {
-                            'object_id': objectId,
-                            'active_object_id': activeObjectId,
-                            'object_position_x': objectPositionX / 32,
-                            'object_position_y': objectPositionY / 32
-                        };
-
-                        $('.drop-target').append(
-                            '<div class="drag-item " active-object-id="' + (activeObjects.length - 1) + '" style="display: none; left: ' + objectPositionX + 'px; top: ' + objectPositionY + 'px; background-image: url(\'/assets/images/objects/' + objectLocation + '\'); background-size: ' + objectWidth + 'px; height: ' + objectHeight + 'px; width: ' + objectWidth + 'px;"></div>'
-                        );
-                    }
-                }
-
-                initializeDraggable();
-                $('.drop-target').children().fadeIn();
-
-                if (typeof activeObjects[0] !== 'undefined') {
-                    updateSelected([$('div[active-object-id="0"]')]);
-                } else {
-                    hasObjects = false;
-                    $('#selected-no-objects').parent().children().fadeOut();
-                    $('#selected-no-objects').fadeIn();
-                }
-            });
-        }
-
-        function getArrayInArray(arrayToSearch, arrayToFind) {
-            for (let i = 0; i < arrayToSearch.length; i++) {
-                if (arrayToSearch[i][0] == arrayToFind[0] && arrayToSearch[i][1] == arrayToFind[1]) {
-                    return i;
-                }
+            if(activeObjectsGrid[objectPositionX][objectPositionY] != -1) {
+                //Where we will handle objects inside one another
             }
-            return -1;
+            activeObjectsGrid[objectPositionX][objectPositionY] = activeObjectId;
+
+            activeObjects[activeObjectId].object_position_x = objectPositionX;
+            activeObjects[activeObjectId].object_position_y = objectPositionY;
         }
 
-        function getObjectByPosition(objectPositionX, objectPositionY) {
-            for (let i = 0; i < activeObjects.length; i++) {
-                if (typeof activeObjects[i] != 'undefined' && objectPositionX == activeObjects[i].object_position_x && objectPositionY == activeObjects[i].object_position_y) {
-                    return i;
-                }
-            }
-            return -1;
-        }
-
-        function copyActiveObject(isCut) {
-            copyClipboard = [];
-            for (let i = 0; i < selectedIds.length; i++) {
-                copyClipboard.push(activeObjects[selectedIds[i]]);
-                if (isCut) {
-                    $('div[active-object-id=' + selectedIds[i] + ']').fadeOut('slow', function() {
-                        $(this).remove();
-                        delete activeObjects[selectedIds[i]];
-                        clearSelected();
-                        if ($('.drop-target').children().length > 0)
-                            updateSelected([$('div[active-object-id="' + $('.drop-target').children(0).attr('active-object-id') + '"]')]);
-                    });
-                }
-            }
-        }
-
-        function pasteActiveObject() {
-            for (let i = 0; i < copyClipboard.length; i++) {
-                var copiedObjectPositionX = copyClipboard[i].object_position_x;
-                var copiedObjectPositionY = copyClipboard[i].object_position_y;
-                var pastedObjectPositionX,
-                    pastedObjectPositionY,
-                    nearestEmptySpace;
-
-                if (getObjectByPosition(copiedObjectPositionX + 1, copiedObjectPositionY + 1) != -1) {
-                    nearestEmptySpace = getNearestEmpty(copyClipboard[i].object_position_x, copyClipboard[i].object_position_y, 5, 5);
-                    if (nearestEmptySpace == -1) {
-                        alert('There is no space to paste the object at ' + copiedObjectPositionX + ', ' + copiedObjectPositionY);
-                        break;
-                    }
-                    pastedObjectPositionX = nearestEmptySpace[0];
-                    pastedObjectPositionY = nearestEmptySpace[1];
-                } else {
-                    pastedObjectPositionX = copiedObjectPositionX + 1;
-                    pastedObjectPositionY = copiedObjectPositionY + 1;
-                }
-                copyClipboard[i] = createActiveObject(copyClipboard[i].object_id, pastedObjectPositionX * 32, pastedObjectPositionY * 32);
-            }
-        }
-
-        function getNearestEmpty(objectPositionX, objectPositionY, maxCheckHeight, maxCheckWidth) {
-            var x = 0,
-                y = 0,
-                delta = [0, -1],
-                potentialEmptyX,
-                potentialEmptyY;
-
-            for (let i = 0; i < Math.pow(Math.max(maxCheckWidth, maxCheckHeight), 2); i++) {
-                if ((-maxCheckWidth / 2 < x && x <= maxCheckWidth / 2) && (-maxCheckHeight / 2 < y && y <= maxCheckHeight / 2)) {
-                    potentialEmptyX = x + objectPositionX;
-                    potentialEmptyY = y + objectPositionY;
-                    if (potentialEmptyX >= 0 && potentialEmptyY >= 0 && potentialEmptyX <= 23 && potentialEmptyY <= 23) {
-                        if (getObjectByPosition(x + objectPositionX, y + objectPositionY) == -1) {
-                            return [x + objectPositionX, y + objectPositionY];
-                        }
-                    }
-                }
-
-                if (x === y || (x < 0 && x === -y) || (x > 0 && x === 1 - y)) {
-                    delta = [-delta[1], delta[0]];
-                }
-
-                x += delta[0];
-                y += delta[1];
-            }
-            return -1;
-        }
-
-        function updateSelected(activeObject) {
-            clearSelected();
-
-            $('#selected-position').append('<td>');
-
-            for (let i = 0; i < activeObject.length; i++) {
-                var activeObjectId = activeObject[i].attr('active-object-id');
-
-                var position = activeObject[i].position();
-                var objectPositionX = position.left / 32;
-                var objectPositionY = position.top / 32;
-
-                activeObjects[activeObjectId].object_position_x = objectPositionX;
-                activeObjects[activeObjectId].object_position_y = objectPositionY;
-
-                selectedIds.push(activeObjectId);
-
-                if (i <= 2) {
-                    selectedNames.push(objects[activeObjects[activeObjectId].object_id].object_name);
-                    $('#selected-position').append(
-                        '<strong>X:</strong> ' + objectPositionX + ', <strong>Y:</strong> ' + objectPositionY + '<br>'
-                    );
-                    $('#selected-image').attr('src', assetsBasePath + objects[activeObjects[activeObjectId].object_id].object_location);
-                } else if (i == 3) {
-                    selectedNames.push('[' + (activeObject.length - i) + ' more]');
-                }
-
-                activeObject[i].addClass('outline-highlight');
-            }
-
-            $('.selected-name').text(selectedNames.join(', '));
-            $('#selected-position').append('</td>');
-        }
-
-        function clearSelected() {
+        function clearSelected()
+        {
             if (!hasObjects) {
                 hasObjects = true;
                 $('#selected-no-objects').parent().children().fadeIn();
@@ -805,7 +851,8 @@
             $('.drag-item').removeClass('outline-highlight');
         }
 
-        function saveActiveObjects(message) {
+        function saveActiveObjects(message)
+        {
             var userConfirmation = message !== null ? confirm(message) : true;
             if (userConfirmation) {
                 deleteActiveObjects(softDeletedActiveObjects);
@@ -823,7 +870,8 @@
             }
         }
 
-        function softDeleteActiveObjects(activeObjectIds) {
+        function softDeleteActiveObjects(activeObjectIds)
+        {
             for (let i = 0; i < activeObjectIds.length; i++) {
                 var activeObject = $('div[active-object-id="' + activeObjectIds[i] + '"]');
                 softDeletedActiveObjects.push(activeObjects[activeObjectIds[i]]);
@@ -839,7 +887,8 @@
             }
         }
 
-        function deleteActiveObjects(softDeletedActiveObjects) {
+        function deleteActiveObjects(softDeletedActiveObjects)
+        {
             if (softDeletedActiveObjects.length > 0) {
                 $.ajax({
                     url: '/class-object',
@@ -855,7 +904,8 @@
             }
         }
 
-        function clearSession() {
+        function clearSession()
+        {
             var activeClassObjects = $('.drop-target').children();
             activeClassObjects.fadeOut(1000, function() {
                 $(this).remove();
