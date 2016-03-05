@@ -2,288 +2,292 @@
 
 @section('title', 'Dashboard')
 @section('main')
-	<!-- Main content -->
-	<div class="content-wrapper">
+    <!-- Main content -->
+    <div class="content-wrapper">
 
-		<!-- Page header -->
-		<div class="page-header">
-			<div class="breadcrumb-line">
-				<ul class="breadcrumb">
-					<li><a href="index.html"><i class="icon-home2 position-left"></i> Home</a></li>
-					<li class="active">Dashboard</li>
-				</ul>
+        <!-- Page header -->
+        <div class="page-header">
+            <div class="breadcrumb-line">
+                <ul class="breadcrumb">
+                    <li><a href="index.html"><i class="icon-home2 position-left"></i> Home</a></li>
+                    <li class="active">Dashboard</li>
+                </ul>
 
-				<ul class="breadcrumb-elements">
-					<li class="dropdown">
-						<a href="#" class="dropdown-toggle" data-toggle="dropdown">
-							<i class="icon-gear position-left"></i>
-							Settings
-							<span class="caret"></span>
-						</a>
+                <ul class="breadcrumb-elements">
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                            <i class="icon-gear position-left"></i>
+                            Settings
+                            <span class="caret"></span>
+                        </a>
 
-						<ul class="dropdown-menu dropdown-menu-right">
-							<li><a href="#"><i class="icon-user-lock"></i> Account security</a></li>
-							<li><a href="#"><i class="icon-statistics"></i> Analytics</a></li>
-							<li><a href="#"><i class="icon-accessibility"></i> Accessibility</a></li>
-							<li class="divider"></li>
-							<li><a href="#"><i class="icon-gear"></i> All settings</a></li>
-						</ul>
-					</li>
-				</ul>
-			</div>
-		</div>
-		<!-- /page header -->
-		<!-- Content area -->
-		<div class="content">
-			<div class="row row-sortable">
-				<div class="col-md-8">
-					<div class="panel panel-white">
-						<div class="panel-heading">
-							<h6 class="panel-title"><span class="text-semibold">Seating Planner</span> <span class="text-muted"><small>Year 11<small></span></h6>
-							<div class="heading-elements">
-								<ul class="pagination pagination-flat pagination-sm">
-									<li><a href="#">←</a></li>
-									<li class="active"><a href="#">1</a></li>
-									<li><a href="#">2</a></li>
-									<li><a href="#">3</a></li>
-									<li><a href="#">→</a></li>
-								</ul>
-								<ul class="icons-list" style="margin-top: 11px;">
-									<li>
-										<i class="glyphicon glyphicon-floppy-save" id="save-button" style="cursor: pointer;"></i>
-									</li>
-								</ul>
-							</div>
-							<a class="heading-elements-toggle"><i class="icon-menu"></i></a></div>
+                        <ul class="dropdown-menu dropdown-menu-right">
+                            <li><a href="#"><i class="icon-user-lock"></i> Account security</a></li>
+                            <li><a href="#"><i class="icon-statistics"></i> Analytics</a></li>
+                            <li><a href="#"><i class="icon-accessibility"></i> Accessibility</a></li>
+                            <li class="divider"></li>
+                            <li><a href="#"><i class="icon-gear"></i> All settings</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <!-- /page header -->
+        <!-- Content area -->
+        <div class="content">
+            <div class="row row-sortable">
+                <div class="col-md-8">
+                    <div class="panel panel-white">
+                        <div class="panel-heading">
+                            <h6 class="panel-title"><span class="text-semibold">Seating Planner</span> <span class="text-muted"><small>Year 11<small></span></h6>
+                            <div class="heading-elements">
+                                <ul class="pagination pagination-flat pagination-sm">
+                                    <li><a href="#">←</a></li>
+                                    <li class="active"><a href="#">1</a></li>
+                                    <li><a href="#">2</a></li>
+                                    <li><a href="#">3</a></li>
+                                    <li><a href="#">→</a></li>
+                                </ul>
+                                <ul class="icons-list" style="margin-top: 11px;">
+                                    <li>
+                                        <i class="glyphicon glyphicon-floppy-save" id="save-button" style="cursor: pointer;"></i>
+                                    </li>
+                                </ul>
+                            </div>
+                            <a class="heading-elements-toggle"><i class="icon-menu"></i></a></div>
 
-							<style>
-								.no-antialias { 
-								    image-rendering: optimizeSpeed;
-								    image-rendering: -moz-crisp-edges;
-								    image-rendering: -o-crisp-edges;
-								    image-rendering: -webkit-optimize-contrast;
-								    image-rendering: pixelated;
-								    image-rendering: optimize-contrast;
-								    -ms-interpolation-mode: nearest-neighbor;
+                            <style>
+                                .no-antialias { 
+                                    image-rendering: optimizeSpeed;
+                                    image-rendering: -moz-crisp-edges;
+                                    image-rendering: -o-crisp-edges;
+                                    image-rendering: -webkit-optimize-contrast;
+                                    image-rendering: pixelated;
+                                    image-rendering: optimize-contrast;
+                                    -ms-interpolation-mode: nearest-neighbor;
 
-								}
-								.drag-item, .outside-drag-item {
-								    position: absolute;
-								    cursor: move;
-								}
-								.drop-target {
-									left: 0px; top: 0px;
-								    position: absolute;
-								    width: 736px;
-								    height: 736px;
-								    border: dashed 1px orange;
-								    background: whitesmoke url('assets/images/objects/grid_64.png') repeat;
-								    background-size: 32px 32px;
-								    
-								}
-								.outline-highlight {
-									-webkit-filter: drop-shadow(1px 1px 0 #26a69a) drop-shadow(-1px -1px 0 #26a69a);
-	    							filter:drop-shadow(1px 1px 0 #26a69a) drop-shadow(-1px -1px 0 #26a69a);
-    							}
-							</style>
-						<div class="panel-body" style="height: 736px; overflow-x: scroll;">
-							<div class="drop-target">
-							</div>
-						</div>
-					</div>
-				</div>
-				<div class="col-md-4">
-					<div class="tabbable">
-						<style>
-							.nav-pills-bordered > li > a {
-							    background-color: #fff;
-							}
-							.nav-pills > li > .btn-group {
-							    position: absolute;
-							    right: 0;
-							    top: 0;
-							}
-							.nav-pills > li > .btn-group > .btn {
-							    padding: 10px 15px;
-							    border-radius: 0 3px 3px 0;
-							}
-							.class-button {
-								background-color: #fcfcfc !important;
-							    border-color: #ddd !important;
-							    color: #333 !important;
-							}
-							.class-button-active {
-								background-color: #2196f3 !important;
-								border-radius: 5px !important;
-								border: 1px solid #2196f3 !important;
-								color: #fff !important;
-							}
-							.class-options {
-								background-color: #fcfcfc !important;
-							    border-color: #ddd !important;
-							    color: #333 !important;
-								padding: 9px 10px 9px 15px !important;
-							}
-							.class-options-active {
-								padding: 9px 10px 9px 15px !important;
-								background-color: #0e7ed5 !important;
-							}
-						</style>
-						<ul class="nav nav-pills nav-pills-bordered nav-stacked">
-							@if(isset($classes))
-						        @foreach($classes as $key => $class)
-								    <li>
-								        <a href="javascript:;" class="class-button @if($key == 0) class-button-active @endif" class-id="{{ $class->id }}">{{ $class->class_name }}</a>
-									    <div class="btn-group">
-									        <a href="javascript:;" class="btn btn-primary btn-icon dropdown-toggle @if($key == 0) class-options-active @else class-options @endif" data-toggle="dropdown" class-id="{{ $class->id }}">
-									            <i class="icon-menu7"></i>
-									            <span class="caret"></span>
-									        </a>
-									        <ul class="dropdown-menu dropdown-menu-right">
-									            <li><a href="#">Duplicate Class (soon)</a></li>
-									            <li><a href="#">Edit Class</a></li>
-									            <li class="divider"></li>
-									            <li><a href="#">Delete Class</a></li>
-									        </ul>
-									    </div> 
-								    </li>
-								@endforeach
-							@endif
-						</ul>
-					</div>
-					<div class="panel panel-white">
-						<div class="panel-heading">
-							<h6 class="panel-title" style="word-wrap: break-word; width: 90%;">
-								Selected Object
-								<span class="text-muted">
-									<small class="selected-name">Loading...</small>
-								</span>
-							</h6>
-							<div class="heading-elements">
-								<ul class="icons-list">
-			                		<li><a title="" data-popup="tooltip" data-action="move" href="#" data-original-title="Move" class="ui-sortable-handle"></a></li>
-			                		<li><a title="" data-popup="tooltip" data-action="collapse" data-original-title="Collapse" class=""></a></li>
-			                	</ul>
-			                	<form class="heading-form" action="#" hidden>
-									<div class="form-group">
-										<label class="checkbox-inline checkbox-switchery checkbox-right switchery-xs">
-											<input type="checkbox" class="switchery" checked="checked">
-											Enable editable:
-										</label>
-									</div>
-								</form>
-		                	</div>
-							<a class="heading-elements-toggle"><i class="icon-menu"></i></a>
-						</div>
-						
-						<div class="panel-body" style="display: none;">
-							<div class="col-lg-3 col-sm-6">
-								<div class="thumbnail" style="margin-top: 5px;">
-									<div class="thumb">
-										<img id="selected-image" src="assets/images/objects/desk.png" alt="" class="no-antialias">
-									</div>
-								</div>
-							</div>
-							<div class="col-lg-9 col-sm-6">
-								<h5 class="no-margin">
-									<name class="selected-name">Student Desk</name>
-									<small>Settings</small>
-								</h4>
-								<table class="table table-bordered table-striped">
-									<thead>
-										<tr>
-											<th>Setting</th>
-											<th>Value</th>
-										</tr>
-									</thead>
-									<tbody>
-										<tr>
-											<td>Location</td>
-											<td id="selected-position">
-												<strong>X:</strong> 1, <strong>Y:</strong> 6<br />
-											</td>
-										</tr>
-										<tr>
-											<td>Action</td>
-											<td>
-												<button id="selected-delete" class="btn btn-danger btn-sm" type="button" style="padding: 3px 6px;">
-													Delete
-													<i class="icon-diff-removed position-right"></i>
-												</button>
-											</td>
-										</tr>
-									</tbody>
-								</table>
-							</div>
-						</div>
-						<div class="panel-body" style="display: none;" id="selected-no-objects">
-							There is no objects on the canvas. Start by clicking on an object in the objects panel below.
-						</div>
-					</div>
-					<!-- /editable inputs -->
-					<div class="panel panel-white">
-						<div class="panel-heading">
-							<h6 class="panel-title">Objects</h6>
-							<div class="heading-elements">
-								<form action="#" class="heading-form" style="margin-left: 0px; margin-right: -12px;">
-									<div class="form-group has-feedback">
-										<input type="search" placeholder="Search..." class="form-control" style="width: 180px;">
-										<div class="form-control-feedback">
-											<i class="icon-search4 text-size-base text-muted"></i>
-										</div>
-									</div>
-								</form>
-								<ul class="icons-list">
-			                		<li><a title="" data-popup="tooltip" data-action="move" href="#" data-original-title="Move" class="ui-sortable-handle"></a></li>
-			                		<li><a title="" data-popup="tooltip" data-action="collapse" data-original-title="Collapse" class=""></a></li>
-			                	</ul>
-							</div>
-						<a class="heading-elements-toggle"><i class="icon-menu"></i></a></div>
-						
-						<div class="panel-body">
-							@if(isset($objects))
-								@foreach($objects as $object)
-									<div class="col-lg-4 col-sm-6">
-										<div class="thumbnail">
-											<div class="thumb">
-												<img class="no-antialias" src="assets/images/objects/{{ $object->object_location }}">
-												<div class="caption-overflow">
-													<span>
-														<a class="btn border-white text-white btn-flat btn-icon btn-rounded create-active-object" href="javascript:;" object-id={{ $object->id }}><i class="icon-plus3"></i></a>
-													</span>
-												</div>
-											</div>
+                                }
+                                .drag-item, .outside-drag-item {
+                                    position: absolute;
+                                    cursor: move;
+                                }
+                                .drop-target {
+                                    left: 0px; top: 0px;
+                                    position: absolute;
+                                    width: 736px;
+                                    height: 736px;
+                                    border: dashed 1px orange;
+                                    background: whitesmoke url('assets/images/objects/grid_64.png') repeat;
+                                    background-size: 32px 32px;
+                                    cursor: crosshair;
+                                    
+                                }
+                                .outline-highlight {
+                                    -webkit-filter: drop-shadow(1px 1px 0 #26a69a) drop-shadow(-1px -1px 0 #26a69a);
+                                    filter:drop-shadow(1px 1px 0 #26a69a) drop-shadow(-1px -1px 0 #26a69a);
+                                }
+                            </style>
+                        <div class="panel-body" style="height: 736px; overflow-x: scroll;">
+                            <div class="drop-target" id="paper">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="tabbable">
+                        <style>
+                            .nav-pills-bordered > li > a {
+                                background-color: #fff;
+                            }
+                            .nav-pills > li > .btn-group {
+                                position: absolute;
+                                right: 0;
+                                top: 0;
+                            }
+                            .nav-pills > li > .btn-group > .btn {
+                                padding: 10px 15px;
+                                border-radius: 0 3px 3px 0;
+                            }
+                            .class-button {
+                                background-color: #fcfcfc !important;
+                                border-color: #ddd !important;
+                                color: #333 !important;
+                            }
+                            .class-button-active {
+                                background-color: #2196f3 !important;
+                                border-radius: 5px !important;
+                                border: 1px solid #2196f3 !important;
+                                color: #fff !important;
+                            }
+                            .class-options {
+                                background-color: #fcfcfc !important;
+                                border-color: #ddd !important;
+                                color: #333 !important;
+                                padding: 9px 10px 9px 15px !important;
+                            }
+                            .class-options-active {
+                                padding: 9px 10px 9px 15px !important;
+                                background-color: #0e7ed5 !important;
+                            }
+                        </style>
+                        <ul class="nav nav-pills nav-pills-bordered nav-stacked">
+                            @if(isset($classes))
+                                @foreach($classes as $key => $class)
+                                    <li>
+                                        <a href="javascript:;" class="class-button @if($key == 0) class-button-active @endif" class-id="{{ $class->id }}">{{ $class->class_name }}</a>
+                                        <div class="btn-group">
+                                            <a href="javascript:;" class="btn btn-primary btn-icon dropdown-toggle @if($key == 0) class-options-active @else class-options @endif" data-toggle="dropdown" class-id="{{ $class->id }}">
+                                                <i class="icon-menu7"></i>
+                                                <span class="caret"></span>
+                                            </a>
+                                            <ul class="dropdown-menu dropdown-menu-right">
+                                                <li><a href="#">Duplicate Class (soon)</a></li>
+                                                <li><a href="#">Edit Class</a></li>
+                                                <li class="divider"></li>
+                                                <li><a href="#">Delete Class</a></li>
+                                            </ul>
+                                        </div> 
+                                    </li>
+                                @endforeach
+                            @endif
+                        </ul>
+                    </div>
+                    <div class="panel panel-white">
+                        <div class="panel-heading">
+                            <h6 class="panel-title" style="word-wrap: break-word; width: 90%;">
+                                Selected Object
+                                <span class="text-muted">
+                                    <small class="selected-name">Loading...</small>
+                                </span>
+                            </h6>
+                            <div class="heading-elements">
+                                <ul class="icons-list">
+                                    <li><a title="" data-popup="tooltip" data-action="move" href="#" data-original-title="Move" class="ui-sortable-handle"></a></li>
+                                    <li><a title="" data-popup="tooltip" data-action="collapse" data-original-title="Collapse" class=""></a></li>
+                                </ul>
+                                <form class="heading-form" action="#" hidden>
+                                    <div class="form-group">
+                                        <label class="checkbox-inline checkbox-switchery checkbox-right switchery-xs">
+                                            <input type="checkbox" class="switchery" checked="checked">
+                                            Enable editable:
+                                        </label>
+                                    </div>
+                                </form>
+                            </div>
+                            <a class="heading-elements-toggle"><i class="icon-menu"></i></a>
+                        </div>
+                        
+                        <div class="panel-body" style="display: none;">
+                            <div class="col-lg-3 col-sm-6">
+                                <div class="thumbnail" style="margin-top: 5px;">
+                                    <div class="thumb">
+                                        <img id="selected-image" src="assets/images/objects/desk.png" alt="" class="no-antialias">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-9 col-sm-6">
+                                <h5 class="no-margin">
+                                    <name class="selected-name">Student Desk</name>
+                                    <small>Settings</small>
+                                </h4>
+                                <table class="table table-bordered table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>Setting</th>
+                                            <th>Value</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>Location</td>
+                                            <td id="selected-position">
+                                                <strong>X:</strong> 1, <strong>Y:</strong> 6<br />
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>Action</td>
+                                            <td>
+                                                <button id="selected-delete" class="btn btn-danger btn-sm" type="button" style="padding: 3px 6px;">
+                                                    Delete
+                                                    <i class="icon-diff-removed position-right"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="panel-body" style="display: none;" id="selected-no-objects">
+                            There is no objects on the canvas. Start by clicking on an object in the objects panel below.
+                        </div>
+                    </div>
+                    <!-- /editable inputs -->
+                    <div class="panel panel-white">
+                        <div class="panel-heading">
+                            <h6 class="panel-title">Objects</h6>
+                            <div class="heading-elements">
+                                <form action="#" class="heading-form" style="margin-left: 0px; margin-right: -12px;">
+                                    <div class="form-group has-feedback">
+                                        <input type="search" placeholder="Search..." class="form-control" style="width: 180px;">
+                                        <div class="form-control-feedback">
+                                            <i class="icon-search4 text-size-base text-muted"></i>
+                                        </div>
+                                    </div>
+                                </form>
+                                <ul class="icons-list">
+                                    <li><a title="" data-popup="tooltip" data-action="move" href="#" data-original-title="Move" class="ui-sortable-handle"></a></li>
+                                    <li><a title="" data-popup="tooltip" data-action="collapse" data-original-title="Collapse" class=""></a></li>
+                                </ul>
+                            </div>
+                        <a class="heading-elements-toggle"><i class="icon-menu"></i></a></div>
+                        
+                        <div class="panel-body">
+                            @if(isset($objects))
+                                @foreach($objects as $object)
+                                    <div class="col-lg-4 col-sm-6">
+                                        <div class="thumbnail">
+                                            <div class="thumb">
+                                                <img class="no-antialias" src="assets/images/objects/{{ $object->object_location }}">
+                                                <div class="caption-overflow">
+                                                    <span>
+                                                        <a class="btn border-white text-white btn-flat btn-icon btn-rounded create-active-object" href="javascript:;" object-id={{ $object->id }}><i class="icon-plus3"></i></a>
+                                                    </span>
+                                                </div>
+                                            </div>
 
-											<div class="caption" style="padding-top: 5px; padding-bottom: 5px; padding-left: 5px;">
-												<h6 class="no-margin"><a href="#" class="text-default" style="font-size: 10px;">{{ $object->object_name }}</a></h6>
-											</div>
-										</div>
-									</div>
-								@endforeach
-							@endif
-						</div>
-					</div>
-				</div>
-			</div>
-			<!-- /dashboard content -->
+                                            <div class="caption" style="padding-top: 5px; padding-bottom: 5px; padding-left: 5px;">
+                                                <h6 class="no-margin"><a href="#" class="text-default" style="font-size: 10px;">{{ $object->object_name }}</a></h6>
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            @endif
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- /dashboard content -->
 
-			<!-- Footer -->
-			<div class="footer text-muted">
-				&copy; 2016 SeatingPlanner by Toby Mellor
-			</div>
-			<!-- /footer -->
-		</div>
-		<!-- /content area -->
-	</div>
-	<!-- /main content -->
+            <!-- Footer -->
+            <div class="footer text-muted">
+                &copy; 2016 SeatingPlanner by Toby Mellor
+            </div>
+            <!-- /footer -->
+        </div>
+        <!-- /content area -->
+    </div>
+    <!-- /main content -->
 
 @stop
 @section('scripts')
+    <script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/raphael/2.1.0/raphael-min.js"></script>
+    <script type="text/javascript" src="/assets/js/plugins/drag_selection.js"></script>
 
     <script>
         $(document).ready(function() {
-            $('.drop-target').on('click', '.drag-item', function() {
-                updateSelected([$(this)]);
+            $('.drop-target').on('mousedown', '.drag-item', function() {
+                if(selectedIds.indexOf($(this).attr('active-object-id')) == -1)
+                    updateSelected([$(this)]);
             });
 
             $('#selected-delete').click(function() {
@@ -448,7 +452,8 @@
             return activeObjects[activeObjects.length - 1];
         }
 
-        function initializeDraggable() {
+        function initializeDraggable()
+        {
             $('.drag-item').draggable({
                 grid: [32, 32],
                 containment: '.drop-target',
@@ -463,13 +468,48 @@
                     var previousPositionX = Math.floor(activeObjects[activeObjectId].object_position_x);
                     var previousPositionY = Math.floor(activeObjects[activeObjectId].object_position_y);
 
-                    if (objectPositionX != previousPositionX || objectPositionY != previousPositionY) {
-                        updateSelected([$(this)]);
-                        updateConnectedObjects(objectPositionX, objectPositionY, [], null);
+                    var selectedObjects = [],
+                        selectedPositions = [];
 
-                        updateConnectedObjects(previousPositionX, previousPositionY, [
-                            [objectPositionX, objectPositionY, []]
-                        ], 0);
+                    var selectedObject,
+                        selectedObjectPreviousPositionX,
+                        selectedObjectPreviousPositionY,
+                        selectedObjectPositionX,
+                        selectedObjectPositionY;
+
+                    if (objectPositionX != previousPositionX || objectPositionY != previousPositionY) {
+                        for(let i = 0; i < selectedIds.length; i++) {
+                            if(selectedIds[i] != activeObjectId) {
+                                selectedObject = $('div[active-object-id=' + selectedIds[i] + ']');
+
+                                selectedObjectPreviousPositionX = selectedObject.position().left / 32;
+                                selectedObjectPreviousPositionY = selectedObject.position().top / 32;
+
+                                selectedObjectPositionX = selectedObjectPreviousPositionX - (previousPositionX - objectPositionX);
+                                selectedObjectPositionY = selectedObjectPreviousPositionY - (previousPositionY - objectPositionY);
+
+                                selectedObject.css('left', selectedObjectPositionX * 32);
+                                selectedObject.css('top', selectedObjectPositionY * 32);
+                            } else {
+                                selectedObject = $(this);
+
+                                selectedObjectPreviousPositionX = previousPositionX;
+                                selectedObjectPreviousPositionY = previousPositionY;
+
+                                selectedObjectPositionX = objectPositionX;
+                                selectedObjectPositionY = objectPositionY;
+                            }
+                            selectedObjects.push(selectedObject);
+                            selectedPositions.push([[selectedObjectPreviousPositionX, selectedObjectPreviousPositionY], [selectedObjectPositionX, selectedObjectPositionY]]);
+                        }
+                        updateSelected(selectedObjects);
+                        for(let i = 0; i < selectedPositions.length; i++) {
+                            updateConnectedObjects(selectedPositions[i][1][0], selectedPositions[i][1][1], [], null);
+
+                            updateConnectedObjects(selectedPositions[i][0][0], selectedPositions[i][0][1], [
+                                [selectedPositions[i][1][0], selectedPositions[i][1][1], []]
+                            ], 0);
+                        }
                     }
                 },
                 start: function() {
