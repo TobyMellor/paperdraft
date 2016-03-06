@@ -367,6 +367,96 @@
             });
         });
 
+        $.ui.draggable.prototype._generatePosition = function(event, constrainPosition) {
+            var containment, co, top, left,
+                o = this.options,
+                scrollIsRootNode = this._isRootNode(this.scrollParent[0]),
+                pageX = event.pageX,
+                pageY = event.pageY;
+
+            if (!scrollIsRootNode || !this.offset.scroll) {
+                this.offset.scroll = {
+                    top: this.scrollParent.scrollTop(),
+                    left: this.scrollParent.scrollLeft()
+                };
+            }
+
+            if (constrainPosition) {
+                if (this.containment) {
+                    if (this.relativeContainer) {
+                        co = this.relativeContainer.offset();
+                        containment = [
+                            this.containment[0] + co.left,
+                            this.containment[1] + co.top,
+                            this.containment[2] + co.left,
+                            this.containment[3] + co.top
+                        ];
+                    } else {
+                        containment = this.containment;
+                    }
+
+                    if (event.pageX - this.offset.click.left < containment[0]) {
+                        pageX = containment[0] + this.offset.click.left;
+                    }
+                    if (event.pageY - this.offset.click.top < containment[1]) {
+                        pageY = containment[1] + this.offset.click.top;
+                    }
+                    if (event.pageX - this.offset.click.left > containment[2]) {
+                        pageX = containment[2] + this.offset.click.left;
+                    }
+                    if (event.pageY - this.offset.click.top > containment[3]) {
+                        pageY = containment[3] + this.offset.click.top;
+                    }
+                }
+
+                if (o.grid) {
+                    top = o.grid[1] ? this.originalPageY + Math.round((pageY - this.originalPageY) / o.grid[1]) * o.grid[1] : this.originalPageY;
+                    pageY = containment ? ((top - this.offset.click.top >= containment[1] || top - this.offset.click.top > containment[3]) ? top : ((top - this.offset.click.top >= containment[1]) ? top - o.grid[1] : top + o.grid[1])) : top;
+
+                    left = o.grid[0] ? this.originalPageX + Math.round((pageX - this.originalPageX) / o.grid[0]) * o.grid[0] : this.originalPageX;
+                    pageX = containment ? ((left - this.offset.click.left >= containment[0] || left - this.offset.click.left > containment[2]) ? left : ((left - this.offset.click.left >= containment[0]) ? left - o.grid[0] : left + o.grid[0])) : left;
+                }
+
+                if (o.axis === "y") {
+                    pageX = this.originalPageX;
+                }
+
+                if (o.axis === "x") {
+                    pageY = this.originalPageY;
+                }
+            }
+
+            // This is the only part added to the original function.
+            // You have access to the updated position after it's been
+            // updated through containment and grid, but before the
+            // element is modified.
+            // If there's an object in position, you prevent dragging.
+
+            if(selectedObjectPosition[0] != (pageX - this.offset.click.left - this.offset.parent.left) / 32
+                    || selectedObjectPosition[1] != (pageY - this.offset.click.top - this.offset.parent.top) / 32) {
+                if (getObjectByPosition((pageX - this.offset.click.left - this.offset.parent.left) / 32, (pageY - this.offset.click.top - this.offset.parent.top) / 32) != -1) {
+                    return false;
+                }
+            }
+
+            return {
+                top: (
+                    pageY -
+                    this.offset.click.top -
+                    this.offset.relative.top -
+                    this.offset.parent.top +
+                    (this.cssPosition === "fixed" ? -this.offset.scroll.top : (scrollIsRootNode ? 0 : this.offset.scroll.top))
+                ),
+                left: (
+                    pageX -
+                    this.offset.click.left -
+                    this.offset.relative.left -
+                    this.offset.parent.left +
+                    (this.cssPosition === "fixed" ? -this.offset.scroll.left : (scrollIsRootNode ? 0 : this.offset.scroll.left))
+                )
+            };
+        }
+
         let token = '{{ csrf_token() }}';
         let assetsBasePath = '{{ $assetsBasePath }}';
 
@@ -378,6 +468,8 @@
             softDeletedActiveObjects = [],
             copyClipboard = [],
             actionHistory = [];
+
+        var selectedObjectPosition = [];
 
         var classId = parseInt($('.class-button:first').attr('class-id'));
 
@@ -480,41 +572,42 @@
                     var previousPositionX = Math.floor(activeObjects[activeObjectId].object_position_x);
                     var previousPositionY = Math.floor(activeObjects[activeObjectId].object_position_y);
 
-                    var selectedObjects = [],
-                        selectedPositions = [];
-
-                    var selectedObject,
-                        selectedObjectPreviousPositionX,
-                        selectedObjectPreviousPositionY,
-                        selectedObjectPositionX,
-                        selectedObjectPositionY;
+                    selectedObjectPosition = [previousPositionX, previousPositionY];
 
                     if (objectPositionX != previousPositionX || objectPositionY != previousPositionY) {
+                        var selectedObjects = [$(this)],
+                            selectedPositions = [
+                                [
+                                    [previousPositionX, previousPositionY],
+                                    [objectPositionX, objectPositionY]
+                                ]
+                            ];
+
+                        var selectedObject,
+                            selectedObjectPreviousPositionX,
+                            selectedObjectPreviousPositionY,
+                            selectedObjectPositionX,
+                            selectedObjectPositionY;
+
                         for(let i = 0; i < selectedIds.length; i++) {
-                            if(selectedIds[i] != activeObjectId) {
-                                selectedObject = $('div[active-object-id=' + selectedIds[i] + ']');
+                            if(selectedIds[i] == activeObjectId)
+                                continue;
+                            selectedObject = $('div[active-object-id=' + selectedIds[i] + ']');
 
-                                selectedObjectPreviousPositionX = selectedObject.position().left / 32;
-                                selectedObjectPreviousPositionY = selectedObject.position().top / 32;
+                            selectedObjectPreviousPositionX = selectedObject.position().left / 32;
+                            selectedObjectPreviousPositionY = selectedObject.position().top / 32;
 
-                                selectedObjectPositionX = selectedObjectPreviousPositionX - (previousPositionX - objectPositionX);
-                                selectedObjectPositionY = selectedObjectPreviousPositionY - (previousPositionY - objectPositionY);
+                            selectedObjectPositionX = selectedObjectPreviousPositionX - (previousPositionX - objectPositionX);
+                            selectedObjectPositionY = selectedObjectPreviousPositionY - (previousPositionY - objectPositionY);
 
-                                selectedObject.css('left', selectedObjectPositionX * 32);
-                                selectedObject.css('top', selectedObjectPositionY * 32);
-                            } else {
-                                selectedObject = $(this);
+                            selectedObject.css('left', selectedObjectPositionX * 32);
+                            selectedObject.css('top', selectedObjectPositionY * 32);
 
-                                selectedObjectPreviousPositionX = previousPositionX;
-                                selectedObjectPreviousPositionY = previousPositionY;
-
-                                selectedObjectPositionX = objectPositionX;
-                                selectedObjectPositionY = objectPositionY;
-                            }
                             selectedObjects.push(selectedObject);
                             selectedPositions.push([[selectedObjectPreviousPositionX, selectedObjectPreviousPositionY], [selectedObjectPositionX, selectedObjectPositionY]]);
                         }
-                        updateSelected(selectedObjects);
+                        if(selectedObjects.length != 0)
+                            updateSelected(selectedObjects);
                         for(let i = 0; i < selectedPositions.length; i++) {
                             updateConnectedObjects(selectedPositions[i][1][0], selectedPositions[i][1][1], [], null);
 
@@ -534,8 +627,6 @@
                 }
             });
         }
-
-        
 
         function generateGrid(size)
         {
@@ -710,16 +801,16 @@
             return -1;
         }
 
-        function updateSelected(activeObject)
+        function updateSelected(selectedObjects)
         {
             clearSelected();
 
             $('#selected-position').append('<td>');
 
-            for (let i = 0; i < activeObject.length; i++) {
-                var activeObjectId = activeObject[i].attr('active-object-id');
+            for (let i = 0; i < selectedObjects.length; i++) {
+                var activeObjectId = selectedObjects[i].attr('active-object-id');
 
-                var position = activeObject[i].position();
+                var position = selectedObjects[i].position();
                 var objectPositionX = position.left / 32;
                 var objectPositionY = position.top / 32;
 
@@ -734,10 +825,10 @@
                     );
                     $('#selected-image').attr('src', assetsBasePath + objects[activeObjects[activeObjectId].object_id].object_location);
                 } else if (i == 3) {
-                    selectedNames.push('[' + (activeObject.length - i) + ' more]');
+                    selectedNames.push('[' + (selectedObjects.length - i) + ' more]');
                 }
 
-                activeObject[i].addClass('outline-highlight');
+                selectedObjects[i].addClass('outline-highlight');
             }
 
             $('.selected-name').text(selectedNames.join(', '));
@@ -765,29 +856,29 @@
                 if (objectPositionX - 1 >= 0 && objectPositionX + 1 <= 23 && objectPositionY - 1 >= 0 && objectPositionY + 1 <= 23) {
                     for (let i = 0; i < 3; i++) {
                         for (let x = 0; x < 3; x++) {
-                            if (i != 1 || x != 1) {
-                                var checkPositionX = objectPositionX - 1 + x;
-                                var checkPositionY = objectPositionY - 1 + i;
+                            if (i == 1 && x == 1)
+                                continue;
+                            var checkPositionX = objectPositionX - 1 + x;
+                            var checkPositionY = objectPositionY - 1 + i;
 
-                                hasAlreadyBeenChecked = getArrayInArray(checkExemptions, [checkPositionX, checkPositionX]);
+                            hasAlreadyBeenChecked = getArrayInArray(checkExemptions, [checkPositionX, checkPositionX]);
 
-                                if (hasAlreadyBeenChecked == -1) {
-                                    objectInCheckPosition = getObjectByPosition(checkPositionX, checkPositionY);
-                                    if (objectInCheckPosition != -1 && activeObjects[objectInCheckPosition].object_id == 1) {
-                                        if (adjacentDirections[i][x].length == 9) {
-                                            objectInCheckPosition = [
-                                                getObjectByPosition(objectPositionX, checkPositionY),
-                                                getObjectByPosition(checkPositionX, objectPositionY)
-                                            ];
-                                            if (objectInCheckPosition[0] != -1 
-                                                    && activeObjects[objectInCheckPosition[0]].object_id == 1
-                                                    && objectInCheckPosition[1] != -1
-                                                    && activeObjects[objectInCheckPosition[1]].object_id == 1) {
-                                                checkExemptions[pushedIndex][2].push([checkPositionX, checkPositionY, adjacentDirections[i][x], pushedIndex > 0 ? true : false]);
-                                            }
-                                        } else {
+                            if (hasAlreadyBeenChecked == -1) {
+                                objectInCheckPosition = getObjectByPosition(checkPositionX, checkPositionY);
+                                if (objectInCheckPosition != -1 && activeObjects[objectInCheckPosition].object_id == 1) {
+                                    if (adjacentDirections[i][x].length == 9) {
+                                        objectInCheckPosition = [
+                                            getObjectByPosition(objectPositionX, checkPositionY),
+                                            getObjectByPosition(checkPositionX, objectPositionY)
+                                        ];
+                                        if (objectInCheckPosition[0] != -1 
+                                                && activeObjects[objectInCheckPosition[0]].object_id == 1
+                                                && objectInCheckPosition[1] != -1
+                                                && activeObjects[objectInCheckPosition[1]].object_id == 1) {
                                             checkExemptions[pushedIndex][2].push([checkPositionX, checkPositionY, adjacentDirections[i][x], pushedIndex > 0 ? true : false]);
                                         }
+                                    } else {
+                                        checkExemptions[pushedIndex][2].push([checkPositionX, checkPositionY, adjacentDirections[i][x], pushedIndex > 0 ? true : false]);
                                     }
                                 }
                             }
@@ -826,9 +917,6 @@
 
             activeObjectsGrid[previousPositionX][previousPositionY] = -1;
 
-            if(activeObjectsGrid[objectPositionX][objectPositionY] != -1) {
-                //Where we will handle objects inside one another
-            }
             activeObjectsGrid[objectPositionX][objectPositionY] = activeObjectId;
 
             activeObjects[activeObjectId].object_position_x = objectPositionX;
