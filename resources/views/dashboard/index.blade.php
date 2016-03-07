@@ -433,35 +433,64 @@
             // If there's an object in position, you prevent dragging.
 
             let activeObjectId = this.element.attr('active-object-id');
-            var objectPositionX = (pageX - this.offset.click.left - this.offset.parent.left) / 32;
-            var objectPositionY = (pageY - this.offset.click.top - this.offset.parent.top) / 32;
+            var objectPositionX = Math.round((pageX - this.offset.click.left - this.offset.parent.left) / 32);
+            var objectPositionY = Math.round((pageY - this.offset.click.top - this.offset.parent.top) / 32);
 
             var previousPositionX = Math.floor(activeObjects[activeObjectId].object_position_x);
             var previousPositionY = Math.floor(activeObjects[activeObjectId].object_position_y);
 
-            var mousePositionX = Math.floor((event.pageX - this.element.parent().offset().left) / 32) 
-            var mousePositionY = Math.floor((event.pageY - this.element.parent().offset().top) / 32) 
+            var mousePositionX = Math.floor((event.pageX - this.element.parent().offset().left) / 32);
+            var mousePositionY = Math.floor((event.pageY - this.element.parent().offset().top) / 32);
+
+            var netMovementX = previousPositionX - objectPositionX;
+            var netMovementY = previousPositionY - objectPositionY;
+
+            var delta = [netMovementX, netMovementY];
+
+            if (Math.abs(netMovementX) > Math.abs(netMovementY) && netMovementX > 0) {
+                delta = [1, 0];
+            } else if (Math.abs(netMovementX) > Math.abs(netMovementY) && netMovementX < 0) {
+                delta = [-1, 0];
+            } else if (Math.abs(netMovementY) > Math.abs(netMovementX) && netMovementY > 0) {
+                delta = [0, 1];
+            } else if (Math.abs(netMovementY) > Math.abs(netMovementX) && netMovementY < 0) {
+                delta = [0, -1]
+            }
 
             if(objectPositionX != previousPositionX
                     || objectPositionY != previousPositionY) {
                 if (getObjectByPosition((pageX - this.offset.click.left - this.offset.parent.left) / 32, (pageY - this.offset.click.top - this.offset.parent.top) / 32) != -1) {
-                    var netMovementX = previousPositionX - objectPositionX;
-                    var netMovementY = previousPositionY - objectPositionY;
+                    console.log('HERE!');
+                    if(getArrayInArray(moveAttempts, [mousePositionX, mousePositionY]) == -1) {
+                        if(moveAttempts.length > 1) {
+                            moveAttempts[moveAttempts.length - 2] = [moveAttempts[moveAttempts.length - 1][0], moveAttempts[moveAttempts.length - 1][1]];
+                            moveAttempts[moveAttempts.length - 1] = [mousePositionX, mousePositionY];
+                        } else {
+                            moveAttempts = [[mousePositionX, mousePositionY], [objectPositionX, objectPositionY]];
+                        }
 
-                    var arrayInArray = getArrayInArray([previousPositionX, previousPositionY], moveAttempts);
-                    if(arrayInArray != -1) {
-                        moveAttempts.push(arrayInArray[0] + netMovement)
-                    }
-                    selectedPositions = [
-                        [
-                            [previousPositionX, previousPositionY],
-                            [previousPositionX, previousPositionY],
+                        var netMovementX = moveAttempts[moveAttempts.length - 2][0] - moveAttempts[moveAttempts.length - 1][0];
+                        var netMovementY = moveAttempts[moveAttempts.length - 2][1] - moveAttempts[moveAttempts.length - 1][1];
+
+                        if (Math.abs(netMovementX) > Math.abs(netMovementY) && netMovementX > 0) {
+                            delta = [1, 0];
+                        } else if (Math.abs(netMovementX) > Math.abs(netMovementY) && netMovementX < 0) {
+                            delta = [-1, 0];
+                        } else if (Math.abs(netMovementY) > Math.abs(netMovementX) && netMovementY > 0) {
+                            delta = [0, 1];
+                        } else if (Math.abs(netMovementY) > Math.abs(netMovementX) && netMovementY < 0) {
+                            delta = [0, -1]
+                        }
+                        selectedPositions = [
                             [
-                                netMovementX,
-                                netMovementY
+                                [previousPositionX, previousPositionY],
+                                [previousPositionX, previousPositionY],
+                                delta
                             ]
-                        ]
-                    ];
+                        ];
+                    } else {
+                        selectedPositions = [];
+                    }
                     return false;
                 } else {
                     this.element.css('left', objectPositionX * 32);
@@ -470,17 +499,15 @@
                         [
                             [previousPositionX, previousPositionY],
                             [objectPositionX, objectPositionY],
-                            [
-                                previousPositionX - objectPositionX,
-                                previousPositionY - objectPositionY
-                            ]
+                            delta
                         ]
                     ];
                 }
             } else {
                 selectedPositions = [];
             }
-            moveAttempts = 0;
+
+            moveAttempts = [];
 
             return {
                 top: (
