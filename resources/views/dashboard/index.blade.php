@@ -431,8 +431,8 @@
             // updated through containment and grid, but before the
             // element is modified.
             // If there's an object in position, you prevent dragging.
-
             let activeObjectId = this.element.attr('active-object-id');
+
             var objectPositionX = Math.round((pageX - this.offset.click.left - this.offset.parent.left) / 32);
             var objectPositionY = Math.round((pageY - this.offset.click.top - this.offset.parent.top) / 32);
 
@@ -460,7 +460,6 @@
             if(objectPositionX != previousPositionX
                     || objectPositionY != previousPositionY) {
                 if (getObjectByPosition((pageX - this.offset.click.left - this.offset.parent.left) / 32, (pageY - this.offset.click.top - this.offset.parent.top) / 32) != -1) {
-                    console.log('HERE!');
                     if(getArrayInArray(moveAttempts, [mousePositionX, mousePositionY]) == -1) {
                         if(moveAttempts.length > 1) {
                             moveAttempts[moveAttempts.length - 2] = [moveAttempts[moveAttempts.length - 1][0], moveAttempts[moveAttempts.length - 1][1]];
@@ -481,6 +480,7 @@
                         } else if (Math.abs(netMovementY) > Math.abs(netMovementX) && netMovementY < 0) {
                             delta = [0, -1]
                         }
+
                         selectedPositions = [
                             [
                                 [previousPositionX, previousPositionY],
@@ -536,7 +536,6 @@
             selectedIds = [],
             selectedNames = [],
             selectedPositions = [],
-            cursorPosition = [],
             softDeletedActiveObjects = [],
             copyClipboard = [],
             actionHistory = [];
@@ -627,6 +626,8 @@
             return activeObjects[activeObjects.length - 1];
         }
 
+        var selectedTriedPositions = [];
+
         function initializeDraggable()
         {
             $('.drag-item').draggable({
@@ -650,7 +651,8 @@
                             selectedObjectPreviousPositionX,
                             selectedObjectPreviousPositionY,
                             selectedObjectPositionX,
-                            selectedObjectPositionY;
+                            selectedObjectPositionY,
+                            selectedTriedPosition;
 
                         for(let i = 0; i < selectedIds.length; i++) {
                             if(selectedIds[i] == activeObjectId)
@@ -660,18 +662,30 @@
                             selectedObjectPreviousPositionX = selectedObject.position().left / 32;
                             selectedObjectPreviousPositionY = selectedObject.position().top / 32;
 
-                            console.log(selectedPositions);
-                            console.log(objectPositionX + ', ' + objectPositionY);
-                            console.log(previousPositionX + ', ' + previousPositionY);
-
                             selectedObjectPositionX = selectedObjectPreviousPositionX - selectedPositions[0][2][0];
                             selectedObjectPositionY = selectedObjectPreviousPositionY - selectedPositions[0][2][1];
 
+                            selectedTriedPosition = getArrayInArray(selectedTriedPositions, [selectedObjectPositionX, selectedObjectPositionY]);
+
                             if(selectedObjectPreviousPositionX != selectedObjectPositionX
-                                    || selectedObjectPreviousPositionY != selectedObjectPositionY) {
-                                selectedObject.css('left', selectedObjectPositionX * 32);
-                                selectedObject.css('top', selectedObjectPositionY * 32);
+                                    || selectedObjectPreviousPositionY != selectedObjectPositionY
+                                    || selectedTriedPosition != -1) {
+                                if(getObjectByPosition(selectedObjectPositionX, selectedObjectPositionY) == -1
+                                        || selectedTriedPosition != -1) {
+                                    if(selectedTriedPosition != -1) {
+                                        selectedObjectPositionX -= selectedPositions[0][2][0];
+                                        selectedObjectPositionY -= selectedPositions[0][2][1];
+                                        selectedTriedPositions.splice(selectedTriedPosition, 1);
+                                    }
+                                    selectedObject.css('left', selectedObjectPositionX * 32);
+                                    selectedObject.css('top', selectedObjectPositionY * 32);
+                                } else {
+                                    selectedTriedPositions.push([selectedObjectPositionX, selectedObjectPositionY]);
+                                }
+                            } else {
+                                selectedTriedPositions.push([selectedObjectPositionX, selectedObjectPositionY]);
                             }
+                            
                             selectedObjects.push(selectedObject);
                             selectedPositions.push([[selectedObjectPreviousPositionX, selectedObjectPreviousPositionY], [selectedObjectPositionX, selectedObjectPositionY]]);
                         }
