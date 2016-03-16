@@ -74,17 +74,20 @@
                                                 <span class="caret"></span>
                                             </a>
                                             <ul class="dropdown-menu dropdown-menu-right">
-                                                <li><a href="#">Duplicate Class (soon)</a></li>
-                                                <li><a href="#">Edit Class</a></li>
+                                                <li><a href="#" class="duplicate-class" data-toggle="modal" data-target="#modal_form_inline">Duplicate class template</a></li>
                                                 <li class="divider"></li>
-                                                <li><a href="#">Delete Class</a></li>
+                                                <li><a href="#" class="delete-seatingplan" data-toggle="modal" data-target="#modal_delete_seatingplan">Clear seating plan</a></li>
+                                                <li><a href="#" class="delete-class" data-toggle="modal" data-target="#modal_delete_class">Delete class</a></li>
                                             </ul>
                                         </div> 
                                     </li>
                                 @endforeach
+                                <li>
+                                <br />
+                            @else
+                                <li>
                             @endif
-                            <li>
-                                <a href="javascript:;" class="class-button class-button-create">Create new</a>
+                                <a href="javascript:;" class="class-button class-button-create" data-toggle="modal" data-target="#modal_form_inline">Create a new class</a>
                             </li>
                         </ul>
                     </div>

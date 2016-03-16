@@ -67,16 +67,14 @@ class StudentController extends Controller
                 'current_attainment_level' => $currentAttainmentLevel,
                 'target_attainment_level' => $targetAttainmentLevel,
             ]);
-            return redirect()
-                ->intended('/dashboard/classes')
-                ->with('successMessage', 'The student has been successfully created');
+            return;
         }
 
         $response = $validation->messages();
-        return redirect()
-            ->intended('/dashboard/classes')
-            ->with('errorMessage', 'There were error(s) with the data you gave us:')
-            ->with('errorValidationResponse', $response);
+        echo json_encode([
+            'There were error(s) with the data you gave us:',
+            $response
+        ]);
     }
 
     /**
@@ -119,6 +117,15 @@ class StudentController extends Controller
         return $student;
     }
 
+    public function updateClassStudents()
+    {
+        $request = $this->request;
+        $classStudentId = $request->input('class_student_id');
+
+        ClassStudent::where('class_id', $classId)
+            ->delete();
+    }
+
     public function deleteClassStudents()
     {
         $request = $this->request;
@@ -131,7 +138,7 @@ class StudentController extends Controller
     protected function validator(array $data)
     {
         return Validator::make($data, [
-            'student_name' => 'required|between:1,30',
+            'student_name' => 'required|between:2,30',
             'class_id' => 'required|integer|exists:classes,id,user_id,' . Auth::user()->id,
             'pupil_premium' => 'required|boolean',
             'ability_cap' => 'required|in:H,M,L',

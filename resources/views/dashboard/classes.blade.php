@@ -43,16 +43,21 @@
 							<h6 class="panel-title">
 								<span class="text-semibold">Manage Class</span>
 								<span class="text-muted">
-									<small>Year 11<small>
+									<small> {{ $selectedClass->class_name }}<small>
 								</span>
-								<a class="btn bg-teal-400" href="#"><i class="icon-statistics position-left"></i> View Seating Plan</a>
 							</h6>
 							<div class="heading-elements">
-								<button class="btn btn-link daterange-ranges heading-btn text-semibold" type="button">
-									<i class="icon-calendar3 position-left"></i> <span>Next Period: Coming soon</span>
-								</button>
+								<a class="btn bg-teal-400" href="#"><i class="icon-statistics position-left"></i> View Seating Plan</a>
 		                	</div>
 						<a class="heading-elements-toggle"><i class="icon-menu"></i></a></div>
+						<style>
+							.editable-input, .editable-select {
+								cursor: pointer;
+							}
+							.editable-input:hover, .editable-select:hover {
+								color: #666 !important;
+							}
+						</style>
 						<table class="table text-nowrap">
 							<thead>
 								<tr>
@@ -60,60 +65,49 @@
 									<th>CAL</th>
 									<th>Target</th>
 									<th>PP</th>
-									<th>Ability Tier</th>
+									<th>Ability</th>
 									<th style="width: 20px;" class="text-center"><i class="icon-arrow-down12"></i></th>
 								</tr>
 							</thead>
 							<tbody>
 								@if(isset($classStudents))
                                     @foreach($classStudents as $classStudent)
-                                		<tr>
+                                		<tr class-student-id="{{ $classStudent->id }}">
 											<td>
 												<div class="media-left media-middle">
 													<a class="btn bg-teal-400 btn-rounded btn-icon btn-xs" href="#">
-														<span class="letter-icon">A</span>
+														<span class="letter-icon">{{ strtoupper($classStudent->student->name[0]) }}</span>
 													</a>
 												</div>
 
-												<div class="media-body">
-													<a class="display-inline-block text-default text-semibold letter-icon-title" href="#">{{ $classStudent->student->name }}</a>
-													<div class="text-muted text-size-small"><span class="status-mark border-blue position-left"></span> Active</div>
+												<div class="media-body media-middle">
+													<h6 class="display-inline-block text-default text-semibold letter-icon-title editable-input" href="#" style="margin-bottom: 3px; margin-top: 3px;">{{ $classStudent->student->name }}</h6>
 												</div>
 											</td>
-											<td class="text-center">
-												<h6 class="no-margin">{{ $classStudent->current_attainment_level or 'N/A'}}</h6>
+											<td>
+												<h6 class="no-margin editable-select current-attainment-level">{{ $classStudent->current_attainment_level or 'N/A'}}</h6>
 											</td>
-											<td class="text-center">
-												<h6 class="no-margin">{{ $classStudent->target_attainment_level or 'N/A'}}</h6>
+											<td>
+												<h6 class="no-margin editable-select target-attainment-level">{{ $classStudent->target_attainment_level or 'N/A'}}</h6>
 											</td>
-											<td class="text-center">
-												<i class="@if($classStudent->student->pupil_premium) icon-checkmark3 text-success @else icon-cross2 text-danger-400 @endif"></i>
+											<td>
+												<span class="editable-select pupil-premium">
+													<i class="@if($classStudent->student->pupil_premium) icon-checkmark3 text-success @else icon-cross2 text-danger-400 @endif"></i>
+												</span>
 											</td>
-											<td class="text-center">
-												<h6 class="no-margin">{{ $classStudent->ability_cap }}</h6>
+											<td>
+												<h6 class="no-margin editable-select ability-cap">{{ $classStudent->ability_cap }}</h6>
 											</td>
-											<td class="text-center">
-												<ul class="icons-list">
-													<li class="dropdown">
-														<a data-toggle="dropdown" class="dropdown-toggle" href="#"><i class="icon-menu7"></i></a>
-														<ul class="dropdown-menu dropdown-menu-right">
-															<li><a href="#"><i class="icon-undo"></i> Quick reply</a></li>
-															<li><a href="#"><i class="icon-history"></i> Full history</a></li>
-															<li class="divider"></li>
-															<li><a href="#"><i class="icon-checkmark3 text-success"></i> Resolve issue</a></li>
-															<li><a href="#"><i class="icon-cross2 text-danger"></i> Close issue</a></li>
-														</ul>
-													</li>
-												</ul>
+											<td>
+												<button class="btn btn-danger">Delete</button>
 											</td>
 										</tr>
 									@endforeach
 								@endif
 							</tbody>
 						</table>
-						<form action="/student" method="POST">
-							<!-- TODO: Load class id -->
-							<input type="text" name="class_id" value="1" hidden>
+						<form action="/student" method="POST" id="create-student">
+							<input type="text" name="class_id" value="{{ $selectedClass->id }}" hidden>
 							<input name="_token" value="{{ csrf_token() }}" hidden>
 						    <div class="content">
 						        <div class="row">
@@ -148,7 +142,7 @@
 													<div id="icon-only-tab1" class="tab-pane has-padding active">
 														<div class="row">
 															<div class="col-md-6">
-																<label class="display-block text-bold">Basic Information *</label>
+																<label class="display-block text-bold">Basic Information*</label>
 																<input data-original-title="Enter the students name" class="form-control" data-popup="tooltip" title="" placeholder="Students Name" type="text" name="student_name" required>
 																<br />
 																<label class="display-block text-bold">Additional Information</label>
@@ -252,9 +246,9 @@
                             @if(isset($classes))
                                 @foreach($classes as $key => $class)
                                     <li>
-                                        <a href="javascript:;" class="class-button @if($key == 0) class-button-active @endif" class-id="{{ $class->id }}">{{ $class->class_name }}</a>
+                                        <a href="/dashboard/classes/{{ $class->id }}" class="class-button @if($selectedClass->id == $class->id) class-button-active @endif" class-id="{{ $class->id }}">{{ $class->class_name }}</a>
                                         <div class="btn-group">
-                                            <a href="javascript:;" class="btn btn-primary btn-icon dropdown-toggle @if($key == 0) class-options-active @else class-options @endif" data-toggle="dropdown" class-id="{{ $class->id }}">
+                                            <a href="javascript:;" class="btn btn-primary btn-icon dropdown-toggle @if($selectedClass->id == $class->id) class-options-active @else class-options @endif" data-toggle="dropdown" class-id="{{ $class->id }}">
                                                 <i class="icon-menu7"></i>
                                                 <span class="caret"></span>
                                             </a>
@@ -361,9 +355,7 @@
 	</div>
 @stop
 @section('scripts')
-
 	<script>
-
 	    @if (session('errorMessage') != null)
 	    	let errorValidationResponses = {!! session('errorValidationResponse') !!};
 	    	var errorValidationResponse = '<br />';
@@ -377,7 +369,8 @@
 		@if (session('successMessage') != null)
 	    	handleNotification('{{ session('successMessage') }}', 'success');
 	    @endif
-
+	</script>
+	<script>
         $(document).ready(function()
         {
 		    $('.duplicate-class').click(function()
@@ -415,9 +408,151 @@
 	            	.children(0)
 	            	.attr('class-id');
 	        });
+
+	        $('#create-student').submit(function(event){
+		        event.preventDefault();
+
+		        var formData = $('#create-student').serializeArray().reduce(function(obj, item) {
+				    obj[item.name] = item.value;
+				    return obj;
+				}, {});
+
+		        $.ajax({
+		        	url: '/student',
+		        	type: 'POST',
+		        	data: {
+						_token: token,
+						student_name: formData['student_name'],
+						pupil_premium: formData['pupil_premium'],
+						class_id: formData['class_id'],
+						ability_cap: formData['ability_cap'],
+						current_attainment_level: formData['current_attainment_level'],
+						target_attainment_level: formData['target_attainment_level']
+		        	}
+		        }).done(function(data) {
+					if(data == "") {
+						handleNotification(formData['student_name'] + ' has been added to the class!', 'success');
+						$.get('/html-snippets/table_element.html', function(html) {
+	                        html = html.replace('%firstLetter%', formData['student_name'].charAt(0).toUpperCase())
+	                        		   .replace('%studentName%', formData['student_name'])
+	                        		   .replace('%pupilPremium%', (formData['pupil_premium'] ? 'icon-checkmark3 text-success' : 'icon-cross2 text-danger-400'))
+	                        		   .replace('%abilityCap%', formData['ability_cap'])
+	                        		   .replace('%currentAttainmentLevel%', (formData['current_attainment_level'] === undefined) ? 'N/A' : formData['current_attainment_level'])
+	                        		   .replace('%targetAttainmentLevel%', (formData['target_attainment_level'] === undefined) ? 'N/A' : formData['target_attainment_level']);
+	                        $(html).appendTo('tbody').fadeIn();
+	                    });
+	                    $('#create-student').trigger('reset');
+	                    $('a[data-original-title="Information"]').tab('show')
+					} else {
+						var errorMessage = data[0];
+						errorMessage += $.map(data[0], function(e){
+						    return e;
+						}).join('<br />');
+
+						handleNotification(errorMessage, 'error');
+					}
+		        });
+		    });
+        });
+
+        //Probably a nicer way of doing this
+        $(document).on('mouseenter', '.editable-input, .editable-select', function() {
+		    $(this).html($(this).html() + '<i class="icon-pencil"></i>');
+        }).on('mouseleave', '.editable-input, .editable-select', function() {
+			$(this).html($(this).html().replace('<i class="icon-pencil"></i>', ''));
+        }).on('click', '.editable-input, .editable-select', function() {
+		    $(this).html($(this).html().replace('<i class="icon-pencil"></i>', ''));
+		    $(this).addClass('currently-editing');
+
+		    if($(this).hasClass('editable-input')) {
+		    	$(this).removeClass('editable-input');
+		    	$(this).html('<input class="form-control" type="text" placeholder="Students Name" title="" data-popup="tooltip" data-original-title="Enter the students name">')
+			    $(this).children().focus();
+			    $(this).parent()
+			    	   .parent()
+			    	   .parent()
+			    	   .children('td:nth-child(6)')
+			    	   .html('<button class="btn btn-success">Save</button>');
+			} else {
+				console.log('removing');
+		    	$(this).removeClass('editable-select');
+				if($(this).hasClass('current-attainment-level')) {
+			    	$(this).html(
+			    		'<select class="form-control" name="current_attainment_level">' +
+							'<optgroup label="Current">' +
+								'<option selected="" value="A*">A*</option>' + 
+								'<option value="A">A</option>' + 
+								'<option value="B">B</option>' +
+								'<option value="C">C</option>' +
+								'<option value="D">D</option>' +
+								'<option value="E">E</option>' +
+								'<option value="F">F</option>' +
+								'<option value="G">G</option>' +
+								'<option value="U">U</option>' +
+							'</optgroup>' +
+						'</select>'
+					);
+		    	} else if($(this).hasClass('target-attainment-level')) {
+			    	$(this).html(
+			    		'<select class="form-control" name="target_attainment_level">' +
+							'<optgroup label="Target">' +
+								'<option selected="" value="A*">A*</option>' + 
+								'<option value="A">A</option>' + 
+								'<option value="B">B</option>' +
+								'<option value="C">C</option>' +
+								'<option value="D">D</option>' +
+								'<option value="E">E</option>' +
+								'<option value="F">F</option>' +
+								'<option value="G">G</option>' +
+								'<option value="U">U</option>' +
+							'</optgroup>' +
+						'</select>'
+					);
+		    	} else if($(this).hasClass('pupil-premium')) {
+		    		$(this).html('<input class="styled" type="checkbox" name="pupil_premium">');
+		    	} else {
+			    	$(this).html(
+			    		'<select class="form-control" name="ability_cap">' +
+							'<optgroup label="Ability Cap">' +
+								'<option selected="" value="H">High</option>' + 
+								'<option value="M">Medium</option>' + 
+								'<option value="L">Low</option>' +
+							'</optgroup>' +
+						'</select>'
+					);
+		    	}
+
+			    $(this).children().focus();
+			    $(this).parent()
+			    	   .parent()
+			    	   .children('td:nth-child(6)')
+			    	   .html('<button class="btn btn-success" onclick="updateStudentInformation($(this))">Save</button>');
+			}
         });
 
         var classId;
+        var token = '{{ csrf_token() }}';
+
+        function updateStudentInformation(saveButton)
+        {
+        	var classStudentId = $(this).parent().parent().attr('class-student-id');
+
+        	//TODO: Get edited data, submit separately.
+        	$.ajax({
+                url: '/class-student',
+                type: 'PUT',
+                data: {
+                    _token: token,
+                    class_student_id: classStudentId
+                }
+            }).done(function(data) {
+            	saveButton.parent().html('<button class="btn btn-danger">Delete</button>');
+
+            	var tableElement = saveButton.parent().parent();
+
+            	tableElement.children
+            });
+        }
 
         function submitDeleteForm(URL, successMessage)
         {                
@@ -425,7 +560,7 @@
                 url: URL,
                 type: 'DELETE',
                 data: {
-                    _token: '{{ csrf_token() }}',
+                    _token: token,
                     class_id: classId
                 }
             }).done(function(data) {

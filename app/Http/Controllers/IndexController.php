@@ -41,26 +41,39 @@ class IndexController extends Controller
     }
 
     /**
-     * Display the classes dashboard.
+     * Find a class to redirect to. If none, show creation options
      *
-     * @return \Illuminate\Http\View
+     * @return \Illuminate\Http\Redirect || \Illuminate\Http\View
      */
-    public function getClassesDashboard(
-        ClassController $classController,
-        StudentController $studentController,
-        ObjectController $objectController
-    )
+    public function getClassesDashboard(ClassController $classController)
     {
         $classes = $classController->getClasses();
         if($classes->first() != null) {
-            $classStudents = $studentController->getClassStudents($classes->first()->id);
-            $objects = $objectController->getObjects(9);
-            return view('dashboard.classes')
-                ->with('classStudents', $classStudents)
-                ->with('classes', $classes);
+            return redirect('/dashboard/classes/' . $classes->first()->id);
         } else {
             //Lets do something here for new users
             return view('dashboard.classes');
         }
+    }
+
+    /**
+     * Display the class dashboard.
+     *
+     * @return \Illuminate\Http\View
+     */
+    public function getClassDashboard(
+        $classId,
+        ClassController $classController,
+        StudentController $studentController
+    )
+    {
+        $classes = $classController->getClasses();
+        $selectedClass = $classController->getClass($classId);
+        $classStudents = $studentController->getClassStudents($classId);
+
+        return view('dashboard.classes')
+            ->with('classStudents', $classStudents)
+            ->with('classes', $classes)
+            ->with('selectedClass', $selectedClass);
     }
 }

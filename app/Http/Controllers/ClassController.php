@@ -69,6 +69,19 @@ class ClassController extends Controller
     }
 
     /**
+     * Get one class of a teacher
+     *
+     * @return \Illuminate\Http\Redirect
+     */
+    public function getClass($classId)
+    {   
+        $class = SchoolClass::where('user_id', Auth::user()->id)
+            ->where('id', $classId)
+            ->first();
+        return $class;
+    }
+
+    /**
      * Deletes the class, along with all connected relationships
      *
      * @return null

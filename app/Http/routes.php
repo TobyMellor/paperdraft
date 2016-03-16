@@ -13,16 +13,17 @@
 
 Route::get('/dashboard', 'IndexController@getDashboard');
 Route::get('/dashboard/classes', 'IndexController@getClassesDashboard');
+Route::get('/dashboard/classes/{classId}', 'IndexController@getClassDashboard');
 
 Route::get('/login', 'UserController@getLogin');
 Route::post('/login', 'UserController@authenticateUser');
+
 Route::post('/register', 'UserController@storeUser');
 Route::get('/logout', 'UserController@getLogout');
 
-/*
- * Routes used by forms
- */
 Route::post('/student', 'StudentController@storeStudent');
+
+Route::put('/class-student', 'StudentController@updateClassStudent');
 
 Route::get('/object', 'ObjectController@getObjects');
 
