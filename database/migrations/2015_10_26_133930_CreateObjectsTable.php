@@ -30,7 +30,7 @@ class CreateObjectsTable extends Migration
                 'object_name' => 'Student Desk',
                 'object_width' => 32,
                 'object_height' => 32,
-                'object_location' => 'desk-1.png'
+                'object_location' => 'desk.png'
             ],
             [
                 'object_name' => 'Sofa',

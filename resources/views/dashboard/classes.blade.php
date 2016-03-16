@@ -41,7 +41,7 @@
 					<div class="panel panel-flat">
 						<div class="panel-heading">
 							<h6 class="panel-title">
-								<span class="text-semibold">Class</span>
+								<span class="text-semibold">Manage Class</span>
 								<span class="text-muted">
 									<small>Year 11<small>
 								</span>
@@ -49,71 +49,68 @@
 							</h6>
 							<div class="heading-elements">
 								<button class="btn btn-link daterange-ranges heading-btn text-semibold" type="button">
-									<i class="icon-calendar3 position-left"></i> <span>Next Period: Undefined</span>
+									<i class="icon-calendar3 position-left"></i> <span>Next Period: Coming soon</span>
 								</button>
 		                	</div>
 						<a class="heading-elements-toggle"><i class="icon-menu"></i></a></div>
+						<table class="table text-nowrap">
+							<thead>
+								<tr>
+									<th style="width: 300px;">Student</th>
+									<th>CAL</th>
+									<th>Target</th>
+									<th>PP</th>
+									<th>Ability Tier</th>
+									<th style="width: 20px;" class="text-center"><i class="icon-arrow-down12"></i></th>
+								</tr>
+							</thead>
+							<tbody>
+								@if(isset($classStudents))
+                                    @foreach($classStudents as $classStudent)
+                                		<tr>
+											<td>
+												<div class="media-left media-middle">
+													<a class="btn bg-teal-400 btn-rounded btn-icon btn-xs" href="#">
+														<span class="letter-icon">A</span>
+													</a>
+												</div>
 
-						<div class="table-responsive">
-							<table class="table text-nowrap">
-								<thead>
-									<tr>
-										<th style="width: 300px;">Student</th>
-										<th>CAL</th>
-										<th>Target</th>
-										<th>PP</th>
-										<th>Ability Tier</th>
-										<th style="width: 20px;" class="text-center"><i class="icon-arrow-down12"></i></th>
-									</tr>
-								</thead>
-								<tbody>
-									@if(isset($classStudents))
-                                        @foreach($classStudents as $classStudent)
-                                    		<tr>
-												<td>
-													<div class="media-left media-middle">
-														<a class="btn bg-teal-400 btn-rounded btn-icon btn-xs" href="#">
-															<span class="letter-icon">A</span>
-														</a>
-													</div>
-
-													<div class="media-body">
-														<a class="display-inline-block text-default text-semibold letter-icon-title" href="#">{{ $classStudent->student->name }}</a>
-														<div class="text-muted text-size-small"><span class="status-mark border-blue position-left"></span> Active</div>
-													</div>
-												</td>
-												<td class="text-center">
-													<h6 class="no-margin">{{ $classStudent->current_attainment_level }}</h6>
-												</td>
-												<td class="text-center">
-													<h6 class="no-margin">{{ $classStudent->target_attainment_level }}</h6>
-												</td>
-												<td class="text-center">
-													<i class="@if($classStudent->student->pupil_premium) icon-checkmark3 text-success @else icon-cross2 text-danger-400 @endif"></i>
-												</td>
-												<td class="text-center">
-													<h6 class="no-margin">{{ $classStudent->ability_cap }}</h6>
-												</td>
-												<td class="text-center">
-													<ul class="icons-list">
-														<li class="dropdown">
-															<a data-toggle="dropdown" class="dropdown-toggle" href="#"><i class="icon-menu7"></i></a>
-															<ul class="dropdown-menu dropdown-menu-right">
-																<li><a href="#"><i class="icon-undo"></i> Quick reply</a></li>
-																<li><a href="#"><i class="icon-history"></i> Full history</a></li>
-																<li class="divider"></li>
-																<li><a href="#"><i class="icon-checkmark3 text-success"></i> Resolve issue</a></li>
-																<li><a href="#"><i class="icon-cross2 text-danger"></i> Close issue</a></li>
-															</ul>
-														</li>
-													</ul>
-												</td>
-											</tr>
-										@endforeach
-									@endif
-								</tbody>
-							</table>
-						</div>
+												<div class="media-body">
+													<a class="display-inline-block text-default text-semibold letter-icon-title" href="#">{{ $classStudent->student->name }}</a>
+													<div class="text-muted text-size-small"><span class="status-mark border-blue position-left"></span> Active</div>
+												</div>
+											</td>
+											<td class="text-center">
+												<h6 class="no-margin">{{ $classStudent->current_attainment_level or 'N/A'}}</h6>
+											</td>
+											<td class="text-center">
+												<h6 class="no-margin">{{ $classStudent->target_attainment_level or 'N/A'}}</h6>
+											</td>
+											<td class="text-center">
+												<i class="@if($classStudent->student->pupil_premium) icon-checkmark3 text-success @else icon-cross2 text-danger-400 @endif"></i>
+											</td>
+											<td class="text-center">
+												<h6 class="no-margin">{{ $classStudent->ability_cap }}</h6>
+											</td>
+											<td class="text-center">
+												<ul class="icons-list">
+													<li class="dropdown">
+														<a data-toggle="dropdown" class="dropdown-toggle" href="#"><i class="icon-menu7"></i></a>
+														<ul class="dropdown-menu dropdown-menu-right">
+															<li><a href="#"><i class="icon-undo"></i> Quick reply</a></li>
+															<li><a href="#"><i class="icon-history"></i> Full history</a></li>
+															<li class="divider"></li>
+															<li><a href="#"><i class="icon-checkmark3 text-success"></i> Resolve issue</a></li>
+															<li><a href="#"><i class="icon-cross2 text-danger"></i> Close issue</a></li>
+														</ul>
+													</li>
+												</ul>
+											</td>
+										</tr>
+									@endforeach
+								@endif
+							</tbody>
+						</table>
 						<form action="/student" method="POST">
 							<!-- TODO: Load class id -->
 							<input type="text" name="class_id" value="1" hidden>
@@ -151,8 +148,10 @@
 													<div id="icon-only-tab1" class="tab-pane has-padding active">
 														<div class="row">
 															<div class="col-md-6">
-																<label class="display-block text-bold">Student Information</label>
-																<input data-original-title="Enter the students name" class="form-control" data-popup="tooltip" title="" placeholder="Students Name" type="text" name="student_name">
+																<label class="display-block text-bold">Basic Information *</label>
+																<input data-original-title="Enter the students name" class="form-control" data-popup="tooltip" title="" placeholder="Students Name" type="text" name="student_name" required>
+																<br />
+																<label class="display-block text-bold">Additional Information</label>
 																<label class="checkbox-inline">
 																    <input type="checkbox" class="styled" name="pupil_premium">
 																    Pupil Premium
@@ -248,17 +247,35 @@
 					</div>
 				</div>
 				<div class="col-md-4">
-					<div class="tabbable">
-						<ul class="nav nav-pills nav-stacked">
-							@if(isset($classes))
-								{{ $classCount = 0 }}
-                                @foreach($classes as $class)
-									{{ $classCount++ }}
-									<li @if($classCount == 1) class="active" @endif style="background-color:#FFF; border:solid #DDD; border-radius: 3px; border-width: 1px; border- box-shadow: 0 1px 1px rgba(0, 0, 0, 0.05);"><a data-toggle="tab"><i class="icon-book position-left"></i> {{ $class->class_name }}</a></li>
-								@endforeach
-							@endif
-						</ul>
-					</div>
+                    <div class="tabbable">
+                        <ul class="nav nav-pills nav-pills-bordered nav-stacked">
+                            @if(isset($classes))
+                                @foreach($classes as $key => $class)
+                                    <li>
+                                        <a href="javascript:;" class="class-button @if($key == 0) class-button-active @endif" class-id="{{ $class->id }}">{{ $class->class_name }}</a>
+                                        <div class="btn-group">
+                                            <a href="javascript:;" class="btn btn-primary btn-icon dropdown-toggle @if($key == 0) class-options-active @else class-options @endif" data-toggle="dropdown" class-id="{{ $class->id }}">
+                                                <i class="icon-menu7"></i>
+                                                <span class="caret"></span>
+                                            </a>
+                                            <ul class="dropdown-menu dropdown-menu-right">
+                                                <li><a href="#" class="duplicate-class" data-toggle="modal" data-target="#modal_form_inline">Duplicate class template</a></li>
+                                                <li class="divider"></li>
+                                                <li><a href="#" class="delete-seatingplan" data-toggle="modal" data-target="#modal_delete_seatingplan">Clear seating plan</a></li>
+                                                <li><a href="#" class="delete-class" data-toggle="modal" data-target="#modal_delete_class">Delete class</a></li>
+                                            </ul>
+                                        </div> 
+                                    </li>
+                                @endforeach
+                            	<li>
+                            	<br />
+                            @else
+                            	<li>
+                            @endif
+                                <a href="javascript:;" class="class-button class-button-create" data-toggle="modal" data-target="#modal_form_inline">Create a new class</a>
+                            </li>
+                        </ul>
+                    </div>
 				</div>
 			</div>
 			<!-- /dashboard content -->
@@ -273,21 +290,161 @@
 		<!-- /content area -->
 	</div>
 	<!-- /main content -->
+	<div id="modal_form_inline" class="modal fade">
+		<div class="modal-dialog">
+			<div class="modal-content text-center">
+				<div class="modal-header bg-primary">
+					<h5 class="modal-title">Enter information for the new class</h5>
+				</div>
 
+				<form action="/class" method="POST" class="form-inline">
+					<input name="_token" value="{{ csrf_token() }}" hidden>
+					<div class="modal-body">
+						<label class="display-block text-bold">What's the classes name?*</label>
+						<div class="form-group has-feedback">
+							<input type="text" placeholder="Class name" class="form-control" name="class_name">
+							<div class="form-control-feedback">
+								<i class="icon-book text-muted"></i>
+							</div>
+						</div>
+						@if(isset($classes))
+							<br />
+							<br />
+							<div class="form-group">
+								<label class="display-block text-bold">Should we take a seating template from another class?</label>
+								<select class="form-control" name="class_template" id="template-picker">
+									<optgroup label="Available class templates">
+										<option value="" selected>Select a class template to copy</option>
+										@foreach($classes as $class)
+											<option value="{{ $class->id }}">{{ $class->class_name }}</option>
+										@endforeach
+									</optgroup>
+								</select>
+							</div>
+						@endif
+					</div>
+
+					<div class="modal-footer text-center">
+						<button type="submit" class="btn btn-primary">Create new class <i class="icon-plus22"></i></button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+	<div id="modal_delete_class" class="modal fade">
+		<div class="modal-dialog">
+			<div class="modal-content text-center">
+				<div class="modal-header bg-danger">
+					<h5 class="modal-title">Are you sure you want to delete that class?</h5>
+				</div>
+				<input name="class_id" id="class-id-to-delete" value="" hidden>
+				<div class="modal-body">
+					<button type="button" class="btn">Cancel</button>
+					<button type="button" class="btn btn-danger" onclick="submitDeleteForm('/class', 'The class has been deleted!'); location.reload();">Delete <i class="icon-x"></i></button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div id="modal_delete_seatingplan" class="modal fade">
+		<div class="modal-dialog">
+			<div class="modal-content text-center">
+				<div class="modal-header bg-danger">
+					<h5 class="modal-title">Are you sure you want to delete the seating plan for that class?</h5>
+				</div>
+				<input name="class_id" id="class-object-id-to-delete" value="" hidden>
+				<div class="modal-body">
+					<button type="button" class="btn">Cancel</button>
+					<button type="button" class="btn btn-danger" onclick="submitDeleteForm('/class-object', 'The seating plan for that class has been cleared')">Delete <i class="icon-x"></i></button>
+				</div>
+			</div>
+		</div>
+	</div>
 @stop
 @section('scripts')
 
 	<script>
-	    $(".drag-item").draggable({
-	        grid: [32, 32],
-	        containment: '.drop-target',
-	        drag: function(){
-	            var position = $(this).position();
-	            var xPos = position.left;
-	            var yPos = position.top;
-	            console.log('x: ' + xPos / 32 + ' | y: ' + yPos / 32);
-	        }
-	    });
-	</script>
+
+	    @if (session('errorMessage') != null)
+	    	let errorValidationResponses = {!! session('errorValidationResponse') !!};
+	    	var errorValidationResponse = '<br />';
+
+	    	for(var key in errorValidationResponses) {
+	    		errorValidationResponse += errorValidationResponses[key] + '<br />';
+	    	}
+
+	    	handleNotification('{{ session('errorMessage') }}<br />' + errorValidationResponse, 'error');
+	    @endif
+		@if (session('successMessage') != null)
+	    	handleNotification('{{ session('successMessage') }}', 'success');
+	    @endif
+
+        $(document).ready(function()
+        {
+		    $('.duplicate-class').click(function()
+	        {
+	            $('#template-picker').val($(this)
+	            	.parent()
+	            	.parent()
+	            	.parent()
+	            	.children(0)
+	            	.attr('class-id')
+	            ).parent().hide();
+	        });
+
+	        $('.class-button-create').click(function()
+	        {
+	        	$('#template-picker').parent().show();
+	        });
+
+	        $('.delete-class').click(function()
+	        {
+	        	classId = $(this)
+	            	.parent()
+	            	.parent()
+	            	.parent()
+	            	.children(0)
+	            	.attr('class-id');
+	        });
+
+	        $('.delete-seatingplan').click(function()
+	        {
+	        	classId = $(this)
+	            	.parent()
+	            	.parent()
+	            	.parent()
+	            	.children(0)
+	            	.attr('class-id');
+	        });
+        });
+
+        var classId;
+
+        function submitDeleteForm(URL, successMessage)
+        {                
+        	$.ajax({
+                url: URL,
+                type: 'DELETE',
+                data: {
+                    _token: '{{ csrf_token() }}',
+                    class_id: classId
+                }
+            }).done(function(data) {
+            	handleNotification(successMessage, 'success')
+            });
+        }
+
+	    function handleNotification(notificationContent, type)
+	    {
+		    var n = noty({
+			    text: notificationContent,
+			    layout: 'topCenter',
+			    type: type
+			});
+
+			setTimeout(function() {
+				n.close();
+			}, 5000);
+	    }
+    </script>
 
 @stop

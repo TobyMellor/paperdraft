@@ -26,8 +26,10 @@ class CreateClassStudentsTable extends Migration
                 ->on('classes');
 
             $table->string('ability_cap');
-            $table->string('current_attainment_level');
-            $table->string('target_attainment_level');
+            $table->string('current_attainment_level')
+                ->nullable();
+            $table->string('target_attainment_level')
+                ->nullable();
 
             $table->timestamps();
         });

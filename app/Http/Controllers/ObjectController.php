@@ -59,6 +59,30 @@ class ObjectController extends Controller
     }
 
     /**
+     * Duplicate class objects from one class to another
+     *
+     * @return null
+     */
+    public function duplicateClassObjects($classIdToCopy, $classIdToPaste)
+    {
+        $classObjectsToCopy = ClassObject::where('class_id', $classIdToCopy)->get();
+
+        $classObjectsToPaste = [];
+
+        foreach($classObjectsToCopy as $classObjectToCopy) {
+            array_push($classObjectsToPaste, [
+                'object_id' => $classObjectToCopy->object_id,
+                'class_id' => $classIdToPaste,
+                'object_position_x' => $classObjectToCopy->object_position_x,
+                'object_position_y' => $classObjectToCopy->object_position_y,
+            ]);
+        }
+
+        ClassObject::insert($classObjectsToPaste);
+    }
+
+
+    /**
      * Get all objects
      *
      * @return \Illuminate\Http\Redirect
@@ -91,14 +115,20 @@ class ObjectController extends Controller
     public function deleteClassObjects()
     {
         $request = $this->request;
-        $classObjects = $request->input('class_objects');
         $classId = $request->input('class_id');
 
-        $classObjectIds = array_map(function($classObjects){ return $classObjects['active_object_id']; }, $classObjects);
+        if($request->input('class_objects') != null) {
+            $classObjects = $request->input('class_objects');
 
-        ClassObject::where('class_id', $classId)
-            ->whereIn('id', $classObjectIds)
-            ->delete(); 
+            $classObjectIds = array_map(function($classObjects){ return $classObjects['active_object_id']; }, $classObjects);
+
+            ClassObject::where('class_id', $classId)
+                ->whereIn('id', $classObjectIds)
+                ->delete(); 
+        } else {
+            ClassObject::where('class_id', $classId)
+                ->delete(); 
+        }
     }
 
     protected function validator(array $data)

@@ -26,6 +26,9 @@ Route::post('/student', 'StudentController@storeStudent');
 
 Route::get('/object', 'ObjectController@getObjects');
 
+Route::post('/class', 'ClassController@storeClass');
+Route::delete('/class', 'ClassController@deleteClass');
+
 Route::post('/class-object', 'ObjectController@storeClassObjects');
 Route::get('/class-object', 'ObjectController@getClassObjects');
 Route::delete('/class-object', 'ObjectController@deleteClassObjects');

@@ -119,6 +119,15 @@ class StudentController extends Controller
         return $student;
     }
 
+    public function deleteClassStudents()
+    {
+        $request = $this->request;
+        $classId = $request->input('class_id');
+
+        ClassStudent::where('class_id', $classId)
+            ->delete();
+    }
+
     protected function validator(array $data)
     {
         return Validator::make($data, [
@@ -126,8 +135,8 @@ class StudentController extends Controller
             'class_id' => 'required|integer|exists:classes,id,user_id,' . Auth::user()->id,
             'pupil_premium' => 'required|boolean',
             'ability_cap' => 'required|in:H,M,L',
-            'current_attainment_level' => 'required|in:A*,A,B,C,D,E,F,G,U',
-            'target_attainment_level' => 'required|in:A*,A,B,C,D,E,F,G,U'
+            'current_attainment_level' => 'in:A*,A,B,C,D,E,F,G,U',
+            'target_attainment_level' => 'in:A*,A,B,C,D,E,F,G,U'
         ]);
     }
 }

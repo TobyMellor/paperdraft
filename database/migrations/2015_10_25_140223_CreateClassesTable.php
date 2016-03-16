@@ -20,10 +20,12 @@ class CreateClassesTable extends Migration
                 ->references('id')
                 ->on('users');
 
+            /*
             $table->integer('period_id')->unsigned();
             $table->foreign('period_id')
                 ->references('id')
                 ->on('periods');
+            */
 
             $table->string('class_name');
 
@@ -33,7 +35,7 @@ class CreateClassesTable extends Migration
         DB::table('classes')->insert([
             [
                 'user_id' => 1,
-                'period_id' => 1,
+                //'period_id' => 1,
                 'class_name' => 'Year 11'
             ]
         ]);

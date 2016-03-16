@@ -10,9 +10,10 @@ class CreatePeriodsTable extends Migration
      *
      * @return void
      */
+
     public function up()
     {
-        Schema::create('periods', function (Blueprint $table) {
+        /*Schema::create('periods', function (Blueprint $table) {
             $table->increments('id');
 
             $table->string('period_day');
@@ -56,7 +57,9 @@ class CreatePeriodsTable extends Migration
         }
         
         DB::table('periods')->insert($periods);
+        */
     }
+    /*
 
     /**
      * Reverse the migrations.
@@ -65,6 +68,8 @@ class CreatePeriodsTable extends Migration
      */
     public function down()
     {
+        /*
         Schema::drop('periods');
+        */
     }
 }

@@ -20,7 +20,6 @@ class SchoolClass extends Model
      */
     protected $fillable = [
         'user_id',
-        'period_id',
         'class_name',
     ];
 }

@@ -20,16 +20,24 @@ class IndexController extends Controller
         ObjectController $objectController
     )
     {
-        $classes = $classController->getClasses();
-        $classStudents = $studentController->getClassStudents($classes->first()->id, 9);
-        $objects = $objectController->getObjects(9);
         $assetsBasePath = '/assets/images/objects/';
+        $classes = $classController->getClasses();
+        $objects = $objectController->getObjects(9);
 
-        return view('dashboard.index')
-            ->with('classStudents', $classStudents)
-            ->with('classes', $classes)
-            ->with('objects', $objects)
-            ->with('assetsBasePath', $assetsBasePath);
+        if($classes->first() != null) {
+            $classStudents = $studentController->getClassStudents($classes->first()->id, 9);
+
+            return view('dashboard.index')
+                ->with('classStudents', $classStudents)
+                ->with('classes', $classes)
+                ->with('objects', $objects)
+                ->with('assetsBasePath', $assetsBasePath);
+        } else {
+            //Lets do something here for new users e.g. redirect them to force make a class
+            return view('dashboard.index')
+                ->with('objects', $objects)
+                ->with('assetsBasePath', $assetsBasePath);
+        }
     }
 
     /**
@@ -44,10 +52,15 @@ class IndexController extends Controller
     )
     {
         $classes = $classController->getClasses();
-        $classStudents = $studentController->getClassStudents($classes->first()->id);
-        $objects = $objectController->getObjects(9);
-        return view('dashboard.classes')
-            ->with('classStudents', $classStudents)
-            ->with('classes', $classes);
+        if($classes->first() != null) {
+            $classStudents = $studentController->getClassStudents($classes->first()->id);
+            $objects = $objectController->getObjects(9);
+            return view('dashboard.classes')
+                ->with('classStudents', $classStudents)
+                ->with('classes', $classes);
+        } else {
+            //Lets do something here for new users
+            return view('dashboard.classes');
+        }
     }
 }

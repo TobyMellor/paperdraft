@@ -12,6 +12,7 @@
         <link href="/assets/css/core.min.css" rel="stylesheet" type="text/css">
         <link href="/assets/css/components.min.css" rel="stylesheet" type="text/css">
         <link href="/assets/css/colors.min.css" rel="stylesheet" type="text/css">
+        <link href="/assets/css/seatingplanner.css" rel="stylesheet" type="text/css">
         <!-- /global stylesheets -->
 
         <!-- Core JS files -->
@@ -31,7 +32,9 @@
         <script type="text/javascript" src="/assets/js/plugins/buttons/ladda.min.js"></script>
         <script type="text/javascript" src="/assets/js/core/app.js"></script>
         <script type="text/javascript" src="/assets/js/pages/components_buttons.js"></script>
+        <script type="text/javascript" src="/assets/js/pages/components_modals.js"></script>
         <script type="text/javascript" src="/assets/js/pages/uploader_bootstrap.js"></script>
+        <script type="text/javascript" src="/assets/js/plugins/notifications/noty.min.js"></script>
     </head>
 
     <body>

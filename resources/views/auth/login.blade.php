@@ -197,14 +197,12 @@
 	<script>
 	    //jQuery Element Events
 	    $(document).ready(function() {
-
 	      $('#button-switch-to-sign-in').click(function() {
 	        switchForms('sign-in');
 	      });
 	      $('#button-switch-to-sign-up').click(function() {
 	        switchForms('sign-up');
 	      });
-
 	    });
 	  
 	    //Javascript Functions
@@ -220,7 +218,8 @@
 	    	switchForms('{{ session('changeSection') }}')
 	    @endif
 
-	    function switchForms(switchTo) {
+	    function switchForms(switchTo)
+	    {
 	      if(switchTo == 'sign-in') {
 	        $('#sign-up').hide();
 	        $('#sign-in').show();
@@ -230,7 +229,8 @@
 	      }
 	    }
 
-	    function handleNotification(notificationContent, type) {
+	    function handleNotification(notificationContent, type)
+	    {
 		    var n = noty({
 			    text: notificationContent,
 			    layout: 'topCenter',

@@ -55,38 +55,6 @@
                                 </ul>
                             </div>
                             <a class="heading-elements-toggle"><i class="icon-menu"></i></a></div>
-
-                            <style>
-                                .no-antialias { 
-                                    image-rendering: optimizeSpeed;
-                                    image-rendering: -moz-crisp-edges;
-                                    image-rendering: -o-crisp-edges;
-                                    image-rendering: -webkit-optimize-contrast;
-                                    image-rendering: pixelated;
-                                    image-rendering: optimize-contrast;
-                                    -ms-interpolation-mode: nearest-neighbor;
-
-                                }
-                                .drag-item, .outside-drag-item {
-                                    position: absolute;
-                                    cursor: move;
-                                }
-                                .drop-target {
-                                    left: 0px; top: 0px;
-                                    position: absolute;
-                                    width: 736px;
-                                    height: 736px;
-                                    border: dashed 1px orange;
-                                    background: whitesmoke url('assets/images/objects/grid_64.png') repeat;
-                                    background-size: 32px 32px;
-                                    cursor: crosshair;
-                                    
-                                }
-                                .outline-highlight {
-                                    -webkit-filter: drop-shadow(1px 1px 0 #26a69a) drop-shadow(-1px -1px 0 #26a69a);
-                                    filter:drop-shadow(1px 1px 0 #26a69a) drop-shadow(-1px -1px 0 #26a69a);
-                                }
-                            </style>
                         <div class="panel-body" style="height: 736px; overflow-x: scroll;">
                             <div class="drop-target" id="paper">
                             </div>
@@ -95,41 +63,6 @@
                 </div>
                 <div class="col-md-4">
                     <div class="tabbable">
-                        <style>
-                            .nav-pills-bordered > li > a {
-                                background-color: #fff;
-                            }
-                            .nav-pills > li > .btn-group {
-                                position: absolute;
-                                right: 0;
-                                top: 0;
-                            }
-                            .nav-pills > li > .btn-group > .btn {
-                                padding: 10px 15px;
-                                border-radius: 0 3px 3px 0;
-                            }
-                            .class-button {
-                                background-color: #fcfcfc !important;
-                                border-color: #ddd !important;
-                                color: #333 !important;
-                            }
-                            .class-button-active {
-                                background-color: #2196f3 !important;
-                                border-radius: 5px !important;
-                                border: 1px solid #2196f3 !important;
-                                color: #fff !important;
-                            }
-                            .class-options {
-                                background-color: #fcfcfc !important;
-                                border-color: #ddd !important;
-                                color: #333 !important;
-                                padding: 9px 10px 9px 15px !important;
-                            }
-                            .class-options-active {
-                                padding: 9px 10px 9px 15px !important;
-                                background-color: #0e7ed5 !important;
-                            }
-                        </style>
                         <ul class="nav nav-pills nav-pills-bordered nav-stacked">
                             @if(isset($classes))
                                 @foreach($classes as $key => $class)
@@ -150,6 +83,9 @@
                                     </li>
                                 @endforeach
                             @endif
+                            <li>
+                                <a href="javascript:;" class="class-button class-button-create">Create new</a>
+                            </li>
                         </ul>
                     </div>
                     <div class="panel panel-white">
@@ -626,7 +562,7 @@
             return activeObjects[activeObjects.length - 1];
         }
 
-        var selectedTriedPositions = [];
+        var selectedTriedPositions = {};
 
         function initializeDraggable()
         {
@@ -665,27 +601,46 @@
                             selectedObjectPositionX = selectedObjectPreviousPositionX - selectedPositions[0][2][0];
                             selectedObjectPositionY = selectedObjectPreviousPositionY - selectedPositions[0][2][1];
 
-                            selectedTriedPosition = getArrayInArray(selectedTriedPositions, [selectedObjectPositionX, selectedObjectPositionY]);
+                            if(typeof selectedTriedPositions[selectedIds[i]] != 'undefined') {
+                                selectedTriedPositions[selectedIds[i]] = {
+                                    delta: {
+                                        x: selectedPositions[0][2][0],
+                                        y: selectedPositions[0][2][1]
+                                    },
+                                    checked_positions: [
+                                        [
+                                            selectedObjectPositionX,
+                                            selectedObjectPositionY
+                                        ]
+                                    ]
+                                };
+                            }
+
+                            if(getArrayInArray(selectedTriedPositions[selectedIds[i]].checked_positions, [selectedObjectPositionX,selectedObjectPositionY]) != -1) {
+                                var hasAlreadyBeenChecked = true;
+                            } else {
+                                var hasAlreadyBeenChecked = false;
+                            }
 
                             if(selectedObjectPreviousPositionX != selectedObjectPositionX
                                     || selectedObjectPreviousPositionY != selectedObjectPositionY
-                                    || selectedTriedPosition != -1) {
+                                    || !hasAlreadyBeenChecked) {
                                 if(getObjectByPosition(selectedObjectPositionX, selectedObjectPositionY) == -1
-                                        || selectedTriedPosition != -1) {
-                                    if(selectedTriedPosition != -1) {
-                                        selectedObjectPositionX -= selectedPositions[0][2][0];
-                                        selectedObjectPositionY -= selectedPositions[0][2][1];
-                                        selectedTriedPositions.splice(selectedTriedPosition, 1);
+                                        || !hasAlreadyBeenChecked) {
+                                    if(!hasAlreadyBeenChecked) {
+                                        selectedObjectPositionX -= selectedTriedPositions[selectedIds[i]].delta.x;
+                                        selectedObjectPositionY -= selectedTriedPositions[selectedIds[i]].delta.y;
+                                        selectedTriedPositions[selectedIds[i]].delta[0] -= selectedPositions[0][2][0];
+                                        selectedTriedPositions[selectedIds[i]].delta[1] -= selectedPositions[0][2][1];
+
+                                        selectedTriedPositions[selectedIds[i]].checked_positions.push([selectedObjectPositionX, selectedObjectPositionX]);
                                     }
                                     selectedObject.css('left', selectedObjectPositionX * 32);
                                     selectedObject.css('top', selectedObjectPositionY * 32);
-                                } else {
-                                    selectedTriedPositions.push([selectedObjectPositionX, selectedObjectPositionY]);
+                                    selectedTriedPositions[selectedIds[i]] = undefined;
                                 }
-                            } else {
-                                selectedTriedPositions.push([selectedObjectPositionX, selectedObjectPositionY]);
                             }
-                            
+
                             selectedObjects.push(selectedObject);
                             selectedPositions.push([[selectedObjectPreviousPositionX, selectedObjectPreviousPositionY], [selectedObjectPositionX, selectedObjectPositionY]]);
                         }
