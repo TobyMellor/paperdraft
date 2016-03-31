@@ -444,8 +444,9 @@
 	                    $('#create-student').trigger('reset');
 	                    $('a[data-original-title="Information"]').tab('show')
 					} else {
-						var errorMessage = data[0];
-						errorMessage += $.map(data[0], function(e){
+						data = JSON.parse(data);
+						var errorMessage = data[0] + '<br />';
+						errorMessage += $.map(data[1], function(e){
 						    return e;
 						}).join('<br />');
 
