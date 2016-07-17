@@ -74,6 +74,7 @@ class IndexController extends Controller
         return view('dashboard.classes')
             ->with('classStudents', $classStudents)
             ->with('classes', $classes)
-            ->with('selectedClass', $selectedClass);
+            ->with('selectedClass', $selectedClass)
+            ->with('classId', $classId);
     }
 }

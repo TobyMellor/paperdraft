@@ -117,7 +117,7 @@ class StudentController extends Controller
         return $student;
     }
 
-    public function updateClassStudents()
+    public function updateClassStudent()
     {
         $request = $this->request;
         $classStudentId = $request->input('class_student_id');

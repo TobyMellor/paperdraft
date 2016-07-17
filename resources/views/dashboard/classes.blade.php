@@ -50,14 +50,6 @@
 								<a class="btn bg-teal-400" href="#"><i class="icon-statistics position-left"></i> View Seating Plan</a>
 		                	</div>
 						<a class="heading-elements-toggle"><i class="icon-menu"></i></a></div>
-						<style>
-							.editable-input, .editable-select {
-								cursor: pointer;
-							}
-							.editable-input:hover, .editable-select:hover {
-								color: #666 !important;
-							}
-						</style>
 						<table class="table text-nowrap">
 							<thead>
 								<tr>
@@ -76,30 +68,36 @@
 											<td>
 												<div class="media-left media-middle">
 													<a class="btn bg-teal-400 btn-rounded btn-icon btn-xs" href="#">
-														<span class="letter-icon">{{ strtoupper($classStudent->student->name[0]) }}</span>
+														<div class="letter-icon">{{ strtoupper($classStudent->student->name[0]) }}</div>
 													</a>
 												</div>
 
 												<div class="media-body media-middle">
-													<h6 class="display-inline-block text-default text-semibold letter-icon-title editable-input" href="#" style="margin-bottom: 3px; margin-top: 3px;">{{ $classStudent->student->name }}</h6>
+													<h6 class="display-inline-block text-default text-semibold letter-icon-title student-name" href="#" style="margin-bottom: 3px; margin-top: 3px;">{{ $classStudent->student->name }}</h6>
 												</div>
 											</td>
 											<td>
-												<h6 class="no-margin editable-select current-attainment-level">{{ $classStudent->current_attainment_level or 'N/A'}}</h6>
+												<h6 class="no-margin current-attainment-level">{{ $classStudent->current_attainment_level or 'N/A'}}</h6>
 											</td>
 											<td>
-												<h6 class="no-margin editable-select target-attainment-level">{{ $classStudent->target_attainment_level or 'N/A'}}</h6>
+												<h6 class="no-margin target-attainment-level">{{ $classStudent->target_attainment_level or 'N/A'}}</h6>
 											</td>
 											<td>
-												<span class="editable-select pupil-premium">
+												<span class="pupil-premium">
 													<i class="@if($classStudent->student->pupil_premium) icon-checkmark3 text-success @else icon-cross2 text-danger-400 @endif"></i>
 												</span>
 											</td>
 											<td>
-												<h6 class="no-margin editable-select ability-cap">{{ $classStudent->ability_cap }}</h6>
+												<h6 class="no-margin ability-cap">{{ $classStudent->ability_cap }}</h6>
 											</td>
 											<td>
-												<button class="btn btn-danger">Delete</button>
+												<div class="btn-group">
+							                    	<button type="button" class="btn btn-danger dropdown-toggle" data-toggle="dropdown">Options <span class="caret"></span></button>
+							                    	<ul class="dropdown-menu dropdown-menu-right">
+														<li><a class="delete-student"><i class="icon-user-minus"></i> Delete</a></li>
+														<li><a class="edit-student"><i class="icon-pencil"></i> Edit</a></li>
+													</ul>
+												</div>
 											</td>
 										</tr>
 									@endforeach
@@ -107,7 +105,6 @@
 							</tbody>
 						</table>
 						<form action="/student" method="POST" id="create-student">
-							<input type="text" name="class_id" value="{{ $selectedClass->id }}" hidden>
 							<input name="_token" value="{{ csrf_token() }}" hidden>
 						    <div class="content">
 						        <div class="row">
@@ -454,104 +451,114 @@
 					}
 		        });
 		    });
+
+	        $('.delete-student').click(function()
+	        {
+
+	        });
+
+	        $('.edit-student').click(function()
+	        {
+                classStudent = $(this).closest('tr');
+                classStudentId = classStudent.attr('class-student-id');
+
+                var length = classStudent.children('td').length;
+                classStudent.children('td').each(function (index) {
+                    if (index != length - 1) {
+                        var editableInput = $(this).find('h6, span');
+
+                        if(editableInput.hasClass('current-attainment-level')
+                                || editableInput.hasClass('target-attainment-level')) {
+                            editableInput.html(
+                                '<select class="form-control" name="' + (editableInput.hasClass('current-attainment-level') ? 'current_attainment_level' : 'target_attainment_level') + '" value="' + editableInput.html() + '">' +
+                                    '<optgroup label="Choose">' +
+                                        '<option selected="" value="A*">A*</option>' + 
+                                        '<option value="A">A</option>' + 
+                                        '<option value="B">B</option>' +
+                                        '<option value="C">C</option>' +
+                                        '<option value="D">D</option>' +
+                                        '<option value="E">E</option>' +
+                                        '<option value="F">F</option>' +
+                                        '<option value="G">G</option>' +
+                                        '<option value="U">U</option>' +
+                                    '</optgroup>' +
+                                '</select>'
+                            );
+                        } else if(editableInput.hasClass('pupil-premium')) {
+                            editableInput.html('<input class="styled" type="checkbox" name="pupil_premium">');
+                        } else if(editableInput.hasClass('ability-cap')) {
+                            editableInput.html(
+                                '<select class="form-control" name="ability_cap">' +
+                                    '<optgroup label="Ability Cap">' +
+                                        '<option selected="" value="H">H</option>' + 
+                                        '<option value="M">M</option>' + 
+                                        '<option value="L">L</option>' +
+                                    '</optgroup>' +
+                                '</select>'
+                            );
+                        } else {
+                            editableInput.html('<input class="form-control" type="text" placeholder="Students Name" title="" data-popup="tooltip" data-original-title="Enter the students name" value="' + editableInput.html() + '">');
+                        }
+                    } else {
+                       classStudent.children().last().html('<button class="btn btn-success student-save">Save</button>');
+                    }
+                });
+	        });
+
+            $(document).on('click', '.student-save', function() {
+                classStudentId = $(this).closest('tr').attr('class-student-id');
+
+                updateStudentInformation(classStudentId);
+                console.log('nice');
+            });
         });
 
-        //Probably a nicer way of doing this
-        $(document).on('mouseenter', '.editable-input, .editable-select', function() {
-		    $(this).html($(this).html() + '<i class="icon-pencil"></i>');
-        }).on('mouseleave', '.editable-input, .editable-select', function() {
-			$(this).html($(this).html().replace('<i class="icon-pencil"></i>', ''));
-        }).on('click', '.editable-input, .editable-select', function() {
-		    $(this).html($(this).html().replace('<i class="icon-pencil"></i>', ''));
-		    $(this).addClass('currently-editing');
-
-		    if($(this).hasClass('editable-input')) {
-		    	$(this).removeClass('editable-input');
-		    	$(this).html('<input class="form-control" type="text" placeholder="Students Name" title="" data-popup="tooltip" data-original-title="Enter the students name">')
-			    $(this).children().focus();
-			    $(this).parent()
-			    	   .parent()
-			    	   .parent()
-			    	   .children('td:nth-child(6)')
-			    	   .html('<button class="btn btn-success">Save</button>');
-			} else {
-				console.log('removing');
-		    	$(this).removeClass('editable-select');
-				if($(this).hasClass('current-attainment-level')) {
-			    	$(this).html(
-			    		'<select class="form-control" name="current_attainment_level">' +
-							'<optgroup label="Current">' +
-								'<option selected="" value="A*">A*</option>' + 
-								'<option value="A">A</option>' + 
-								'<option value="B">B</option>' +
-								'<option value="C">C</option>' +
-								'<option value="D">D</option>' +
-								'<option value="E">E</option>' +
-								'<option value="F">F</option>' +
-								'<option value="G">G</option>' +
-								'<option value="U">U</option>' +
-							'</optgroup>' +
-						'</select>'
-					);
-		    	} else if($(this).hasClass('target-attainment-level')) {
-			    	$(this).html(
-			    		'<select class="form-control" name="target_attainment_level">' +
-							'<optgroup label="Target">' +
-								'<option selected="" value="A*">A*</option>' + 
-								'<option value="A">A</option>' + 
-								'<option value="B">B</option>' +
-								'<option value="C">C</option>' +
-								'<option value="D">D</option>' +
-								'<option value="E">E</option>' +
-								'<option value="F">F</option>' +
-								'<option value="G">G</option>' +
-								'<option value="U">U</option>' +
-							'</optgroup>' +
-						'</select>'
-					);
-		    	} else if($(this).hasClass('pupil-premium')) {
-		    		$(this).html('<input class="styled" type="checkbox" name="pupil_premium">');
-		    	} else {
-			    	$(this).html(
-			    		'<select class="form-control" name="ability_cap">' +
-							'<optgroup label="Ability Cap">' +
-								'<option selected="" value="H">High</option>' + 
-								'<option value="M">Medium</option>' + 
-								'<option value="L">Low</option>' +
-							'</optgroup>' +
-						'</select>'
-					);
-		    	}
-
-			    $(this).children().focus();
-			    $(this).parent()
-			    	   .parent()
-			    	   .children('td:nth-child(6)')
-			    	   .html('<button class="btn btn-success" onclick="updateStudentInformation($(this))">Save</button>');
-			}
-        });
-
-        var classId;
+        var classId = {{ $classId }};
         var token = '{{ csrf_token() }}';
 
-        function updateStudentInformation(saveButton)
+        function updateStudentInformation(classStudentId)
         {
-        	var classStudentId = $(this).parent().parent().attr('class-student-id');
+            console.log(classStudentId);
+            classStudent = $('tr[class-student-id=' + classStudentId + ']');
 
-        	//TODO: Get edited data, submit separately.
+            var studentName = classStudent.find('.student-name').children().first().val();
+            var pupilPremium = classStudent.find('.pupil-premium').children().first().val();
+            var abilityCap = classStudent.find('.ability-cap').children().first().find(":selected").text();
+            var currentAttainmentLevel = classStudent.find('.current-attainment-level').children().first().find(":selected").text();
+            var targetAttainmentLevel = classStudent.find('.target-attainment-level').children().first().find(":selected").text();
+            console.log(classStudentId);
+            console.log(studentName);
+            console.log(pupilPremium);
+            console.log(classId);
+            console.log(abilityCap);
+            console.log(currentAttainmentLevel);
+            console.log(targetAttainmentLevel);
+
         	$.ajax({
                 url: '/class-student',
                 type: 'PUT',
                 data: {
                     _token: token,
-                    class_student_id: classStudentId
+                    class_student_id: classStudentId,
+                    student_name: studentName,
+                    pupil_premium: pupilPremium,
+                    class_id: classId,
+                    ability_cap: abilityCap,
+                    current_attainment_level: currentAttainmentLevel,
+                    target_attainment_level: targetAttainmentLevel
                 }
             }).done(function(data) {
-            	saveButton.parent().html('<button class="btn btn-danger">Delete</button>');
 
-            	var tableElement = saveButton.parent().parent();
-
-            	tableElement.children
+            console.log('test2');
+            	classStudent.find('.student-save').parent().html(
+                    '<div class="btn-group">' + 
+                        '<button type="button" class="btn btn-danger dropdown-toggle" data-toggle="dropdown">Options <span class="caret"></span></button>' +
+                        '<ul class="dropdown-menu dropdown-menu-right">' +
+                            '<li><a class="delete-student"><i class="icon-user-minus"></i> Delete</a></li>' +
+                            '<li><a class="edit-student"><i class="icon-pencil"></i> Edit</a></li>' +
+                        '</ul>' +
+                    '</div>'
+                );
             });
         }
 
