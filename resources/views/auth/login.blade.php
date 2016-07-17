@@ -71,7 +71,7 @@
 							<input type="hidden" name="_token" value="{{ csrf_token() }}">
 
 							<div class="form-group has-feedback has-feedback-left">
-								<input type="text" name="email" class="form-control" placeholder="Email" @if(session('predefinedData')['email'] != null) value="{{ session('predefinedData')['email'] }}" @endif>
+								<input type="text" name="email" class="form-control" placeholder="Email" value="{{ old('email') }}">
 								<div class="form-control-feedback">
 									<i class="icon-user text-muted"></i>
 								</div>
@@ -88,7 +88,7 @@
 								<div class="row">
 									<div class="col-sm-6">
 										<label class="checkbox-inline">
-											<input type="checkbox" name="checkbox" class="styled">
+											<input type="checkbox" name="checkbox" class="styled" checked>
 											Remember
 										</label>
 									</div>
@@ -110,7 +110,7 @@
 					<!-- /login -->
 
 					<!-- registration -->
-					<form id="sign-up" action="{{ url('register') }}" method="POST" style="display:none;">
+					<form id="sign-up" action="{{ url('register') }}" method="POST" style="display: none;">
 						<div class="panel panel-body login-form">
 							<div class="text-center">
 								<div class="icon-object border-success text-success"><i class="icon-plus3"></i></div>
@@ -122,7 +122,7 @@
 							<div class="content-divider text-muted form-group"><span>Your credentials</span></div>
 
 							<div class="form-group has-feedback has-feedback-left">
-								<input type="text" name="email" class="form-control" placeholder="Email" @if(session('predefinedData')['email'] != null) value="{{ session('predefinedData')['email'] }}" @endif>
+								<input type="text" name="email" class="form-control" placeholder="Email" value="{{ old('email') }}">
 								<div class="form-control-feedback">
 									<i class="icon-mention text-muted"></i>
 								</div>
@@ -132,7 +132,7 @@
 							</div>
 
 							<div class="form-group has-feedback has-feedback-left">
-								<input type="password" name="password" class="form-control" placeholder="Create password">
+								<input type="password" name="password" class="form-control" placeholder="Password">
 								<div class="form-control-feedback">
 									<i class="icon-user-lock text-muted"></i>
 								</div>
@@ -177,7 +177,7 @@
 
 					<!-- Footer -->
 					<div class="footer text-muted">
-						&copy; 2015. SeatingPlanner by Toby Mellor
+						&copy; {{ date('Y') }}. SeatingPlanner by Toby Mellor
 					</div>
 					<!-- /footer -->
 
@@ -195,12 +195,13 @@
 	<script>
 	    //jQuery Element Events
 	    $(document).ready(function() {
-	      $('#button-switch-to-sign-in').click(function() {
-	        switchForms('sign-in');
-	      });
-	      $('#button-switch-to-sign-up').click(function() {
-	        switchForms('sign-up');
-	      });
+			$('#button-switch-to-sign-in').click(function() {
+				switchForms('sign-in');
+			});
+
+			$('#button-switch-to-sign-up').click(function() {
+				switchForms('sign-up');
+			});
 	    });
 	  
 	    //Javascript Functions
@@ -213,18 +214,20 @@
 	    	handleNotification('{{ session('successMessage') }}', 'success');
 	    @endif
 	    @if (session('changeSection') != null)
-	    	switchForms('{{ session('changeSection') }}')
+	    	switchForms('{{ session('changeSection') }}', 0)
 	    @endif
 
-	    function switchForms(switchTo)
+	    function switchForms(switchTo, transitionDuration = 200)
 	    {
-	      if(switchTo == 'sign-in') {
-	        $('#sign-up').hide();
-	        $('#sign-in').show();
-	      } else {
-	        $('#sign-in').hide();
-	        $('#sign-up').show();
-	      }
+			if(switchTo == 'sign-in') {
+				$('#sign-up').fadeOut(transitionDuration, function() {
+					$('#sign-in').fadeIn(transitionDuration);
+				});
+			} else {
+				$('#sign-in').fadeOut(transitionDuration, function() {
+					$('#sign-up').fadeIn(transitionDuration);
+				});
+			}
 	    }
 
 	    function handleNotification(notificationContent, type)
@@ -237,7 +240,7 @@
 
 			setTimeout(function() {
 				n.close();
-			}, 5000);
+			}, 7500);
 	    }
   	</script>
 </body>

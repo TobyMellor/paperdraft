@@ -10,11 +10,16 @@ use Illuminate\Http\Request;
 
 class UserController extends Controller
 {
-    protected $request;
+    private $request;
 
     public function __construct(Request $request)
     {
         $this->request = $request;
+    }
+
+    private function getRequest()
+    {
+        return $this->request;
     }
 
     /**
@@ -25,7 +30,9 @@ class UserController extends Controller
     public function getLogout()
     {
         Auth::logout();
-        return redirect('/login')->with('successMessage', 'You have been logged out. See you soon!');
+
+        return redirect('/login')
+            ->with('successMessage', 'You have been logged out. See you soon!');
     }
 
     /**
@@ -35,6 +42,22 @@ class UserController extends Controller
      */
     public function getLogin()
     {
+        $request = $this->getRequest();
+        $request->session()->put('changeSection', 'sign-in');
+
+        return view('auth.login');
+    }
+
+    /**
+     * Display the register page.
+     *
+     * @return \Illuminate\Http\View
+     */
+    public function getRegister()
+    {
+        $request = $this->getRequest();
+        $request->session()->put('changeSection', 'sign-up');
+
         return view('auth.login');
     }
 
@@ -46,7 +69,7 @@ class UserController extends Controller
      */
     public function getUsers($paginate = null)
     {
-        if($paginate == null) {
+        if ($paginate == null) {
             $users = User::all();
         } else {
             $users = User::paginate($paginate);
@@ -73,7 +96,8 @@ class UserController extends Controller
      */
     public function authenticateUser()
     {
-        $request = $this->request;
+        $request = $this->getRequest();
+
         if (Auth::attempt([
             'email' => $request->input('email'),
             'password' => $request->input('password')
@@ -81,9 +105,6 @@ class UserController extends Controller
             return redirect()->intended('/dashboard');
         } else {
             return redirect('/login')
-                ->with('predefinedData', [
-                    'email' => $request->input('email'),
-                ])
                 ->with('errorMessage', 'The email and password you entered don\'t match.');
         }
     }
@@ -95,7 +116,7 @@ class UserController extends Controller
      */
     public function storeUser()
     {
-        $request = $this->request;
+        $request = $this->getRequest();
 
         $data = [
             'email' => $request->input('email'),
@@ -111,24 +132,22 @@ class UserController extends Controller
             }
         });
 
-        if(!$validation->fails()) {
+        if (!$validation->fails()) {
             User::create([
                 'email' => $data['email'],
                 'password' => bcrypt($data['password'])
             ]);
+
             return redirect('/login')
-                ->with('changeSection', 'sign-up')
+                ->with('changeSection', 'sign-in')
                 ->with('successMessage', 'You have successfully signed up. Sign in!');
-        } else {
-            return redirect('/login')
-                ->with('changeSection', 'sign-up')
-                ->with('predefinedData', [
-                    'email' => $request->input('email'),
-                    'checkbox' => $request->input('checkbox')
-                ])
-                ->with('errorMessage', 'There was some issues with the data you supplied.')
-                ->withErrors($validation, 'register');
         }
+
+        return redirect('/register')
+            ->with('changeSection', 'sign-up')
+            ->with('errorMessage', 'There was some issues with the data you supplied.')
+            ->withInput($request->except('password'))
+            ->withErrors($validation, 'register');
     }
 
     /**
@@ -138,7 +157,7 @@ class UserController extends Controller
      */
     public function destroyUser($userId)
     {
-        if(Auth::user()->priviledge == 1 && $userId != Auth::user()->id) {
+        if (Auth::user()->priviledge == 1 && $userId != Auth::user()->id) {
             User::destroy($userId);
         }
     }
@@ -154,5 +173,11 @@ class UserController extends Controller
             'email' => 'required|email|max:255|min:1|unique:users',
             'password' => 'required|confirmed|min:6'
         ]);
+    }
+
+    public function __destruct()
+    {
+        $request = $this->getRequest();
+        $request->flash();
     }
 }
