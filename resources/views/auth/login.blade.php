@@ -142,7 +142,7 @@
 							</div>
 
 							<div class="form-group has-feedback has-feedback-left">
-								<input type="password" name="confirm_password" class="form-control" placeholder="Confirm Password">
+								<input type="password" name="password_confirmation" class="form-control" placeholder="Confirm Password">
 								<div class="form-control-feedback">
 									<i class="icon-user-check text-muted"></i>
 								</div>
@@ -208,13 +208,15 @@
 	    var token = '{{ csrf_token() }}';
 
 	    @if (session('errorMessage') != null)
-	    	handleNotification('{{ session('errorMessage') }}', 'error');
+	    	var errorMessage = '{!! addslashes(html_entity_decode(session('errorMessage'))) !!}';
+	    	handleNotification(errorMessage, 'error');
 	    @endif
 		@if (session('successMessage') != null)
-	    	handleNotification('{{ session('successMessage') }}', 'success');
+	    	var successMessage = '{!! addslashes(html_entity_decode(session('successMessage'))) !!}';
+	    	handleNotification(successMessage, 'success');
 	    @endif
 	    @if (session('changeSection') != null)
-	    	switchForms('{{ session('changeSection') }}', 0)
+	    	switchForms('{{ session('changeSection') }}', 0);
 	    @endif
 
 	    function switchForms(switchTo, transitionDuration = 200)

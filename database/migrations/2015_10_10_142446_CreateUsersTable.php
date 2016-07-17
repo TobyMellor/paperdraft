@@ -21,6 +21,9 @@ class CreateUsersTable extends Migration
             $table->integer('priviledge')
                 ->unsigned()
                 ->default(0);
+                
+            $table->boolean('confirmed')->default(false);
+            $table->string('confirmation_code')->nullable();
 
             $table->rememberToken();
             $table->softDeletes();
@@ -30,7 +33,8 @@ class CreateUsersTable extends Migration
         DB::table('users')->insert([
             [
                 'email' => 'tobymulberry@hotmail.com',
-                'password' => bcrypt('Testing123')
+                'password' => bcrypt('Testing123'),
+                'confirmed' => 1
             ]
         ]);
     }

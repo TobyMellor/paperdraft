@@ -3,14 +3,29 @@
 namespace App\Http\Controllers;
 
 use App\User;
+
 use Auth;
 use Validator;
+use Mail;
 
 use Illuminate\Http\Request;
 
+use Illuminate\Foundation\Auth\ThrottlesLogins;
+use Illuminate\Foundation\Auth\AuthenticatesAndRegistersUsers;
+
 class UserController extends Controller
 {
+    use AuthenticatesAndRegistersUsers, ThrottlesLogins;
+
     private $request;
+
+    /**
+     * Where to redirect users after/after login / registration.
+     *
+     * @var string
+     */
+    private $redirectTo = '/dashboard';
+    private $redirectBackTo = '/login';
 
     public function __construct(Request $request)
     {
@@ -31,7 +46,7 @@ class UserController extends Controller
     {
         Auth::logout();
 
-        return redirect('/login')
+        return redirect($this->redirectBackTo)
             ->with('successMessage', 'You have been logged out. See you soon!');
     }
 
@@ -102,9 +117,9 @@ class UserController extends Controller
             'email' => $request->input('email'),
             'password' => $request->input('password')
         ], $request->input('checkbox'))) {
-            return redirect()->intended('/dashboard');
+            return redirect()->intended($this->redirectTo);
         } else {
-            return redirect('/login')
+            return redirect($this->redirectBackTo)
                 ->with('errorMessage', 'The email and password you entered don\'t match.');
         }
     }
@@ -133,21 +148,77 @@ class UserController extends Controller
         });
 
         if (!$validation->fails()) {
-            User::create([
-                'email' => $data['email'],
-                'password' => bcrypt($data['password'])
-            ]);
+            $email = $data['email'];
+            $password = bcrypt($data['password']);
+            $confirmationCode = str_random(30);
 
-            return redirect('/login')
-                ->with('changeSection', 'sign-in')
+            User::create([
+                'email' => $email,
+                'password' => $password,
+                'confirmation_code' => $confirmationCode
+            ]);
+            
+            $this->sendConfirmationEmail($email);
+
+            return redirect($this->redirectBackTo)
+                ->with('successMessage', 'Success! Before you can sign in, look for the confirmation email we\'ve sent to <strong>' . $data['email'] . '</strong>. Check your spam folder too!')
+                ->withInput();
+
+            return redirect($this->redirectBackTo)
                 ->with('successMessage', 'You have successfully signed up. Sign in!');
         }
 
         return redirect('/register')
-            ->with('changeSection', 'sign-up')
             ->with('errorMessage', 'There was some issues with the data you supplied.')
             ->withInput($request->except('password'))
             ->withErrors($validation, 'register');
+    }
+
+    public function sendConfirmationEmail($email)
+    {
+        $user = User::where('email', $email)->where('confirmed', 0);
+
+        if ($user->count() > 0) {
+            $token = User::where('email', $email)->where('confirmed', 0)->first()->confirmation_code;
+
+            Mail::send('auth.emails.confirmation', ['email' => $email, 'token' => $token], function ($m) use ($email, $token) {
+                $m->from('admin@seatingplanner.dev', 'SeatingPlanner');
+
+                $m->to($email, $email)->subject('Please confirm your email!');
+            });
+
+            return redirect($this->redirectBackTo)
+                ->with('successMessage', 'We\'ve sent another, look for the confirmation email we\'ve sent to <strong>' . $email . '</strong>. Check your spam folder too!');
+        } else {
+            return redirect($this->redirectBackTo)
+                ->with('errorMessage', 'You\'ve already confirmed your email. You can now sign in.');
+        }
+    }
+
+    public function confirmEmail()
+    {
+        $request = $this->request;
+        $confirmationCode = $request->get('token');
+        $email = $request->get('email');
+
+        $user = User::where('email', $email)
+            ->where('confirmed', 0)
+            ->where('confirmation_code', $confirmationCode)
+            ->first();
+
+        if ($user != null) {
+            $user->confirmed = 1;
+            $user->save();
+
+            return redirect($this->redirectBackTo)
+                ->with('successMessage', 'You\'ve successfully confirmed your email. You can now sign in.');
+        } else if (User::where('email', $email)->where('confirmed', 1)->count() > 0) {
+            return redirect($this->redirectBackTo)
+                ->with('successMessage', 'You\'ve already confirmed your email. You can now sign in.');
+        }
+
+        return redirect($this->redirectBackTo)
+            ->with('errorMessage', 'The link was invalid. <strong><a href="' . url('email/confirmation/send/' . $email) . '"  style="text-decoration: underline; color: inherit !important;">Send another?</a></strong>');
     }
 
     /**

@@ -18,6 +18,12 @@ Route::group(['middleware' => ['web', 'guest']], function () {
 
     Route::get('/register', 'UserController@getRegister');
     Route::post('/register', 'UserController@storeUser');
+
+    Route::get('email/confirmation', 'UserController@confirmEmail');
+    Route::get('email/confirmation/send/{email}', 'UserController@sendConfirmationEmail');
+
+    Route::get('password/reset/{token}', 'PasswordController@getReset');
+    Route::post('password/reset', 'PasswordController@postReset');
 });
 
 //The user needs to be authenticated to perform these actions
