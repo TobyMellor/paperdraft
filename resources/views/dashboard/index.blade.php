@@ -67,9 +67,9 @@
                             @if(isset($classes))
                                 @foreach($classes as $key => $class)
                                     <li>
-                                        <a href="javascript:;" class="class-button @if($key == 0) class-button-active @endif" class-id="{{ $class->id }}">{{ $class->class_name }}</a>
+                                        <a href="javascript:void(0);" class="class-button @if($key == 0) class-button-active @endif" class-id="{{ $class->id }}">{{ $class->class_name }}</a>
                                         <div class="btn-group">
-                                            <a href="javascript:;" class="btn btn-primary btn-icon dropdown-toggle @if($key == 0) class-options-active @else class-options @endif" data-toggle="dropdown" class-id="{{ $class->id }}">
+                                            <a href="javascript:void(0);" class="btn btn-primary btn-icon dropdown-toggle @if($key == 0) class-options-active @else class-options @endif" data-toggle="dropdown" class-id="{{ $class->id }}">
                                                 <i class="icon-menu7"></i>
                                                 <span class="caret"></span>
                                             </a>
@@ -87,7 +87,7 @@
                             @else
                                 <li>
                             @endif
-                                <a href="javascript:;" class="class-button class-button-create" data-toggle="modal" data-target="#modal_form_inline">Create a new class</a>
+                                <a href="javascript:void(0);" class="class-button class-button-create" data-toggle="modal" data-target="#modal_form_inline">Create a new class</a>
                             </li>
                         </ul>
                     </div>
@@ -189,7 +189,7 @@
                                                 <img class="no-antialias" src="assets/images/objects/{{ $object->object_location }}">
                                                 <div class="caption-overflow">
                                                     <span>
-                                                        <a class="btn border-white text-white btn-flat btn-icon btn-rounded create-active-object" href="javascript:;" object-id={{ $object->id }}><i class="icon-plus3"></i></a>
+                                                        <a class="btn border-white text-white btn-flat btn-icon btn-rounded create-active-object" href="javascript:void(0);" object-id={{ $object->id }}><i class="icon-plus3"></i></a>
                                                     </span>
                                                 </div>
                                             </div>
@@ -399,7 +399,7 @@
             if(objectPositionX != previousPositionX
                     || objectPositionY != previousPositionY) {
                 if (getObjectByPosition((pageX - this.offset.click.left - this.offset.parent.left) / 32, (pageY - this.offset.click.top - this.offset.parent.top) / 32) != -1) {
-                    if(getArrayInArray(moveAttempts, [mousePositionX, mousePositionY]) == -1) {
+                    if (getArrayInArray(moveAttempts, [mousePositionX, mousePositionY]) == -1) {
                         if(moveAttempts.length > 1) {
                             moveAttempts[moveAttempts.length - 2] = [moveAttempts[moveAttempts.length - 1][0], moveAttempts[moveAttempts.length - 1][1]];
                             moveAttempts[moveAttempts.length - 1] = [mousePositionX, mousePositionY];
@@ -466,8 +466,8 @@
             };
         }
 
-        let token = '{{ csrf_token() }}';
-        let assetsBasePath = '{{ $assetsBasePath }}';
+        var token = '{{ csrf_token() }}';
+        var assetsBasePath = '{{ $assetsBasePath }}';
 
         var objects = [],
             activeObjects = [],
@@ -486,6 +486,8 @@
 
         var hasObjects = false,
             hasChanged = false;
+
+        var selectedTriedPositions = [];
 
         loadObjects();
 
@@ -565,8 +567,6 @@
             return activeObjects[activeObjects.length - 1];
         }
 
-        var selectedTriedPositions = {};
-
         function initializeDraggable()
         {
             $('.drag-item').draggable({
@@ -604,46 +604,27 @@
                             selectedObjectPositionX = selectedObjectPreviousPositionX - selectedPositions[0][2][0];
                             selectedObjectPositionY = selectedObjectPreviousPositionY - selectedPositions[0][2][1];
 
-                            if(typeof selectedTriedPositions[selectedIds[i]] != 'undefined') {
-                                selectedTriedPositions[selectedIds[i]] = {
-                                    delta: {
-                                        x: selectedPositions[0][2][0],
-                                        y: selectedPositions[0][2][1]
-                                    },
-                                    checked_positions: [
-                                        [
-                                            selectedObjectPositionX,
-                                            selectedObjectPositionY
-                                        ]
-                                    ]
-                                };
-                            }
-
-                            if(getArrayInArray(selectedTriedPositions[selectedIds[i]].checked_positions, [selectedObjectPositionX,selectedObjectPositionY]) != -1) {
-                                var hasAlreadyBeenChecked = true;
-                            } else {
-                                var hasAlreadyBeenChecked = false;
-                            }
+                            selectedTriedPosition = getArrayInArray(selectedTriedPositions, [selectedObjectPositionX, selectedObjectPositionY]);
 
                             if(selectedObjectPreviousPositionX != selectedObjectPositionX
                                     || selectedObjectPreviousPositionY != selectedObjectPositionY
-                                    || !hasAlreadyBeenChecked) {
+                                    || selectedTriedPosition != -1) {
                                 if(getObjectByPosition(selectedObjectPositionX, selectedObjectPositionY) == -1
-                                        || !hasAlreadyBeenChecked) {
-                                    if(!hasAlreadyBeenChecked) {
-                                        selectedObjectPositionX -= selectedTriedPositions[selectedIds[i]].delta.x;
-                                        selectedObjectPositionY -= selectedTriedPositions[selectedIds[i]].delta.y;
-                                        selectedTriedPositions[selectedIds[i]].delta[0] -= selectedPositions[0][2][0];
-                                        selectedTriedPositions[selectedIds[i]].delta[1] -= selectedPositions[0][2][1];
-
-                                        selectedTriedPositions[selectedIds[i]].checked_positions.push([selectedObjectPositionX, selectedObjectPositionX]);
+                                        || selectedTriedPosition != -1) {
+                                    if(selectedTriedPosition != -1) {
+                                        selectedObjectPositionX -= selectedPositions[0][2][0];
+                                        selectedObjectPositionY -= selectedPositions[0][2][1];
+                                        selectedTriedPositions.splice(selectedTriedPosition, 1);
                                     }
                                     selectedObject.css('left', selectedObjectPositionX * 32);
                                     selectedObject.css('top', selectedObjectPositionY * 32);
-                                    selectedTriedPositions[selectedIds[i]] = undefined;
+                                } else {
+                                    selectedTriedPositions.push([selectedObjectPositionX, selectedObjectPositionY]);
                                 }
+                            } else {
+                                selectedTriedPositions.push([selectedObjectPositionX, selectedObjectPositionY]);
                             }
-
+                            
                             selectedObjects.push(selectedObject);
                             selectedPositions.push([[selectedObjectPreviousPositionX, selectedObjectPreviousPositionY], [selectedObjectPositionX, selectedObjectPositionY]]);
                         }
@@ -878,7 +859,7 @@
 
         function updateConnectedObjects(objectPositionX, objectPositionY, checkExemptions, pushedIndex)
         {
-            let activeObjectId = getObjectByPosition(objectPositionX, objectPositionY);
+            var activeObjectId = getObjectByPosition(objectPositionX, objectPositionY);
 
             var hasAlreadyBeenChecked,
                 objectInCheckPosition;
