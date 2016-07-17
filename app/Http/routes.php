@@ -22,6 +22,9 @@ Route::group(['middleware' => ['web', 'guest']], function () {
     Route::get('email/confirmation', 'UserController@confirmEmail');
     Route::get('email/confirmation/send/{email}', 'UserController@sendConfirmationEmail');
 
+    Route::get('password/reset', 'PasswordController@getEmail');
+    Route::post('password/email', 'PasswordController@postEmail');
+
     Route::get('password/reset/{token}', 'PasswordController@getReset');
     Route::post('password/reset', 'PasswordController@postReset');
 });
