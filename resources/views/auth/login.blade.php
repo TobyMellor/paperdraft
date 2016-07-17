@@ -38,7 +38,7 @@
 	<!-- Main navbar -->
 	<div class="navbar navbar-inverse">
 		<div class="navbar-header">
-			<a class="navbar-brand" href="index.html"><img src="assets/images/logo_light.png" alt=""></a>
+			<a class="navbar-brand" href="{{ url('/') }}"><img src="assets/images/logo_light.png" alt=""></a>
 
 			<ul class="nav navbar-nav pull-right visible-xs-block">
 				<li><a data-toggle="collapse" data-target="#navbar-mobile"><i class="icon-tree5"></i></a></li>
@@ -61,14 +61,14 @@
 				<div class="content">
 
 					<!-- login -->
-					<form id="sign-in" action="login" method="POST">
+					<form id="sign-in" action="{{ url('login') }}" method="POST">
 						<div class="panel panel-body login-form">
 							<div class="text-center">
 								<div class="icon-object border-slate-300 text-slate-300"><i class="icon-reading"></i></div>
 								<h5 class="content-group">Login to your account <small class="display-block">Your credentials</small></h5>
 							</div>
 
-							<input type="hidden" name="_token" value="<?php echo csrf_token(); ?>">
+							<input type="hidden" name="_token" value="{{ csrf_token() }}">
 
 							<div class="form-group has-feedback has-feedback-left">
 								<input type="text" name="email" class="form-control" placeholder="Email" @if(session('predefinedData')['email'] != null) value="{{ session('predefinedData')['email'] }}" @endif>
@@ -94,7 +94,7 @@
 									</div>
 
 									<div class="col-sm-6 text-right">
-										<a href="login_password_recover.html">Forgot password?</a>
+										<a href="javascript:void(0);">Forgot password?</a>
 									</div>
 								</div>
 							</div>
@@ -104,20 +104,20 @@
 							</div>
 
 							<div class="content-divider text-muted form-group"><span>Don't have an account?</span></div>
-							<a id="button-switch-to-sign-up" href="javascript:;" class="btn btn-default btn-block content-group">Sign up</a>
+							<a id="button-switch-to-sign-up" href="javascript:void(0);" class="btn btn-default btn-block content-group">Sign up</a>
 						</div>
 					</form>
 					<!-- /login -->
 
 					<!-- registration -->
-					<form id="sign-up" action="register" method="POST" style="display:none;">
+					<form id="sign-up" action="{{ url('register') }}" method="POST" style="display:none;">
 						<div class="panel panel-body login-form">
 							<div class="text-center">
 								<div class="icon-object border-success text-success"><i class="icon-plus3"></i></div>
 								<h5 class="content-group">Create account <small class="display-block">All fields are required</small></h5>
 							</div>
 
-							<input type="hidden" name="_token" value="<?php echo csrf_token(); ?>">
+							<input type="hidden" name="_token" value="{{ csrf_token() }}">
 
 							<div class="content-divider text-muted form-group"><span>Your credentials</span></div>
 
@@ -126,19 +126,17 @@
 								<div class="form-control-feedback">
 									<i class="icon-mention text-muted"></i>
 								</div>
-								@if($errors->register->first('email') != null)
+								@if(isset($errors) && $errors->register->first('email') != null)
 									<span class="help-block text-danger"><i class="icon-cancel-circle2 position-left"></i>{{ $errors->register->first('email') }}</span>
 								@endif
 							</div>
-
-							<div class="content-divider text-muted form-group"><span>Your privacy</span></div>
 
 							<div class="form-group has-feedback has-feedback-left">
 								<input type="password" name="password" class="form-control" placeholder="Create password">
 								<div class="form-control-feedback">
 									<i class="icon-user-lock text-muted"></i>
 								</div>
-								@if($errors->register->first('password') != null)
+								@if(isset($errors) && $errors->register->first('password') != null)
 									<span class="help-block text-danger"><i class="icon-cancel-circle2 position-left"></i>{{ $errors->register->first('password') }}</span>
 								@endif
 							</div>
@@ -159,7 +157,7 @@
 										Accept <a href="#">terms of service</a>
 									</label>
 								</div>
-								@if($errors->register->first('checkbox') != null)
+								@if(isset($errors) && $errors->register->first('checkbox') != null)
 									<span class="help-block text-danger"><i class="icon-cancel-circle2 position-left"></i>{{ $errors->register->first('checkbox') }}</span>
 								@endif
 							</div>
@@ -171,7 +169,7 @@
 							<div class="content-divider text-muted form-group">
 								<span>Already have an account?</span>
 							</div>
-							<a id="button-switch-to-sign-in" class="btn btn-default btn-block content-group" href="javascript:;">Sign in</a>
+							<a id="button-switch-to-sign-in" class="btn btn-default btn-block content-group" href="javascript:void(0);">Sign in</a>
 						</div>
 					</form>
 					<!-- /registration -->
@@ -206,7 +204,7 @@
 	    });
 	  
 	    //Javascript Functions
-	    var token = '<?php echo csrf_token(); ?>';
+	    var token = '{{ csrf_token() }}';
 
 	    @if (session('errorMessage') != null)
 	    	handleNotification('{{ session('errorMessage') }}', 'error');

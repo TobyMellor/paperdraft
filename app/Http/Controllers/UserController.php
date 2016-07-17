@@ -14,21 +14,6 @@ class UserController extends Controller
 
     public function __construct(Request $request)
     {
-        $this->middleware('guest', [
-            'only' => [
-                'getLogin',
-                'authenticateUser',
-                'storeUser'
-            ]
-        ]);
-        $this->middleware('auth', [
-            'except' => [
-                'getLogin',
-                'authenticateUser',
-                'storeUser',
-                'validator'
-            ]
-        ]);
         $this->request = $request;
     }
 

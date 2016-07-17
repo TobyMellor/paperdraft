@@ -11,25 +11,33 @@
 |
 */
 
-Route::get('/dashboard', 'IndexController@getDashboard');
-Route::get('/dashboard/classes', 'IndexController@getClassesDashboard');
-Route::get('/dashboard/classes/{classId}', 'IndexController@getClassDashboard');
+//The user cannot be logged in to perform these actions
+Route::group(['middleware' => ['web', 'guest']], function () {
+    Route::get('/login', 'UserController@getLogin');
+    Route::post('/login', 'UserController@authenticateUser');
 
-Route::get('/login', 'UserController@getLogin');
-Route::post('/login', 'UserController@authenticateUser');
+    Route::post('/register', 'UserController@storeUser');
+});
 
-Route::post('/register', 'UserController@storeUser');
-Route::get('/logout', 'UserController@getLogout');
+//The user needs to be authenticated to perform these actions
+Route::group(['middleware' => ['web', 'auth']], function () {
+    Route::get('/dashboard', 'IndexController@getDashboard');
+    Route::get('/dashboard/classes', 'IndexController@getClassesDashboard');
+    Route::get('/dashboard/classes/{classId}', 'IndexController@getClassDashboard');
 
-Route::post('/student', 'StudentController@storeStudent');
+    Route::get('/logout', 'UserController@getLogout');
 
-Route::put('/class-student', 'StudentController@updateClassStudent');
+    Route::post('/student', 'StudentController@storeStudent');
 
-Route::get('/object', 'ObjectController@getObjects');
+    Route::put('/class-student', 'StudentController@updateClassStudent');
 
-Route::post('/class', 'ClassController@storeClass');
-Route::delete('/class', 'ClassController@deleteClass');
+    Route::get('/object', 'ObjectController@getObjects');
 
-Route::post('/class-object', 'ObjectController@storeClassObjects');
-Route::get('/class-object', 'ObjectController@getClassObjects');
-Route::delete('/class-object', 'ObjectController@deleteClassObjects');
+    Route::post('/class', 'ClassController@storeClass');
+    Route::delete('/class', 'ClassController@deleteClass');
+
+    Route::post('/class-object', 'ObjectController@storeClassObjects');
+    Route::get('/class-object', 'ObjectController@getClassObjects');
+    Route::delete('/class-object', 'ObjectController@deleteClassObjects');
+});
+
