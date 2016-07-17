@@ -103,8 +103,8 @@
                                 <ul class="navigation navigation-main navigation-accordion">
                                     <!-- Main -->
                                     <li class="navigation-header"><span>Main</span> <i class="icon-menu" title="Main pages"></i></li>
-                                    <li @if(app('url')->current() == (url() . '/dashboard')) class="active" @endif><a href="/dashboard"><i class="icon-home4"></i> <span>Dashboard</span></a></li>
-                                    <li @if(app('url')->current() == (url() . '/dashboard/classes')) class="active" @endif><a href="/dashboard/classes"><i class="icon-design"></i> <span>Manage Classes</span></a></li>
+                                    <li @if(app('url')->current() == url('/dashboard')) class="active" @endif><a href="/dashboard"><i class="icon-home4"></i> <span>Dashboard</span></a></li>
+                                    <li @if(app('url')->current() == url('/dashboard/classes')) class="active" @endif><a href="/dashboard/classes"><i class="icon-design"></i> <span>Manage Classes</span></a></li>
                                 </ul>
                             </div>
                         </div>
