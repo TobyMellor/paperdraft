@@ -16,26 +16,23 @@ class IndexController extends Controller
     public function getDashboard(
         ClassController $classController,
         StudentController $studentController,
-        ObjectController $objectController
+        ItemController $itemController
     )
     {
-        $assetsBasePath = '/assets/images/objects/';
         $classes = $classController->getClasses();
-        $objects = $objectController->getObjects(9);
+        $items = $itemController->getItems(9);
 
         if($classes->first() != null) {
             $classStudents = $studentController->getClassStudents($classes->first()->id, 9);
 
-            return view('dashboard.index')
+            return view('dashboard.index-test')
                 ->with('classStudents', $classStudents)
                 ->with('classes', $classes)
-                ->with('objects', $objects)
-                ->with('assetsBasePath', $assetsBasePath);
+                ->with('items', $items);
         } else {
             //Lets do something here for new users e.g. redirect them to force make a class
             return view('dashboard.index')
-                ->with('objects', $objects)
-                ->with('assetsBasePath', $assetsBasePath);
+                ->with('items', $items);
         }
     }
 

@@ -41,13 +41,13 @@ Route::group(['middleware' => ['web', 'auth']], function () {
 
     Route::put('/class-student', 'StudentController@updateClassStudent');
 
-    Route::get('/object', 'ObjectController@getObjects');
+    Route::get('/item', 'ItemController@getItems');
 
     Route::post('/class', 'ClassController@storeClass');
     Route::delete('/class', 'ClassController@deleteClass');
 
-    Route::post('/class-object', 'ObjectController@storeClassObjects');
-    Route::get('/class-object', 'ObjectController@getClassObjects');
-    Route::delete('/class-object', 'ObjectController@deleteClassObjects');
+    Route::post('/canvas-item', 'ItemController@storeCanvasItems');
+    Route::get('/canvas-item', 'ItemController@getCanvasItems');
+    Route::delete('/canvas-item', 'ItemController@deleteCanvasItems');
 });
 

@@ -4,14 +4,14 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
-class ClassObject extends Model
+class Item extends Model
 {
     /**
      * The database table used by the model.
      *
      * @var string
      */
-    protected $table = 'class_objects';
+    protected $table = 'items';
 
     /**
      * The attributes that are mass assignable.
@@ -19,9 +19,9 @@ class ClassObject extends Model
      * @var array
      */
     protected $fillable = [
-        'object_id',
-        'class_id',
-        'object_position_x',
-        'object_position_y',
+        'name',
+        'width',
+        'height',
+        'location',
     ];
 }

@@ -1,4 +1,4 @@
-var activeObjects;
+var canvasController;
 
 (function() {
     'use strict';
@@ -32,7 +32,7 @@ var activeObjects;
     
     // Draw the shape based on the current coordinates and position at onmousedown
     function doDraw(event) {
-        if(checkAgain) {
+        if (checkAgain) {
             $('.drag-item').each(function() {
                 if ($(this).hasClass('ui-draggable-dragging')) {
                     isDragging = true;
@@ -40,7 +40,7 @@ var activeObjects;
             });
         }
 
-        if(!isDragging) {
+        if (!isDragging) {
             checkAgain = false;
             if (rect) {
                 var mousePos = getCoords(event);
@@ -54,6 +54,7 @@ var activeObjects;
                 } else {
                     rect.attr({'x': startX, 'width': width});
                 }
+
                 if (height < 0) {
                     rect.attr({'y': currentY, 'height': height * -1});
                 } else {
@@ -63,7 +64,7 @@ var activeObjects;
         }
     }
 
-    function getActiveObjectsInsideSelection()
+    function getCanvasItemsInsideSelection()
     {
         var leftX = startX / 32;
         var rightX = endX / 32;
@@ -71,28 +72,33 @@ var activeObjects;
         var topY = startY / 32;
         var bottomY = endY / 32;
 
-        if(startX >= endX) {
+        if (startX >= endX) {
             leftX = endX / 32;
             rightX = startX / 32;
         }
-        if(startY >= endY) {
+
+        if (startY >= endY) {
             topY = endY / 32;
             bottomY = startY / 32;
         }
 
-        var selectedObjects = [];
+        var selectedCanvasItems = [];
+        var canvasItems = canvasController.canvasItems;
 
-        for(var i = 0; i < activeObjects.length; i++) {
-            if(activeObjects[i].object_position_x >= Math.floor(leftX)
-                    && activeObjects[i].object_position_x <= rightX
-                    && activeObjects[i].object_position_y >= Math.floor(topY)
-                    && activeObjects[i].object_position_y <= bottomY) {
-                selectedObjects.push($('div[active-object-id="' + i + '"]'));
+        for (var index in canvasItems) {
+            var canvasItem = canvasItems[index];
+
+            if (canvasItem.position_x >= Math.floor(leftX)
+                    && canvasItem.position_x <= rightX
+                    && canvasItem.position_y >= Math.floor(topY)
+                    && canvasItem.position_y <= bottomY) {
+                selectedCanvasItems.push(parseInt(index));
             }
         }
 
-        if(selectedObjects.length > 0)
-            updateSelected(selectedObjects);
+        if (selectedCanvasItems.length > 0) {
+            canvasController.updateSelected(selectedCanvasItems);
+        }
     }
     
     // Global variables
@@ -113,14 +119,14 @@ var activeObjects;
     };
     
     document.onmouseup = function(event) {
-        if(!isDragging) {
+        if (!isDragging) {
             if (!rect.removed) {
                 rect.remove();
 
                 endX = getCoords(event).x - $('.drop-target').offset().left;
                 endY = getCoords(event).y - $('.drop-target').offset().top;
 
-                getActiveObjectsInsideSelection();
+                getCanvasItemsInsideSelection();
             }
         }
 

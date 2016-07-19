@@ -396,11 +396,11 @@
                 delta = [0, -1]
             }
 
-            if(objectPositionX != previousPositionX
+            if (objectPositionX != previousPositionX
                     || objectPositionY != previousPositionY) {
                 if (getObjectByPosition((pageX - this.offset.click.left - this.offset.parent.left) / 32, (pageY - this.offset.click.top - this.offset.parent.top) / 32) != -1) {
                     if (getArrayInArray(moveAttempts, [mousePositionX, mousePositionY]) == -1) {
-                        if(moveAttempts.length > 1) {
+                        if (moveAttempts.length > 1) {
                             moveAttempts[moveAttempts.length - 2] = [moveAttempts[moveAttempts.length - 1][0], moveAttempts[moveAttempts.length - 1][1]];
                             moveAttempts[moveAttempts.length - 1] = [mousePositionX, mousePositionY];
                         } else {
@@ -467,7 +467,7 @@
         }
 
         var token = '{{ csrf_token() }}';
-        var assetsBasePath = '{{ $assetsBasePath }}';
+        var assetsBasePath = '{{ asset('assets/images/objects') }}/';
 
         var objects = [],
             activeObjects = [],
@@ -878,8 +878,10 @@
                 if (objectPositionX - 1 >= 0 && objectPositionX + 1 <= 23 && objectPositionY - 1 >= 0 && objectPositionY + 1 <= 23) {
                     for (let i = 0; i < 3; i++) {
                         for (let x = 0; x < 3; x++) {
-                            if (i == 1 && x == 1)
+                            if (i == 1 && x == 1) {
                                 continue;
+                            }
+                            
                             var checkPositionX = objectPositionX - 1 + x;
                             var checkPositionY = objectPositionY - 1 + i;
 
