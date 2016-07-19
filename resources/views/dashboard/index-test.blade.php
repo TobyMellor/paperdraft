@@ -326,15 +326,6 @@
             parent: {},
             children: {}
         };
-        
-        bootstrapper();
-
-        function bootstrapper() {
-            var classId = parseInt($('.class-button:first').attr('class-id'));
-
-            canvasController = new CanvasController(classId);
-            canvasController.loadItems();
-        }
 
         class View {
             addCanvasItem(item, canvasItem) {
@@ -352,6 +343,18 @@
                 );
 
                 $('.drop-target').children().show();
+            }
+
+            updateCanvasItemPosition(canvasItemId, canvasItemPositionX, canvasItemPositionY) {
+                console.log(canvasItemId);
+                console.log(canvasItemPositionX);
+                var canvasItem = $('.drag-item[canvas-item-id=' + canvasItemId + ']');
+
+                canvasItem.css('left', canvasItem.position_x * 32);
+                canvasItem.css('top', canvasItem.position_y * 32);
+
+                console.log(canvasItem);
+                console.log(canvasItem.css('left'));
             }
 
             removeCanvasItem(canvasItem) {
@@ -474,7 +477,7 @@
         }
 
         class CanvasController {
-            constructor(classId, gridSize = 32) {
+            constructor(classId, gridSize = 23) {
                 this.jsonItems,
                 this.jsonCanvasItems;
 
@@ -554,6 +557,34 @@
                 this.view.addCanvasItem(item, canvasItem);
             }
 
+            // Updates the canvasItem position and syncs with grid
+            // returns false if item is not allowed in this location
+            updateCanvasItemPosition(canvasItem, positionX, positionY) {
+                var canvasItemsGrid = this.canvasItemsGrid;
+
+                if (positionX >= 0
+                        && positionY >= 0
+                        && positionX < canvasItemsGrid.length
+                        && positionY < canvasItemsGrid.length) {
+                    if (canvasItemsGrid[positionX][positionY] == -1) { // TODO: Also check if parent is moving into child and allow that
+                        canvasItemsGrid[canvasItem.position_x][canvasItem.position_y] = -1; // Free up the old position
+
+                        canvasItem.position_x = positionX;
+                        canvasItem.position_y = positionY;
+
+                        canvasItemsGrid[positionX][positionY] = canvasItem.id; // Occupy the new position
+
+                        return true;
+                    }
+                }
+
+                console.log('GO BACK TO ' + canvasItem.position_x);
+
+                this.view.updateCanvasItemPosition(canvasItem.id, canvasItem.position_x, canvasItem.position_y); // Ensure the item doesn't move
+
+                return false;
+            }
+
             // Generates a grid array (Size: size * size) that shows all of the locations of canvasItems
             // -1 indicates no item is stored in that spot, anything else is the canvasItem id.
             // [
@@ -597,46 +628,75 @@
 
                         if (newParentCanvasItemPositionX != oldParentCanvasItemPositionX
                                 || newParentCanvasItemPositionY != oldParentCanvasItemPositionY) { // Continue if the item has moved
-                            canvasItems[parentCanvasItemId].position_x = newParentCanvasItemPositionX;
-                            canvasItems[parentCanvasItemId].position_y = newParentCanvasItemPositionY;
+                            if (canvasController.updateCanvasItemPosition(canvasItems[parentCanvasItemId], newParentCanvasItemPositionX, newParentCanvasItemPositionY)) { // TODO not working with parent?
+                                var lastDeltaX = newParentCanvasItemPositionX - oldParentCanvasItemPositionX;
+                                var lastDeltaY = newParentCanvasItemPositionY - oldParentCanvasItemPositionY;
 
-                            var lastDeltaX = newParentCanvasItemPositionX - oldParentCanvasItemPositionX;
-                            var lastDeltaY = newParentCanvasItemPositionY - oldParentCanvasItemPositionY;
+                                selectedCanvasItems.parent.last_delta_x = lastDeltaX;
+                                selectedCanvasItems.parent.last_delta_y = lastDeltaY;
 
-                            selectedCanvasItems.parent.last_delta_x = lastDeltaX;
-                            selectedCanvasItems.parent.last_delta_y = lastDeltaY;
+                                var selectedCanvasItemIds = [parentCanvasItemId];
 
-                            var selectedCanvasItemIds = [parentCanvasItemId];
+                                var sortedChildren = []; // Stores childrenIds sorted based on the parents movement direction. If the parent moves right, the children will update from right to left to prevent collisions
 
-                            for (let i = 0; i < Object.keys(selectedCanvasItems.children).length; i++) {
-                                var childCanvasItemId = Object.keys(selectedCanvasItems.children)[i];
-                                var childCanvasItem = canvasItems[childCanvasItemId];
+                                for (var childrenId in selectedCanvasItems.children) {
+                                    if (Math.abs(lastDeltaX) >= Math.abs(lastDeltaY) && lastDeltaX > 0) {
+                                        // right
+                                        sortedChildren.push([childrenId, -selectedCanvasItems.children[childrenId].relative_position_x]);
+                                    } else if (Math.abs(lastDeltaX) >= Math.abs(lastDeltaY) && lastDeltaX < 0) {
+                                        // left
+                                        sortedChildren.push([childrenId, selectedCanvasItems.children[childrenId].relative_position_x]);
+                                    } else if (Math.abs(lastDeltaX) <= Math.abs(lastDeltaY) && lastDeltaY > 0) {
+                                        // up
+                                        sortedChildren.push([childrenId, -selectedCanvasItems.children[childrenId].relative_position_y]);
+                                    } else if (Math.abs(lastDeltaX) <= Math.abs(lastDeltaY) && lastDeltaY < 0) {
+                                        // down
+                                        sortedChildren.push([childrenId, selectedCanvasItems.children[childrenId].relative_position_y]);
+                                    }
+                                }
 
-                                view.removeCanvasItem(childCanvasItem);
+                                sortedChildren.sort(
+                                    function(a, b) {
+                                        return a[1] - b[1];
+                                    }
+                                );
 
-                                var childRelativePositionX = selectedCanvasItems.children[childCanvasItemId].relative_position_x;
-                                var childRelativePositionY = selectedCanvasItems.children[childCanvasItemId].relative_position_y;
-                                
-                                childCanvasItem.position_x = newParentCanvasItemPositionX + childRelativePositionX;
-                                childCanvasItem.position_y = newParentCanvasItemPositionY + childRelativePositionY;
+                                for (let i = 0; i < sortedChildren.length; i++) {
+                                    var childCanvasItemId = sortedChildren[i][0];
+                                    var childCanvasItem = canvasItems[childCanvasItemId];
 
-                                selectedCanvasItemIds.push(childCanvasItemId);
+                                    var childRelativePositionX = selectedCanvasItems.children[childCanvasItemId].relative_position_x;
+                                    var childRelativePositionY = selectedCanvasItems.children[childCanvasItemId].relative_position_y;
+                                    
+                                    if (canvasController.updateCanvasItemPosition(
+                                        childCanvasItem,
+                                        newParentCanvasItemPositionX + childRelativePositionX,
+                                        newParentCanvasItemPositionY + childRelativePositionY
+                                    )) {
+                                        view.removeCanvasItem(childCanvasItem);
 
-                                // TODO: Deny movement if somethings in that place
+                                        selectedCanvasItemIds.push(childCanvasItemId);
 
-                                view.addCanvasItem(items[childCanvasItem.item_id], childCanvasItem);
+                                        view.addCanvasItem(items[childCanvasItem.item_id], childCanvasItem);
+                                    } else {
+                                        console.log('somethings already in that position or out of bounds (child)');
+                                    }
+                                }
+
+                                canvasController.updateSelected(selectedCanvasItemIds);
+                                canvasController.initializeDraggable();
+
+                                // for (let i = 0; i < selectedPositions.length; i++) {
+                                //     updateConnectedItems(selectedPositions[i][1][0], selectedPositions[i][1][1], [], null);
+
+                                //     updateConnectedItems(selectedPositions[i][0][0], selectedPositions[i][0][1], [
+                                //         [selectedPositions[i][1][0], selectedPositions[i][1][1], []]
+                                //     ], 0);
+                                // }
+                            } else {
+                                console.log('somethings already in that position or out of bounds (parent)');
+                                return false;
                             }
-
-                            canvasController.updateSelected(selectedCanvasItemIds);
-                            canvasController.initializeDraggable();
-
-                            // for (let i = 0; i < selectedPositions.length; i++) {
-                            //     updateConnectedItems(selectedPositions[i][1][0], selectedPositions[i][1][1], [], null);
-
-                            //     updateConnectedItems(selectedPositions[i][0][0], selectedPositions[i][0][1], [
-                            //         [selectedPositions[i][1][0], selectedPositions[i][1][1], []]
-                            //     ], 0);
-                            // }
                         }
                     },
                     // start: function() {
@@ -715,7 +775,16 @@
                 view.updateSelectedBoard(selectedBoardItems);
             }
         }
-        
+
+        function bootstrapper() {
+            var classId = parseInt($('.class-button:first').attr('class-id'));
+
+            canvasController = new CanvasController(classId);
+            canvasController.loadItems();
+        }
+
+        bootstrapper(); // Start initializing
+
         // $.ui.draggable.prototype._generatePosition = function(event, constrainPosition) {
         //     var containment, co, top, left,
         //         o = this.options,
@@ -1078,7 +1147,7 @@
 
         //     activeItemsGrid[itemPositionX][itemPositionY] = activeItemId;
 
-        //     activeItems[activeItemId].item_position_x = itemPositionX;
+        //     activeItems[activeItemId].position_x = itemPositionX;
         //     activeItems[activeItemId].position_y = itemPositionY;
         // }
 
