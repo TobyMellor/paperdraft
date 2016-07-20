@@ -10,6 +10,7 @@ use Validator;
 
 use Illuminate\Http\Request;
 
+// TODO: Use built in json manager
 class ItemController extends Controller
 {
     public function __construct(Request $request)
@@ -18,43 +19,72 @@ class ItemController extends Controller
     }
 
     /**
-     * Store the class items in the database.
+     * Store the canvas item in the database.
+     *
+     * @return \Illuminate\Http\Redirect
+     */
+    public function storeCanvasItem()
+    {
+        $request = $this->request;
+        $canvasItem = $request->input('canvas_item');
+        $classId = $request->input('class_id');
+
+        $response = [];
+
+        if ($canvasItem != null) {
+            $storedCanvasItem = new CanvasItem;
+
+            $storedCanvasItem->item_id = $canvasItem['item_id'];
+            $storedCanvasItem->class_id = $classId;
+            $storedCanvasItem->position_x = $canvasItem['position_x'];
+            $storedCanvasItem->position_y = $canvasItem['position_y'];
+
+            $storedCanvasItem->save();
+
+            $response = [$storedCanvasItem->id];
+        }
+
+        return $response;
+    }
+
+    /**
+     * Store the canvas items in the database.
      *
      * @return \Illuminate\Http\Redirect
      */
     public function storeCanvasItems()
     {
         $request = $this->request;
-        $items = $request->input('items');
+        $canvasItems = $request->input('canvas_items');
         $classId = $request->input('class_id');
 
-        if($items != null) {
-            foreach ($items as $key => $item) {
-                if (isset($item['canvas_item_id']) && $item['canvas_item_id'] != null) {
-                    CanvasItem::where('id', $item['canvas_item_id'])
+        if ($canvasItems != null) {
+            foreach ($canvasItems as $key => $canvasItem) {
+                if (isset($canvasItem['canvas_item_id']) && $canvasItem['canvas_item_id'] != null) {
+                    CanvasItem::where('id', $canvasItem['canvas_item_id'])
                         ->where('class_id', $classId)
                         ->update([
-                            'position_x' => $item['position_x'],
-                            'position_y' => $item['position_y']
+                            'position_x' => $canvasItem['position_x'],
+                            'position_y' => $canvasItem['position_y']
                         ]
                     );
-                } elseif(isset($item['item_id'])) {
+                } else if (isset($canvasItem['item_id'])) {
                     $canvasItem = new CanvasItem;
 
-                    $canvasItem->item_id = $item['item_id'];
+                    $canvasItem->item_id = $canvasItem['item_id'];
                     $canvasItem->class_id = $classId;
-                    $canvasItem->position_x = $item['position_x'];
-                    $canvasItem->position_y = $item['position_y'];
+                    $canvasItem->position_x = $canvasItem['position_x'];
+                    $canvasItem->position_y = $canvasItem['position_y'];
 
                     $canvasItem->save();
 
-                    $items[$key]['canvas_item_id'] = $canvasItem->id;
+                    $canvasItems[$key]['canvas_item_id'] = $canvasItem->id;
                 }
             }
         } else {
             return [];
         }
-        return $items;
+        return $canvasItems;
     }
 
     /**
@@ -68,7 +98,7 @@ class ItemController extends Controller
 
         $canvasItemsToPaste = [];
 
-        foreach($canvasItemsToCopy as $classObjectToCopy) {
+        foreach ($canvasItemsToCopy as $classObjectToCopy) {
             array_push($canvasItemsToPaste, [
                 'item_id' => $canvasItemToCopy->item_id,
                 'class_id' => $classIdToPaste,
@@ -116,7 +146,7 @@ class ItemController extends Controller
         $request = $this->request;
         $classId = $request->input('class_id');
 
-        if($request->input('canvas_items') != null) {
+        if ($request->input('canvas_items') != null) {
             $canvasItems = $request->input('canvas_items');
 
             $canvasItemIds = array_map(function($canvasItems){ return $canvasItems['canvas_item_id']; }, $canvasItems);

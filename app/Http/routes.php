@@ -46,7 +46,8 @@ Route::group(['middleware' => ['web', 'auth']], function () {
     Route::post('/class', 'ClassController@storeClass');
     Route::delete('/class', 'ClassController@deleteClass');
 
-    Route::post('/canvas-item', 'ItemController@storeCanvasItems');
+    // TODO: Routes should be named /canvas-item for one, /canvas-items for multiple
+    Route::post('/canvas-item', 'ItemController@storeCanvasItem');
     Route::get('/canvas-item', 'ItemController@getCanvasItems');
     Route::delete('/canvas-item', 'ItemController@deleteCanvasItems');
 });

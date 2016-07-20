@@ -189,7 +189,7 @@
                                                 <img class="no-antialias" src="assets/images/objects/{{ $item->location }}">
                                                 <div class="caption-overflow">
                                                     <span>
-                                                        <a class="btn border-white text-white btn-flat btn-icon btn-rounded create-active-item" href="javascript:void(0);" item-id={{ $item->id }}><i class="icon-plus3"></i></a>
+                                                        <a class="btn border-white text-white btn-flat btn-icon btn-rounded create-canvas-item" href="javascript:void(0);" item-id={{ $item->id }}><i class="icon-plus3"></i></a>
                                                     </span>
                                                 </div>
                                             </div>
@@ -224,8 +224,7 @@
 
     <script>
         $(document).ready(function() {
-            $('.drop-target').on('mousedown', '.drag-item', function()
-            {
+            $('.drop-target').on('mousedown', '.drag-item', function() {
                 var canvasItemId = $(this).attr('canvas-item-id');
                 var selectedCanvasItemIds = [canvasItemId];
 
@@ -242,6 +241,12 @@
                 canvasController.updateSelected(selectedCanvasItemIds);
             });
 
+            $('.create-canvas-item').click(function() {
+                var itemId = parseInt($(this).attr('item-id'));
+
+                canvasController.createCanvasItem(itemId);
+            });
+
             // $('#selected-delete').click(function()
             // {
             //     softDeleteActiveItems(selectedIds);
@@ -250,25 +255,6 @@
             // $('#save-button').click(function()
             // {
             //     saveActiveItems(null);
-            // });
-
-            // $('.create-active-item').click(function()
-            // {
-            //     var itemId = parseInt($(this).attr('item-id'));
-            //     if (selectedIds.length > 0) {
-            //         var selectedItemPositionX = activeItems[selectedIds[0]].position_y;
-            //         var selectedItemPositionY = activeItems[selectedIds[0]].position_y;
-
-            //         var nearestEmptySpace = getNearestEmpty(selectedItemPositionX, selectedItemPositionY, 5, 5);
-
-            //         if (nearestEmptySpace == -1) {
-            //             createActiveItem(itemId, 0, 0);
-            //         } else {
-            //             createActiveItem(itemId, nearestEmptySpace[0] * 32, nearestEmptySpace[1] * 32);
-            //         }
-            //     } else {
-            //         createActiveItem(itemId, 0, 0);
-            //     }
             // });
 
             // $('.class-button').click(function()
@@ -346,15 +332,10 @@
             }
 
             updateCanvasItemPosition(canvasItemId, canvasItemPositionX, canvasItemPositionY) {
-                console.log(canvasItemId);
-                console.log(canvasItemPositionX);
                 var canvasItem = $('.drag-item[canvas-item-id=' + canvasItemId + ']');
 
                 canvasItem.css('left', canvasItem.position_x * 32);
                 canvasItem.css('top', canvasItem.position_y * 32);
-
-                console.log(canvasItem);
-                console.log(canvasItem.css('left'));
             }
 
             removeCanvasItem(canvasItem) {
@@ -461,6 +442,26 @@
         //     }
         // ]
         class CanvasItemModel {
+            create(classId, canvasItem) {
+                $.ajax({
+                    url: '/canvas-item',
+                    type: 'POST',
+                    data: {
+                        _token: token,
+                        canvas_item: canvasItem,
+                        class_id: classId
+                    }
+                }).done(function(canvasItemIds) {
+                    if (canvasItemIds != null || canvasItemIds.length != 0) {
+                        canvasItem.id = canvasItemIds[0];
+
+                        canvasController.addCanvasItem(canvasItem);
+                    } else {
+                        console.log('Failed to load item.');
+                    }
+                });
+            }
+
             getAll(classId) {
                 $.ajax({
                     url: '/canvas-item',
@@ -494,6 +495,7 @@
                 this.view = new View;
             }
 
+            // TODO: Can't we just load this in with PHP?
             loadItems() {
                 this.itemModel.getAll();
             }
@@ -509,6 +511,8 @@
                 var items = this.items,
                     canvasItems = this.canvasItems; 
 
+                this.generateGrid(this.gridSize);
+
                 // Take JSON array of all items and store them locally
                 for (var jsonItem in jsonItems) {
                     var item = jsonItems[jsonItem];
@@ -522,10 +526,6 @@
 
                     this.addCanvasItem(canvasItem);
                 }
-
-                this.generateGrid(this.gridSize);
-
-                this.initializeDraggable();
             }
 
             // Stores the item locally
@@ -540,10 +540,41 @@
                 };
             }
 
+            createCanvasItem(itemId) {
+                var canvasItems = this.canvasItems,
+                    canvasItemModel = this.canvasItemModel,
+                    classId = this.classId;
+
+                var canvasItem = {
+                    id: Object.keys(canvasItems).length, // TODO: Properly get id
+                    item_id: itemId
+                };
+
+                if (!$.isEmptyObject(selectedCanvasItems.parent)) {
+                    var parentCanvasItemPositionX = canvasItems[selectedCanvasItems.parent.id].position_x;
+                    var parentCanvasItemPositionY = canvasItems[selectedCanvasItems.parent.id].position_y;
+
+                    var nearestEmptySpace = this.getNearestEmpty(parentCanvasItemPositionX, parentCanvasItemPositionY, 5, 5);
+
+                    if (nearestEmptySpace != -1) {
+                        canvasItem.position_x = nearestEmptySpace[0];
+                        canvasItem.position_y = nearestEmptySpace[1];
+
+                        return canvasItemModel.create(classId, canvasItem);
+                    }
+                }
+
+                canvasItem.position_x = 0;
+                canvasItem.position_y = 0;
+
+                return canvasItemModel.create(classId, canvasItem);
+            }
+
             // Stores the canvasItem locally and adds it to the view (canvas)
             addCanvasItem(canvasItem) {
                 var items = this.items,
-                    canvasItems = this.canvasItems;
+                    canvasItems = this.canvasItems,
+                    canvasItemsGrid= this.canvasItemsGrid;
 
                 var canvasItem = canvasItems[canvasItem.id] = {
                     'id': canvasItem.id,
@@ -553,14 +584,18 @@
                 };
 
                 var item = items[canvasItem.item_id];
+                
+                canvasItemsGrid[canvasItem.position_x][canvasItem.position_y] = canvasItem.id;
 
-                this.view.addCanvasItem(item, canvasItem);
+                this.view.addCanvasItem(item, canvasItem); // Render canvas item to view
+                this.updateSelected([canvasItem.id]); // Select the newly added item
+                this.initializeDraggable(); // Allow it to be dragged
             }
 
             isCanvasItemInPosition(positionX, positionY) {
                 var canvasItemsGrid = this.canvasItemsGrid;
 
-                if (canvasItemsGrid[positionX][positionY] != -1) {
+                if (positionX >= canvasItemsGrid.length - 1 || canvasItemsGrid[positionX][positionY] != -1) {
                     return true;
                 }
 
@@ -587,8 +622,6 @@
                         return true;
                     }
                 }
-
-                console.log('GO BACK TO ' + canvasItem.position_x);
 
                 this.view.updateCanvasItemPosition(canvasItem.id, canvasItem.position_x, canvasItem.position_y); // Ensure the item doesn't move
 
@@ -759,8 +792,8 @@
                             id: canvasItemId,
                             position_x: canvasItems[canvasItemId].position_x,
                             position_y: canvasItems[canvasItemId].position_y,
-                            location: items[canvasItems[canvasItemId].id].location,
-                            name: items[canvasItems[canvasItemId].id].name
+                            location: items[canvasItems[canvasItemId].item_id].location,
+                            name: items[canvasItems[canvasItemId].item_id].name
                         };
                     } else {
                         if (childrenIndexOf == -1) {
@@ -779,13 +812,43 @@
                         id: canvasItemId,
                         position_x: canvasItems[canvasItemId].position_x,
                         position_y: canvasItems[canvasItemId].position_y,
-                        location: items[canvasItems[canvasItemId].id].location,
-                        name: items[canvasItems[canvasItemId].id].name
+                        location: items[canvasItems[canvasItemId].item_id].location,
+                        name: items[canvasItems[canvasItemId].item_id].name
                     };
                 }
 
                 view.clearSelectedBoard(selectedCanvasItems);
                 view.updateSelectedBoard(selectedBoardItems);
+            }
+            
+            getNearestEmpty(positionX, positionY, maxCheckHeight, maxCheckWidth) {
+                var x = 0,
+                    y = 0,
+                    delta = [0, -1],
+                    potentialEmptyX,
+                    potentialEmptyY;
+
+                for (let i = 0; i < Math.pow(Math.max(maxCheckWidth, maxCheckHeight), 2); i++) {
+                    if ((-maxCheckWidth / 2 < x && x <= maxCheckWidth / 2) && (-maxCheckHeight / 2 < y && y <= maxCheckHeight / 2)) {
+                        potentialEmptyX = x + positionX;
+                        potentialEmptyY = y + positionY;
+
+                        if (potentialEmptyX >= 0 && potentialEmptyY >= 0 && potentialEmptyX <= 23 && potentialEmptyY <= 23) {
+                            if (!this.isCanvasItemInPosition(x + positionX, y + positionY)) {
+                                return [x + positionX, y + positionY];
+                            }
+                        }
+                    }
+
+                    if (x === y || (x < 0 && x === -y) || (x > 0 && x === 1 - y)) {
+                        delta = [-delta[1], delta[0]];
+                    }
+
+                    x += delta[0];
+                    y += delta[1];
+                }
+
+                return -1;
             }
         }
 
@@ -880,12 +943,6 @@
                     (pageY - this.offset.click.top - this.offset.parent.top) / 32)) {
                 return false;
             }
-
-            // canvasController.updateCanvasItemPosition(
-            //     canvasController.canvasItems[this.element.attr('canvas-item-id')],
-            //     (pageX - this.offset.click.left - this.offset.parent.left) / 32,
-            //     (pageY - this.offset.click.top - this.offset.parent.top) / 32
-            // );
 
             return {
                 top: (
