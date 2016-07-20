@@ -308,6 +308,8 @@
         var assetsBasePath = '{{ asset('assets/images/objects') }}/';
 
         var canvasController;
+        var utils;
+
         var selectedCanvasItems = {
             parent: {},
             children: {}
@@ -712,6 +714,9 @@
                                     var childCanvasItemId = sortedChildren[i][0];
                                     var childCanvasItem = canvasItems[childCanvasItemId];
 
+                                    var oldChildPositionX = childCanvasItem.position_x;
+                                    var oldChildPositionY = childCanvasItem.position_y;
+
                                     var childRelativePositionX = selectedCanvasItems.children[childCanvasItemId].relative_position_x;
                                     var childRelativePositionY = selectedCanvasItems.children[childCanvasItemId].relative_position_y;
                                     
@@ -725,6 +730,11 @@
                                         selectedCanvasItemIds.push(childCanvasItemId);
 
                                         view.addCanvasItem(items[childCanvasItem.item_id], childCanvasItem);
+
+                                        canvasController.updateConnectedCanvasItems(oldChildPositionX, oldChildPositionY, [], null);
+                                        canvasController.updateConnectedCanvasItems(childCanvasItem.position_x, childCanvasItem.position_y, [
+                                            [oldChildPositionX, oldChildPositionY, []]
+                                        ], 0);
                                     } else {
                                         console.log('somethings already in that position or out of bounds (child)');
                                     }
@@ -733,13 +743,10 @@
                                 canvasController.updateSelected(selectedCanvasItemIds);
                                 canvasController.initializeDraggable();
 
-                                // for (let i = 0; i < selectedPositions.length; i++) {
-                                //     updateConnectedItems(selectedPositions[i][1][0], selectedPositions[i][1][1], [], null);
-
-                                //     updateConnectedItems(selectedPositions[i][0][0], selectedPositions[i][0][1], [
-                                //         [selectedPositions[i][1][0], selectedPositions[i][1][1], []]
-                                //     ], 0);
-                                // }
+                                canvasController.updateConnectedCanvasItems(oldParentCanvasItemPositionX, oldParentCanvasItemPositionY, [], null);
+                                canvasController.updateConnectedCanvasItems(newParentCanvasItemPositionX, newParentCanvasItemPositionY, [
+                                    [oldParentCanvasItemPositionX, oldParentCanvasItemPositionY, []]
+                                ], 0);
                             } else {
                                 console.log('somethings already in that position or out of bounds (parent)')
                             }
@@ -749,10 +756,11 @@
                     //     var activeItemId = $(this).attr('canvas-item-id');
                     //     storeActionHistory(activeItemId);
                     // },
-                    // create: function() {
-                    //     var activeItemId = $(this).attr('canvas-item-id');
-                    //     updateConnectedItems(activeItems[activeItemId].position_x, activeItems[activeItemId].position_y, [], null);
-                    // }
+                    create: function() {
+                        var canvasItemId = $(this).attr('canvas-item-id');
+                        
+                        canvasController.updateConnectedCanvasItems(canvasItems[canvasItemId].position_x, canvasItems[canvasItemId].position_y, [], null);
+                    }
                 });
             }
 
@@ -850,6 +858,126 @@
 
                 return -1;
             }
+
+            updateConnectedCanvasItems(canvasItemPositionX, canvasItemPositionY, checkExemptions, checkExemptionsIndex = null) {
+                var canvasItemsGrid = this.canvasItemsGrid,
+                    canvasItems = this.canvasItems,
+                    items = this.items;
+
+                var canvasItemId = canvasItemsGrid[canvasItemPositionX][canvasItemPositionY];
+
+                var adjacentDirections = [
+                    ['northwest', 'north', 'northeast'],
+                    ['west',       null,   'east'],
+                    ['southwest', 'south', 'southeast']
+                ]; // All of the possible directions about an item (null), named to what the images are e.g. (north) desk-connected-north.png
+                
+                //  checkExemptions will keep track of what we've checked so we don't have to check them more than once or infinitely loop
+                //  e.g. prevent: 'connected south' -> check south -> 'connected north' -> check north -> (loop)
+                // 
+                //  Example:
+                //  [
+                //      5,
+                //      7,
+                //      [
+                //          [5, 6, 'north', false], // 'isDirectConnection', false means don't check this any further
+                //          [5, 8, 'south', false]
+                //      ]
+                //  ]
+
+                if (checkExemptionsIndex === null) {
+                    checkExemptionsIndex = checkExemptions.push([
+                        canvasItemPositionX,
+                        canvasItemPositionY,
+                        [] // Connected items and their directions e.g. [[5, 6, 'north', false], [5, 8, 'south', false]]
+                    ]) - 1;
+                }
+
+                if (canvasItemId == -1 || canvasItems[canvasItemId].item_id == 1) { // Tables are the only supported item type TODO: canvasItemId == -1?
+                    if (canvasItemPositionX >= 0
+                            && canvasItemPositionY >= 0
+                            && canvasItemPositionX < canvasItemsGrid.length
+                            && canvasItemPositionY < canvasItemsGrid.length) { // Check if check location is out of bounds
+                        for (let i = 0; i < 3; i++) {
+                            for (let x = 0; x < 3; x++) {
+                                if (i == 1 && x == 1) { // Skip the position we're already in
+                                    continue;
+                                }
+                                
+                                var checkPositionX = canvasItemPositionX - 1 + x;
+                                var checkPositionY = canvasItemPositionY - 1 + i;
+
+                                var canvasItemIdInCheckPosition = canvasItemsGrid[checkPositionX][checkPositionY];
+                                var hasAlreadyBeenChecked = utils.isArrayInArray(checkExemptions, [checkPositionX, checkPositionY]);
+
+                                var shouldCheckFurther = true; // Only used to check previously checked items
+
+                                if (hasAlreadyBeenChecked) {
+                                    if (canvasItemIdInCheckPosition != -1 && canvasItems[canvasItemIdInCheckPosition].item_id == 1) { // Connect alreadyChecked item, but put isDirectConnected to false to prevent further checking
+                                        hasAlreadyBeenChecked = false;
+                                        shouldCheckFurther = false;
+                                    }
+                                }
+
+                                if (!hasAlreadyBeenChecked) {
+                                    if (canvasItemIdInCheckPosition != -1 && canvasItems[canvasItemIdInCheckPosition].item_id == 1) { // There's a table item in the position we're checking
+                                        if (adjacentDirections[i][x].length == 9) { // Check position is northwest, northeast, southeast or southwest (all 9 characters long)
+                                            // We need to check to see if adjacent items are present. i.e. northwest requires north (center x, same y) and west (same x, center y)  to be present
+                                            var canvasItemIdAdjacentCheckPositionX = canvasItemsGrid[canvasItemPositionX][checkPositionY];
+                                            var canvasItemIdAdjacentCheckPositionY = canvasItemsGrid[checkPositionX][canvasItemPositionY];
+
+                                            if (canvasItemIdAdjacentCheckPositionX != -1 
+                                                    && canvasItems[canvasItemIdAdjacentCheckPositionX].item_id == 1
+                                                    && canvasItemIdAdjacentCheckPositionY != -1
+                                                    && canvasItems[canvasItemIdAdjacentCheckPositionY].item_id == 1) {
+                                                checkExemptions[checkExemptionsIndex][2].push([checkPositionX, checkPositionY, adjacentDirections[i][x], checkExemptionsIndex > 0 || !shouldCheckFurther ? false : true]);
+                                            }
+                                        } else {
+                                            checkExemptions[checkExemptionsIndex][2].push([checkPositionX, checkPositionY, adjacentDirections[i][x], checkExemptionsIndex > 0 || !shouldCheckFurther ? false : true]);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    if (checkExemptions[checkExemptionsIndex][2].length > 0) { // There's connected items
+                        var connectedAdjacentDirections = []; // Stores directions from checkExemptions e.g. [["south", 1, 3], ["west", 0, 3]] => ["south", "west"] => "south-west"
+
+                        for (let x = 0; x < checkExemptions[checkExemptionsIndex][2].length; x++) {
+                            connectedAdjacentDirections.push(checkExemptions[checkExemptionsIndex][2][x][2]);
+                        }
+
+                        $('div[canvas-item-id=' + canvasItemId + ']').css('background-image', 'url(\'' + assetsBasePath + 'desk-connected-' + connectedAdjacentDirections.join('-') + '.png\')');
+
+                        let isDirectConnection = checkExemptions[checkExemptionsIndex][2][0][3];
+
+                        if (isDirectConnection) { // Only check direct connections
+                            for (let x = 0; x < checkExemptions[checkExemptionsIndex][2].length; x++) { // Check each connection
+                                if (!utils.isArrayInArray(checkExemptions, [checkExemptions[checkExemptionsIndex][2][x][0], checkExemptions[checkExemptionsIndex][2][x][1]])) { 
+                                    let nextCheckPositionX = checkExemptions[checkExemptionsIndex][2][x][0];
+                                    let nextCheckPositionY = checkExemptions[checkExemptionsIndex][2][x][1];
+
+                                    this.updateConnectedCanvasItems(nextCheckPositionX, nextCheckPositionY, checkExemptions, null);
+                                }
+                            }
+                        }
+                    } else if (canvasItemId != -1 && $('div[canvas-item-id=' + canvasItemId + ']').css('background-image').indexOf('desk-connected-') > -1) {
+                        $('div[canvas-item-id=' + canvasItemId + ']').css('background-image', 'url(\'' + assetsBasePath + items[canvasItems[canvasItemId].item_id].location + '\')');
+                    }
+                }
+            }
+        }
+
+        class Utils {
+            isArrayInArray(arrayToSearch, arrayToFind) {
+                for (let i = 0; i < arrayToSearch.length; i++) {
+                    if (arrayToSearch[i][0] == arrayToFind[0] && arrayToSearch[i][1] == arrayToFind[1]) {
+                        return true;
+                    }
+                }
+                return false;
+            }
         }
 
         function bootstrapper() {
@@ -857,6 +985,8 @@
 
             canvasController = new CanvasController(classId);
             canvasController.loadItems();
+
+            utils = new Utils;
         }
 
         bootstrapper(); // Start initializing
