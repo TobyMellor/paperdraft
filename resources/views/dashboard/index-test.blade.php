@@ -557,6 +557,16 @@
                 this.view.addCanvasItem(item, canvasItem);
             }
 
+            isCanvasItemInPosition(positionX, positionY) {
+                var canvasItemsGrid = this.canvasItemsGrid;
+
+                if (canvasItemsGrid[positionX][positionY] != -1) {
+                    return true;
+                }
+
+                return false;
+            }
+
             // Updates the canvasItem position and syncs with grid
             // returns false if item is not allowed in this location
             updateCanvasItemPosition(canvasItem, positionX, positionY) {
@@ -566,7 +576,7 @@
                         && positionY >= 0
                         && positionX < canvasItemsGrid.length
                         && positionY < canvasItemsGrid.length) {
-                    if (canvasItemsGrid[positionX][positionY] == -1) { // TODO: Also check if parent is moving into child and allow that
+                    if (!this.isCanvasItemInPosition(positionX, positionY)) { // TODO: Also check if parent is moving into child and allow that
                         canvasItemsGrid[canvasItem.position_x][canvasItem.position_y] = -1; // Free up the old position
 
                         canvasItem.position_x = positionX;
@@ -628,7 +638,11 @@
 
                         if (newParentCanvasItemPositionX != oldParentCanvasItemPositionX
                                 || newParentCanvasItemPositionY != oldParentCanvasItemPositionY) { // Continue if the item has moved
-                            if (canvasController.updateCanvasItemPosition(canvasItems[parentCanvasItemId], newParentCanvasItemPositionX, newParentCanvasItemPositionY)) { // TODO not working with parent?
+                            if (canvasController.updateCanvasItemPosition(
+                                canvasItems[parentCanvasItemId],
+                                newParentCanvasItemPositionX,
+                                newParentCanvasItemPositionY
+                            )) {
                                 var lastDeltaX = newParentCanvasItemPositionX - oldParentCanvasItemPositionX;
                                 var lastDeltaY = newParentCanvasItemPositionY - oldParentCanvasItemPositionY;
 
@@ -694,8 +708,7 @@
                                 //     ], 0);
                                 // }
                             } else {
-                                console.log('somethings already in that position or out of bounds (parent)');
-                                return false;
+                                console.log('somethings already in that position or out of bounds (parent)')
                             }
                         }
                     },
@@ -785,437 +798,111 @@
 
         bootstrapper(); // Start initializing
 
-        // $.ui.draggable.prototype._generatePosition = function(event, constrainPosition) {
-        //     var containment, co, top, left,
-        //         o = this.options,
-        //         scrollIsRootNode = this._isRootNode(this.scrollParent[0]),
-        //         pageX = event.pageX,
-        //         pageY = event.pageY;
+        // This is the function generating the position by calculating
+        // mouse position, different offsets and option.
+        $.ui.draggable.prototype._generatePosition = function(event, constrainPosition) {
+            var containment, co, top, left,
+                o = this.options,
+                scrollIsRootNode = this._isRootNode(this.scrollParent[0]),
+                pageX = event.pageX,
+                pageY = event.pageY;
 
-        //     if (!scrollIsRootNode || !this.offset.scroll) {
-        //         this.offset.scroll = {
-        //             top: this.scrollParent.scrollTop(),
-        //             left: this.scrollParent.scrollLeft()
-        //         };
-        //     }
+            // Cache the scroll
+            if (!scrollIsRootNode || !this.offset.scroll) {
+                this.offset.scroll = {
+                    top: this.scrollParent.scrollTop(),
+                    left: this.scrollParent.scrollLeft()
+                };
+            }
 
-        //     if (constrainPosition) {
-        //         if (this.containment) {
-        //             if (this.relativeContainer) {
-        //                 co = this.relativeContainer.offset();
-        //                 containment = [
-        //                     this.containment[0] + co.left,
-        //                     this.containment[1] + co.top,
-        //                     this.containment[2] + co.left,
-        //                     this.containment[3] + co.top
-        //                 ];
-        //             } else {
-        //                 containment = this.containment;
-        //             }
+            /*
+             * - Position constraining -
+             * Constrain the position to a mix of grid, containment.
+             */
 
-        //             if (event.pageX - this.offset.click.left < containment[0]) {
-        //                 pageX = containment[0] + this.offset.click.left;
-        //             }
-        //             if (event.pageY - this.offset.click.top < containment[1]) {
-        //                 pageY = containment[1] + this.offset.click.top;
-        //             }
-        //             if (event.pageX - this.offset.click.left > containment[2]) {
-        //                 pageX = containment[2] + this.offset.click.left;
-        //             }
-        //             if (event.pageY - this.offset.click.top > containment[3]) {
-        //                 pageY = containment[3] + this.offset.click.top;
-        //             }
-        //         }
+            // If we are not dragging yet, we won't check for options
+            if (constrainPosition) {
 
-        //         if (o.grid) {
-        //             top = o.grid[1] ? this.originalPageY + Math.round((pageY - this.originalPageY) / o.grid[1]) * o.grid[1] : this.originalPageY;
-        //             pageY = containment ? ((top - this.offset.click.top >= containment[1] || top - this.offset.click.top > containment[3]) ? top : ((top - this.offset.click.top >= containment[1]) ? top - o.grid[1] : top + o.grid[1])) : top;
+                if (this.containment) {
+                    if (this.relativeContainer) {
+                        co = this.relativeContainer.offset();
+                        containment = [
+                            this.containment[0] + co.left,
+                            this.containment[1] + co.top,
+                            this.containment[2] + co.left,
+                            this.containment[3] + co.top
+                        ];
+                    } else {
+                        containment = this.containment;
+                    }
 
-        //             left = o.grid[0] ? this.originalPageX + Math.round((pageX - this.originalPageX) / o.grid[0]) * o.grid[0] : this.originalPageX;
-        //             pageX = containment ? ((left - this.offset.click.left >= containment[0] || left - this.offset.click.left > containment[2]) ? left : ((left - this.offset.click.left >= containment[0]) ? left - o.grid[0] : left + o.grid[0])) : left;
-        //         }
+                    if (event.pageX - this.offset.click.left < containment[0]) {
+                        pageX = containment[0] + this.offset.click.left;
+                    }
+                    if (event.pageY - this.offset.click.top < containment[1]) {
+                        pageY = containment[1] + this.offset.click.top;
+                    }
+                    if (event.pageX - this.offset.click.left > containment[2]) {
+                        pageX = containment[2] + this.offset.click.left;
+                    }
+                    if (event.pageY - this.offset.click.top > containment[3]) {
+                        pageY = containment[3] + this.offset.click.top;
+                    }
+                }
 
-        //         if (o.axis === "y") {
-        //             pageX = this.originalPageX;
-        //         }
+                if (o.grid) {
 
-        //         if (o.axis === "x") {
-        //             pageY = this.originalPageY;
-        //         }
-        //     }
+                    //Check for grid elements set to 0 to prevent divide by 0 error causing invalid argument errors in IE (see ticket #6950)
+                    top = o.grid[1] ? this.originalPageY + Math.round((pageY - this.originalPageY) / o.grid[1]) * o.grid[1] : this.originalPageY;
+                    pageY = containment ? ((top - this.offset.click.top >= containment[1] || top - this.offset.click.top > containment[3]) ? top : ((top - this.offset.click.top >= containment[1]) ? top - o.grid[1] : top + o.grid[1])) : top;
 
-        //     // This is the only part added to the original function.
-        //     // You have access to the updated position after it's been
-        //     // updated through containment and grid, but before the
-        //     // element is modified.
-        //     // If there's an item in position, you prevent dragging.
-        //     let activeItemId = this.element.attr('canvas-item-id');
+                    left = o.grid[0] ? this.originalPageX + Math.round((pageX - this.originalPageX) / o.grid[0]) * o.grid[0] : this.originalPageX;
+                    pageX = containment ? ((left - this.offset.click.left >= containment[0] || left - this.offset.click.left > containment[2]) ? left : ((left - this.offset.click.left >= containment[0]) ? left - o.grid[0] : left + o.grid[0])) : left;
+                }
 
-        //     var itemPositionX = Math.round((pageX - this.offset.click.left - this.offset.parent.left) / 32);
-        //     var itemPositionY = Math.round((pageY - this.offset.click.top - this.offset.parent.top) / 32);
+                if (o.axis === "y") {
+                    pageX = this.originalPageX;
+                }
 
-        //     var previousPositionX = Math.floor(activeItems[activeItemId].position_x);
-        //     var previousPositionY = Math.floor(activeItems[activeItemId].position_y);
+                if (o.axis === "x") {
+                    pageY = this.originalPageY;
+                }
+            }
 
-        //     var mousePositionX = Math.floor((event.pageX - this.element.parent().offset().left) / 32);
-        //     var mousePositionY = Math.floor((event.pageY - this.element.parent().offset().top) / 32);
+            // This is the only part added to the original function.
+            // You have access to the updated position after it's been
+            // updated through containment and grid, but before the
+            // element is modified.
+            // If there's an object in position, you prevent dragging.
 
-        //     var netMovementX = previousPositionX - itemPositionX;
-        //     var netMovementY = previousPositionY - itemPositionY;
+            if (canvasController.isCanvasItemInPosition(
+                    (pageX - this.offset.click.left - this.offset.parent.left) / 32,
+                    (pageY - this.offset.click.top - this.offset.parent.top) / 32)) {
+                return false;
+            }
 
-        //     var delta = [netMovementX, netMovementY];
+            // canvasController.updateCanvasItemPosition(
+            //     canvasController.canvasItems[this.element.attr('canvas-item-id')],
+            //     (pageX - this.offset.click.left - this.offset.parent.left) / 32,
+            //     (pageY - this.offset.click.top - this.offset.parent.top) / 32
+            // );
 
-        //     if (Math.abs(netMovementX) > Math.abs(netMovementY) && netMovementX > 0) {
-        //         delta = [1, 0];
-        //     } else if (Math.abs(netMovementX) > Math.abs(netMovementY) && netMovementX < 0) {
-        //         delta = [-1, 0];
-        //     } else if (Math.abs(netMovementY) > Math.abs(netMovementX) && netMovementY > 0) {
-        //         delta = [0, 1];
-        //     } else if (Math.abs(netMovementY) > Math.abs(netMovementX) && netMovementY < 0) {
-        //         delta = [0, -1]
-        //     }
-
-        //     if (itemPositionX != previousPositionX
-        //             || itemPositionY != previousPositionY) {
-        //         if (getItemByPosition((pageX - this.offset.click.left - this.offset.parent.left) / 32, (pageY - this.offset.click.top - this.offset.parent.top) / 32) != -1) {
-        //             if (getArrayInArray(moveAttempts, [mousePositionX, mousePositionY]) == -1) {
-        //                 if (moveAttempts.length > 1) {
-        //                     moveAttempts[moveAttempts.length - 2] = [moveAttempts[moveAttempts.length - 1][0], moveAttempts[moveAttempts.length - 1][1]];
-        //                     moveAttempts[moveAttempts.length - 1] = [mousePositionX, mousePositionY];
-        //                 } else {
-        //                     moveAttempts = [[mousePositionX, mousePositionY], [itemPositionX, itemPositionY]];
-        //                 }
-
-        //                 var netMovementX = moveAttempts[moveAttempts.length - 2][0] - moveAttempts[moveAttempts.length - 1][0];
-        //                 var netMovementY = moveAttempts[moveAttempts.length - 2][1] - moveAttempts[moveAttempts.length - 1][1];
-
-        //                 if (Math.abs(netMovementX) > Math.abs(netMovementY) && netMovementX > 0) {
-        //                     delta = [1, 0];
-        //                 } else if (Math.abs(netMovementX) > Math.abs(netMovementY) && netMovementX < 0) {
-        //                     delta = [-1, 0];
-        //                 } else if (Math.abs(netMovementY) > Math.abs(netMovementX) && netMovementY > 0) {
-        //                     delta = [0, 1];
-        //                 } else if (Math.abs(netMovementY) > Math.abs(netMovementX) && netMovementY < 0) {
-        //                     delta = [0, -1]
-        //                 }
-
-        //                 selectedPositions = [
-        //                     [
-        //                         [previousPositionX, previousPositionY],
-        //                         [previousPositionX, previousPositionY],
-        //                         delta
-        //                     ]
-        //                 ];
-        //             } else {
-        //                 selectedPositions = [];
-        //             }
-        //             return false;
-        //         } else {
-        //             this.element.css('left', itemPositionX * 32);
-        //             this.element.css('top', itemPositionY * 32);
-        //             selectedPositions = [
-        //                 [
-        //                     [previousPositionX, previousPositionY],
-        //                     [itemPositionX, itemPositionY],
-        //                     delta
-        //                 ]
-        //             ];
-        //         }
-        //     } else {
-        //         selectedPositions = [];
-        //     }
-
-        //     moveAttempts = [];
-
-        //     return {
-        //         top: (
-        //             pageY -
-        //             this.offset.click.top -
-        //             this.offset.relative.top -
-        //             this.offset.parent.top +
-        //             (this.cssPosition === "fixed" ? -this.offset.scroll.top : (scrollIsRootNode ? 0 : this.offset.scroll.top))
-        //         ),
-        //         left: (
-        //             pageX -
-        //             this.offset.click.left -
-        //             this.offset.relative.left -
-        //             this.offset.parent.left +
-        //             (this.cssPosition === "fixed" ? -this.offset.scroll.left : (scrollIsRootNode ? 0 : this.offset.scroll.left))
-        //         )
-        //     };
-        // }
-
-        // var items = [],
-        //     activeItems = [],
-        //     activeItemsGrid = [],
-        //     selectedIds = [],
-        //     selectedNames = [],
-        //     selectedPositions = [],
-        //     softDeletedActiveItems = [],
-        //     copyClipboard = [],
-        //     actionHistory = [];
-
-        // var classId = parseInt($('.class-button:first').attr('class-id'));
-
-        // var hasItems = false,
-        //     hasChanged = false;
-
-        // var selectedTriedPositions = [];
-
-        // function initializeDraggable()
-        // {
-        //     $('.drag-item').draggable({
-        //         grid: [32, 32],
-        //         containment: '.drop-target',
-        //         drag: function() {
-        //             hasChanged = true;
-
-        //             let activeItemId = $(this).attr('canvas-item-id');
-
-        //             var itemPositionX = $(this).position().left / 32;
-        //             var itemPositionY = $(this).position().top / 32;
-
-        //             var previousPositionX = Math.floor(activeItems[activeItemId].position_x);
-        //             var previousPositionY = Math.floor(activeItems[activeItemId].position_y);
-
-        //             if (selectedPositions.length > 0) {
-        //                 var selectedItems = [$(this)];
-
-        //                 var selectedItem,
-        //                     selectedItemPreviousPositionX,
-        //                     selectedItemPreviousPositionY,
-        //                     selectedItemPositionX,
-        //                     selectedItemPositionY,
-        //                     selectedTriedPosition;
-
-        //                 for(let i = 0; i < selectedIds.length; i++) {
-        //                     if(selectedIds[i] == activeItemId)
-        //                         continue;
-        //                     selectedItem = $('div[canvas-item-id=' + selectedIds[i] + ']');
-
-        //                     selectedItemPreviousPositionX = selectedItem.position().left / 32;
-        //                     selectedItemPreviousPositionY = selectedItem.position().top / 32;
-
-        //                     selectedItemPositionX = selectedItemPreviousPositionX - selectedPositions[0][2][0];
-        //                     selectedItemPositionY = selectedItemPreviousPositionY - selectedPositions[0][2][1];
-
-        //                     selectedTriedPosition = getArrayInArray(selectedTriedPositions, [selectedItemPositionX, selectedItemPositionY]);
-
-        //                     if(selectedItemPreviousPositionX != selectedItemPositionX
-        //                             || selectedItemPreviousPositionY != selectedItemPositionY
-        //                             || selectedTriedPosition != -1) {
-        //                         if(getItemByPosition(selectedItemPositionX, selectedItemPositionY) == -1
-        //                                 || selectedTriedPosition != -1) {
-        //                             if(selectedTriedPosition != -1) {
-        //                                 selectedItemPositionX -= selectedPositions[0][2][0];
-        //                                 selectedItemPositionY -= selectedPositions[0][2][1];
-        //                                 selectedTriedPositions.splice(selectedTriedPosition, 1);
-        //                             }
-        //                             selectedItem.css('left', selectedItemPositionX * 32);
-        //                             selectedItem.css('top', selectedItemPositionY * 32);
-        //                         } else {
-        //                             selectedTriedPositions.push([selectedItemPositionX, selectedItemPositionY]);
-        //                         }
-        //                     } else {
-        //                         selectedTriedPositions.push([selectedItemPositionX, selectedItemPositionY]);
-        //                     }
-                            
-        //                     selectedItems.push(selectedItem);
-        //                     selectedPositions.push([[selectedItemPreviousPositionX, selectedItemPreviousPositionY], [selectedItemPositionX, selectedItemPositionY]]);
-        //                 }
-        //                 updateSelected(selectedItems);
-        //                 for(let i = 0; i < selectedPositions.length; i++) {
-        //                     updateConnectedItems(selectedPositions[i][1][0], selectedPositions[i][1][1], [], null);
-
-        //                     updateConnectedItems(selectedPositions[i][0][0], selectedPositions[i][0][1], [
-        //                         [selectedPositions[i][1][0], selectedPositions[i][1][1], []]
-        //                     ], 0);
-        //                 }
-        //                 selectedPositions = [];
-        //             }
-        //         },
-        //         start: function() {
-        //             let activeItemId = $(this).attr('canvas-item-id');
-        //             storeActionHistory(activeItemId);
-        //         },
-        //         create: function() {
-        //             let activeItemId = $(this).attr('canvas-item-id');
-        //             updateConnectedItems(activeItems[activeItemId].position_x, activeItems[activeItemId].position_y, [], null);
-        //         }
-        //     });
-        // }
-
-        // function getArrayInArray(arrayToSearch, arrayToFind)
-        // {
-        //     for (let i = 0; i < arrayToSearch.length; i++) {
-        //         if (arrayToSearch[i][0] == arrayToFind[0] && arrayToSearch[i][1] == arrayToFind[1]) {
-        //             return i;
-        //         }
-        //     }
-        //     return -1;
-        // }
-
-        // function getItemByPosition(itemPositionX, itemPositionY)
-        // {
-        //     return activeItemsGrid[itemPositionX][itemPositionY];
-        // }
-
-        // function updateConnectedItems(itemPositionX, itemPositionY, checkExemptions, pushedIndex)
-        // {
-        //     var activeItemId = getItemByPosition(itemPositionX, itemPositionY);
-
-        //     var hasAlreadyBeenChecked,
-        //         itemInCheckPosition;
-
-        //     var arrayOfKeys = [],
-        //         adjacentDirections = [
-        //             ['northwest', 'north', 'northeast'],
-        //             ['west',       null,   'east'],
-        //             ['southwest', 'south', 'southeast']
-        //         ];
-
-        //     if (pushedIndex === null) {
-        //         pushedIndex = checkExemptions.push([itemPositionX, itemPositionY, []]) - 1;
-        //     }
-
-        //     if (activeItemId == -1 || activeItems[activeItemId].item_id == 1) {
-        //         if (itemPositionX - 1 >= 0 && itemPositionX + 1 <= 23 && itemPositionY - 1 >= 0 && itemPositionY + 1 <= 23) {
-        //             for (let i = 0; i < 3; i++) {
-        //                 for (let x = 0; x < 3; x++) {
-        //                     if (i == 1 && x == 1) {
-        //                         continue;
-        //                     }
-
-        //                     var checkPositionX = itemPositionX - 1 + x;
-        //                     var checkPositionY = itemPositionY - 1 + i;
-
-        //                     hasAlreadyBeenChecked = getArrayInArray(checkExemptions, [checkPositionX, checkPositionX]);
-
-        //                     if (hasAlreadyBeenChecked == -1) {
-        //                         itemInCheckPosition = getItemByPosition(checkPositionX, checkPositionY);
-        //                         if (itemInCheckPosition != -1 && activeItems[itemInCheckPosition].item_id == 1) {
-        //                             if (adjacentDirections[i][x].length == 9) {
-        //                                 itemInCheckPosition = [
-        //                                     getItemByPosition(itemPositionX, checkPositionY),
-        //                                     getItemByPosition(checkPositionX, itemPositionY)
-        //                                 ];
-        //                                 if (itemInCheckPosition[0] != -1 
-        //                                         && activeItems[itemInCheckPosition[0]].item_id == 1
-        //                                         && itemInCheckPosition[1] != -1
-        //                                         && activeItems[itemInCheckPosition[1]].item_id == 1) {
-        //                                     checkExemptions[pushedIndex][2].push([checkPositionX, checkPositionY, adjacentDirections[i][x], pushedIndex > 0 ? true : false]);
-        //                                 }
-        //                             } else {
-        //                                 checkExemptions[pushedIndex][2].push([checkPositionX, checkPositionY, adjacentDirections[i][x], pushedIndex > 0 ? true : false]);
-        //                             }
-        //                         }
-        //                     }
-        //                 }
-        //             }
-        //         }
-
-        //         if (checkExemptions[pushedIndex][2].length > 0) {
-        //             //Gets directions from checkExemptions e.g. [["south", 1, 3], ["west", 0, 3]] => ["south", "west"] => "south-west"
-        //             arrayOfKeys = [];
-        //             for (let x = 0; x < checkExemptions[pushedIndex][2].length; x++) {
-        //                 arrayOfKeys.push(checkExemptions[pushedIndex][2][x][2]);
-        //             }
-
-        //             if (activeItemId !== null) {
-        //                 $('div[canvas-item-id=' + activeItemId + ']').css('background-image', 'url(\'' + assetsBasePath + 'desk-connected-' + arrayOfKeys.join('-') + '.png\')');
-        //             }
-
-        //             if (!checkExemptions[pushedIndex][2][0][3]) {
-        //                 for (let x = 0; x < checkExemptions[pushedIndex][2].length; x++) {
-        //                     if (getArrayInArray(checkExemptions, [checkExemptions[pushedIndex][2][x][0], checkExemptions[pushedIndex][2][x][1]]) == -1) {
-        //                         updateConnectedItems(checkExemptions[pushedIndex][2][x][0], checkExemptions[pushedIndex][2][x][1], checkExemptions, null);
-        //                     }
-        //                 }
-        //             }
-        //         } else if (activeItemId != -1 && $('div[canvas-item-id=' + activeItemId + ']').css('background-image').indexOf('desk-connected-') > -1) {
-        //             $('div[canvas-item-id=' + activeItemId + ']').css('background-image', 'url(\'' + assetsBasePath + items[activeItems[activeItemId].item_id].item_location + '\')');
-        //         }
-        //     }
-        //     return checkExemptions;
-        // }
-
-        // function updateItemByPosition(activeItemId, itemPositionX, itemPositionY) {
-        //     var previousPositionX = activeItems[activeItemId].item_position_x;
-        //     var previousPositionY = activeItems[activeItemId].position_y;
-
-        //     activeItemsGrid[previousPositionX][previousPositionY] = -1;
-
-        //     activeItemsGrid[itemPositionX][itemPositionY] = activeItemId;
-
-        //     activeItems[activeItemId].position_x = itemPositionX;
-        //     activeItems[activeItemId].position_y = itemPositionY;
-        // }
-
-        // function saveActiveItems(message)
-        // {
-        //     var userConfirmation = message !== null ? confirm(message) : true;
-
-        //     if (userConfirmation) {
-        //         deleteActiveItems(softDeletedActiveItems);
-        //         $.ajax({
-        //             url: '/class-item',
-        //             type: 'POST',
-        //             data: {
-        //                 _token: token,
-        //                 items: activeItems,
-        //                 class_id: classId
-        //             }
-        //         }).done(function(returnedActiveItems) {
-        //             activeItems = returnedActiveItems;
-        //         });
-        //     }
-        // }
-
-        // function softDeleteActiveItems(activeItemIds)
-        // {
-        //     for (let i = 0; i < activeItemIds.length; i++) {
-        //         var activeItem = $('div[canvas-item-id="' + activeItemIds[i] + '"]');
-        //         softDeletedActiveItems.push(activeItems[activeItemIds[i]]);
-
-        //         activeItem.fadeOut('slow', function() {
-        //             $(this).remove();
-        //             delete activeItems[activeItemIds[i]];
-
-        //             if (i == activeItemIds.length - 1) {
-        //                 if ($('.drop-target').children().length > 0) {
-        //                     updateSelected([$('div[canvas-item-id="' + $('.drop-target').children(0).attr('canvas-item-id') + '"]')]);
-        //                 }
-        //             }
-        //         });
-        //     }
-        // }
-
-        // function deleteActiveItems(softDeletedActiveItems)
-        // {
-        //     if (softDeletedActiveItems.length > 0) {
-        //         $.ajax({
-        //             url: '/class-item',
-        //             type: 'DELETE',
-        //             data: {
-        //                 _token: token,
-        //                 class_items: softDeletedActiveItems,
-        //                 class_id: classId
-        //             }
-        //         });
-
-        //         softDeletedActiveItems = [];
-        //     }
-        // }
-
-        // function clearSession()
-        // {
-        //     var activeClassItems = $('.drop-target').children();
-
-        //     activeClassItems.fadeOut(1000, function() {
-        //         $(this).remove();
-        //     });
-
-        //     activeItems = [];
-        // }
+            return {
+                top: (
+                    pageY - // The absolute mouse position
+                    this.offset.click.top - // Click offset (relative to the element)
+                    this.offset.relative.top - // Only for relative positioned nodes: Relative offset from element to offset parent
+                    this.offset.parent.top + // The offsetParent's offset without borders (offset + border)
+                    (this.cssPosition === "fixed" ? -this.offset.scroll.top : (scrollIsRootNode ? 0 : this.offset.scroll.top))
+                ),
+                left: (
+                    pageX - // The absolute mouse position
+                    this.offset.click.left - // Click offset (relative to the element)
+                    this.offset.relative.left - // Only for relative positioned nodes: Relative offset from element to offset parent
+                    this.offset.parent.left + // The offsetParent's offset without borders (offset + border)
+                    (this.cssPosition === "fixed" ? -this.offset.scroll.left : (scrollIsRootNode ? 0 : this.offset.scroll.left))
+                )
+            };
+        }
     </script>
 @stop
