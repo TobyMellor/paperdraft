@@ -279,10 +279,10 @@
                 }
             });
 
-            // $('#selected-delete').click(function()
-            // {
-            //     softDeleteActiveItems(selectedIds);
-            // });
+            $('#selected-delete').click(function()
+            {
+                canvasController.softDeleteCanvasItems();
+            });
 
             // $(document).on('keydown', function(e)
             // {
@@ -388,6 +388,7 @@
 
                 $('.selected-name').text(selectedNames);
                 $('#selected-image').attr('src', assetsBasePath + selectedBoardItems[0].location);
+                $('#selected-delete').html('Delete <i class="icon-diff-removed position-right"></i>');
 
                 for (var index in selectedBoardItems) {
                     var selectedBoardItem = selectedBoardItems[index];
@@ -396,6 +397,10 @@
 
                     var selectedBoardItemPositionX = selectedBoardItem.position_x;
                     var selectedBoardItemPositionY = selectedBoardItem.position_y;
+
+                    if (index == 1) {
+                        $('#selected-delete').html('Delete All <i class="icon-diff-removed position-right"></i>');
+                    }
 
                     if (index == 2) {
                         $('#selected-position').append('<strong>' + selectedBoardItems[Object.keys(selectedBoardItems).length - 1].name + '</strong>');
@@ -452,6 +457,7 @@
         //     }
         // ]
         class CanvasItemModel {
+            // TODO: only accept array of items
             store(classId, canvasItem) {
                 $.ajax({
                     url: '/canvas-item',
@@ -472,6 +478,20 @@
                     } else {
                         console.log('Failed to load item.');
                     }
+                });
+            }
+
+            delete(classId, canvasItemIds) {
+                $.ajax({
+                    url: '/canvas-items',
+                    type: 'DELETE',
+                    data: {
+                        _token: token,
+                        canvas_item_ids: canvasItemIds,
+                        class_id: classId
+                    }
+                }).done(function(response) {
+                    console.log(response);
                 });
             }
 
@@ -513,6 +533,7 @@
                 this.canvasItems = {}, // e.g. Table is stored at X: 5, Y: 8 in the grid
                 this.items = {}, // e.g. A Table desk.png, A Teachers Desk teachers_desk.png
                 this.canvasItemsGrid = [], // e.g. Grid of all possible locations to store items
+                this.softDeletedCanvasItemIds = [];
 
                 this.classId = classId;
                 this.gridSize = gridSize;
@@ -646,12 +667,43 @@
                 canvasItemsGrid[canvasItem.position_x][canvasItem.position_y] = newCanvasItemId;
             }
 
-            deletePseudoCanvasItem() {
 
+            removeCanvasItem(canvasItemId) {
+                var canvasItems = this.canvasItems,
+                    canvasItemsGrid = this.canvasItemsGrid,
+                    softDeletedCanvasItemIds = this.softDeletedCanvasItemIds, 
+                    view = this.view;
+
+                var canvasItem = canvasItems[canvasItemId];
+
+                canvasItemsGrid[canvasItem.position_x][canvasItem.position_y] = -1;
+
+                this.updateConnectedCanvasItems(canvasItem.position_x, canvasItem.position_y, [], null)
+
+                delete canvasItems[canvasItemId];
+                softDeletedCanvasItemIds.push(canvasItemId);
+
+                view.removeCanvasItem(canvasItemId);
+            }
+
+            softDeleteCanvasItems() {
+                var canvasItems = this.canvasItems;
+
+                this.removeCanvasItem(selectedCanvasItems.parent.id);
+
+                for (var canvasItemId in selectedCanvasItems.children) {
+                    this.removeCanvasItem(canvasItemId);
+                }
+
+                this.updateSelected([Object.keys(canvasItems)[0]]);
             }
 
             deleteCanvasItems() {
+                var canvasItemModel = this.canvasItemModel,
+                    softDeletedCanvasItemIds = this.softDeletedCanvasItemIds,
+                    classId = this.classId;
 
+                canvasItemModel.delete(classId, softDeletedCanvasItemIds);
             }
 
             isCanvasItemInPosition(positionX, positionY) {
@@ -1042,8 +1094,6 @@
                         var canvasItem = canvasItems[canvasItemId];
 
                         if (canvasItem.pseudo_item) {
-                            console.log('LETS REMOVE pseudo');
-                            console.log(canvasItemId);
                             this.view.removeCanvasItem(canvasItemId);
                             canvasItemModel.store(classId, canvasItem);
                         }
@@ -1051,6 +1101,8 @@
 
                     canvasItemModel.updateCanvasItems(classId, canvasItems);
                 }
+
+                this.deleteCanvasItems(this.softDeletedCanvasItemIds);
             }
 
             clearSession() {

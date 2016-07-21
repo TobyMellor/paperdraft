@@ -131,16 +131,11 @@ class ItemController extends Controller
         $request = $this->request;
         $classId = $request->input('class_id');
 
-        if ($request->input('canvas_items') != null) {
-            $canvasItems = $request->input('canvas_items');
-
-            $canvasItemIds = array_map(function($canvasItems){ return $canvasItems['canvas_item_id']; }, $canvasItems);
+        if ($request->input('canvas_item_ids') != null) {
+            $canvasItemIds = $request->input('canvas_item_ids');
 
             CanvasItem::where('class_id', $classId)
-                ->whereIn('id', $classItemIds)
-                ->delete(); 
-        } else {
-            CanvasItem::where('class_id', $classId)
+                ->whereIn('id', $canvasItemIds)
                 ->delete(); 
         }
     }
