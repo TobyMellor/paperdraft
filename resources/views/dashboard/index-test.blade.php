@@ -252,30 +252,36 @@
                 canvasController.saveCanvasItems();
             });
 
+            $('.class-button').click(function()
+            {
+                if (!$(this).hasClass('class-button-active')) {
+                    if (hasUserMadeChanges) {
+                        canvasController.saveCanvasItems('Do you want to save the changes made to the seating plan for "' + $('.class-button.class-button-active').text() + '"?');
+                    }
+
+                    hasUserMadeChanges = false;
+
+                    $('.class-button.class-button-active').removeClass('class-button-active');
+                    $(this).addClass('class-button-active');
+
+                    $('.class-options-active').removeClass('class-options-active').addClass('class-options');
+                    $(this).parent()
+                        .children().eq(1)
+                        .children().eq(0)
+                        .addClass('class-options-active')
+                        .removeClass('class-options');
+
+                    var classId = parseInt($(this).attr('class-id'));
+
+                    canvasController.classId = classId;
+                    canvasController.clearSession();
+                    canvasController.loadCanvasItems();
+                }
+            });
+
             // $('#selected-delete').click(function()
             // {
             //     softDeleteActiveItems(selectedIds);
-            // });
-
-            // $('.class-button').click(function()
-            // {
-            //     if (hasChanged)
-            //         saveActiveItems('Do you want to save the changes made to the seating plan for “' + $('.class-button.class-button-active').text() + '”?');
-            //     hasChanged = false;
-
-            //     $('.class-button.class-button-active').removeClass('class-button-active');
-            //     $(this).addClass('class-button-active');
-
-            //     $('.class-options-active').removeClass('class-options-active').addClass('class-options');
-            //     $(this).parent()
-            //         .children().eq(1)
-            //         .children().eq(0)
-            //         .addClass('class-options-active')
-            //         .removeClass('class-options');
-
-            //     classId = parseInt($(this).attr('class-id'));
-            //     clearSession();
-            //     loadActiveItems(classId);
             // });
 
             // $(document).on('keydown', function(e)
@@ -309,6 +315,8 @@
 
         var canvasController;
         var utils;
+
+        var hasUserMadeChanges = false;
 
         var selectedCanvasItems = {
             parent: {},
@@ -347,7 +355,9 @@
             }
 
             removeCanvasItems() {
-                $('.drag-item').remove();
+                $('.drag-item').fadeOut(1000, function() {
+                    $(this).remove();
+                });
             }
 
             clearSelectedBoard(selectedCanvasItems) {
@@ -491,6 +501,7 @@
                     }
                 }).done(function(jsonCanvasItems) {
                     canvasController.jsonCanvasItems = jsonCanvasItems;
+
                     canvasController.init();
                 });
             }
@@ -601,7 +612,7 @@
             addCanvasItem(canvasItem, isPseudoCanvasItem = false) {
                 var items = this.items,
                     canvasItems = this.canvasItems,
-                    canvasItemsGrid= this.canvasItemsGrid;
+                    canvasItemsGrid = this.canvasItemsGrid;
 
                 var canvasItem = canvasItems[canvasItem.id] = {
                     'id': canvasItem.id,
@@ -624,8 +635,6 @@
                 var canvasItemsGrid = this.canvasItemsGrid,
                     canvasItems = this.canvasItems;
 
-                console.log(newCanvasItemId);
-                console.log(oldCanvasItemId);
                 Object.defineProperty(canvasItems, newCanvasItemId,
                     Object.getOwnPropertyDescriptor(canvasItems, oldCanvasItemId));
 
@@ -715,6 +724,8 @@
                     grid: [32, 32],
                     containment: '.drop-target',
                     drag: function() {
+                        hasUserMadeChanges = true; // The users changed something. We'll use this to ask if they want to save
+
                         var parentCanvasItemId = $(this).attr('canvas-item-id');
 
                         // We need the new location of the canvasItem as it may be outdated in the canvasItems array
@@ -848,6 +859,10 @@
                         }
 
                         selectedCanvasItems.parent.id = canvasItemId;
+
+                        console.log(canvasItemId);
+                        console.log(selectedCanvasItems);
+                        console.log(canvasItems);
 
                         selectedBoardItems[index] = {
                             id: canvasItemId,
@@ -1021,20 +1036,38 @@
                 }
             }
 
-            saveCanvasItems() {
-                var canvasItems = this.canvasItems,
-                    canvasItemModel = this.canvasItemModel,
-                    classId = this.classId;
+            saveCanvasItems(message = null) {
+                var userConfirmation = message !== null ? confirm(message) : true;
 
-                for (var canvasItemId in canvasItems) {
-                    var canvasItem = canvasItems[canvasItemId];
+                if (userConfirmation) {      
+                    var canvasItems = this.canvasItems,
+                        canvasItemModel = this.canvasItemModel,
+                        classId = this.classId;
 
-                    if (canvasItem.pseudo_item) {
-                        canvasItemModel.store(classId, canvasItem); // Ajax problems :(
+                    for (var canvasItemId in canvasItems) {
+                        var canvasItem = canvasItems[canvasItemId];
+
+                        if (canvasItem.pseudo_item) {
+                            console.log('Lets remove ' + canvasItemId);
+                            this.view.removeCanvasItem(canvasItemId);
+                            canvasItemModel.store(classId, canvasItem);
+                        }
                     }
-                }
 
-                canvasItemModel.updateCanvasItems(classId, canvasItems);
+                    canvasItemModel.updateCanvasItems(classId, canvasItems);
+                }
+            }
+
+            clearSession() {
+                this.view.removeCanvasItems();
+
+                this.canvasItems = {};
+                this.canvasItemsGrid = [];
+
+                selectedCanvasItems = {
+                    parent: {},
+                    children: {}
+                };
             }
         }
 
