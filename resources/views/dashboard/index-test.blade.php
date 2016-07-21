@@ -860,10 +860,6 @@
 
                         selectedCanvasItems.parent.id = canvasItemId;
 
-                        console.log(canvasItemId);
-                        console.log(selectedCanvasItems);
-                        console.log(canvasItems);
-
                         selectedBoardItems[index] = {
                             id: canvasItemId,
                             position_x: canvasItems[canvasItemId].position_x,

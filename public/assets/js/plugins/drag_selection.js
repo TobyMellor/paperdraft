@@ -92,7 +92,7 @@ var canvasController;
                     && canvasItem.position_x <= rightX
                     && canvasItem.position_y >= Math.floor(topY)
                     && canvasItem.position_y <= bottomY) {
-                selectedCanvasItems.push(parseInt(index));
+                selectedCanvasItems.push(index);
             }
         }
 
