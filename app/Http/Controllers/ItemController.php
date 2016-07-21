@@ -48,42 +48,27 @@ class ItemController extends Controller
     }
 
     /**
-     * Store the canvas items in the database.
+     * Update all the canvas items for a class
      *
      * @return \Illuminate\Http\Redirect
      */
-    public function storeCanvasItems()
+    public function updateCanvasItems()
     {
         $request = $this->request;
         $canvasItems = $request->input('canvas_items');
         $classId = $request->input('class_id');
 
         if ($canvasItems != null) {
-            foreach ($canvasItems as $key => $canvasItem) {
-                if (isset($canvasItem['canvas_item_id']) && $canvasItem['canvas_item_id'] != null) {
-                    CanvasItem::where('id', $canvasItem['canvas_item_id'])
-                        ->where('class_id', $classId)
-                        ->update([
-                            'position_x' => $canvasItem['position_x'],
-                            'position_y' => $canvasItem['position_y']
-                        ]
-                    );
-                } else if (isset($canvasItem['item_id'])) {
-                    $canvasItem = new CanvasItem;
-
-                    $canvasItem->item_id = $canvasItem['item_id'];
-                    $canvasItem->class_id = $classId;
-                    $canvasItem->position_x = $canvasItem['position_x'];
-                    $canvasItem->position_y = $canvasItem['position_y'];
-
-                    $canvasItem->save();
-
-                    $canvasItems[$key]['canvas_item_id'] = $canvasItem->id;
-                }
+            foreach ($canvasItems as $canvasItem) {
+                CanvasItem::where('class_id', $classId)
+                    ->where('id', $canvasItem['id'])
+                    ->update([
+                        'position_x' => $canvasItem['position_x'],
+                        'position_y' => $canvasItem['position_y']
+                    ]);
             }
-        } else {
-            return [];
         }
+
         return $canvasItems;
     }
 

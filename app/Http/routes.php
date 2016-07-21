@@ -41,14 +41,15 @@ Route::group(['middleware' => ['web', 'auth']], function () {
 
     Route::put('/class-student', 'StudentController@updateClassStudent');
 
-    Route::get('/item', 'ItemController@getItems');
+    Route::get('/items', 'ItemController@getItems');
 
     Route::post('/class', 'ClassController@storeClass');
     Route::delete('/class', 'ClassController@deleteClass');
 
-    // TODO: Routes should be named /canvas-item for one, /canvas-items for multiple
     Route::post('/canvas-item', 'ItemController@storeCanvasItem');
-    Route::get('/canvas-item', 'ItemController@getCanvasItems');
-    Route::delete('/canvas-item', 'ItemController@deleteCanvasItems');
+
+    Route::get('/canvas-items', 'ItemController@getCanvasItems');
+    Route::put('/canvas-items', 'ItemController@updateCanvasItems');
+    Route::delete('/canvas-items', 'ItemController@deleteCanvasItems');
 });
 

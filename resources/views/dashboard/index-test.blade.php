@@ -244,17 +244,17 @@
             $('.create-canvas-item').click(function() {
                 var itemId = parseInt($(this).attr('item-id'));
 
-                canvasController.createCanvasItem(itemId);
+                canvasController.createPseudoCanvasItem(itemId);
+            });
+
+            $('#save-button').click(function()
+            {
+                canvasController.saveCanvasItems();
             });
 
             // $('#selected-delete').click(function()
             // {
             //     softDeleteActiveItems(selectedIds);
-            // });
-
-            // $('#save-button').click(function()
-            // {
-            //     saveActiveItems(null);
             // });
 
             // $('.class-button').click(function()
@@ -417,7 +417,7 @@
         class ItemModel {
             getAll() {
                 $.ajax({
-                    url: '/item',
+                    url: '/items',
                     type: 'GET',
                     data: {
                         _token: token
@@ -444,17 +444,20 @@
         //     }
         // ]
         class CanvasItemModel {
-            create(classId, canvasItem) {
+            store(classId, canvasItem) {
                 $.ajax({
                     url: '/canvas-item',
                     type: 'POST',
+                    async: false, // Needs better solution
                     data: {
                         _token: token,
                         canvas_item: canvasItem,
                         class_id: classId
                     }
                 }).done(function(canvasItemIds) {
-                    if (canvasItemIds != null || canvasItemIds.length != 0) {
+                    if (canvasItemIds != null || canvasItemIds.length == 1) {
+                        canvasController.updatePseudoCanvasItemToReal(canvasItem.id, canvasItemIds[0]);
+
                         canvasItem.id = canvasItemIds[0];
 
                         canvasController.addCanvasItem(canvasItem);
@@ -464,9 +467,23 @@
                 });
             }
 
+            updateCanvasItems(classId, canvasItems) {
+                $.ajax({
+                    url: '/canvas-items',
+                    type: 'PUT',
+                    data: {
+                        _token: token,
+                        canvas_items: canvasItems,
+                        class_id: classId
+                    }
+                }).done(function(responseJson) {
+                    console.log(responseJson);
+                });
+            }
+
             getAll(classId) {
                 $.ajax({
-                    url: '/canvas-item',
+                    url: '/canvas-items',
                     type: 'GET',
                     data: {
                         _token: token,
@@ -542,15 +559,23 @@
                 };
             }
 
-            createCanvasItem(itemId) {
+            // A pseudo canvasItem is only stored locally, and will be stored to the database on-save 
+            createPseudoCanvasItem(itemId) {
+                this.createCanvasItem(itemId, true);
+            }
+
+            createCanvasItem(itemId, isPseudoCanvasItem = false) {
                 var canvasItems = this.canvasItems,
                     canvasItemModel = this.canvasItemModel,
                     classId = this.classId;
 
                 var canvasItem = {
-                    id: Object.keys(canvasItems).length, // TODO: Properly get id
                     item_id: itemId
                 };
+
+                if (isPseudoCanvasItem) {
+                    canvasItem.id = 'Pseudo-' + Math.floor(Math.random() * 99999) + 1 
+                }
 
                 if (!$.isEmptyObject(selectedCanvasItems.parent)) {
                     var parentCanvasItemPositionX = canvasItems[selectedCanvasItems.parent.id].position_x;
@@ -562,18 +587,18 @@
                         canvasItem.position_x = nearestEmptySpace[0];
                         canvasItem.position_y = nearestEmptySpace[1];
 
-                        return canvasItemModel.create(classId, canvasItem);
+                        return isPseudoCanvasItem ? this.addCanvasItem(canvasItem, true) : canvasItemModel.create(classId, canvasItem);
                     }
                 }
 
                 canvasItem.position_x = 0;
                 canvasItem.position_y = 0;
 
-                return canvasItemModel.create(classId, canvasItem);
+                return isPseudoCanvasItem ? this.addCanvasItem(canvasItem, true) : canvasItemModel.create(classId, canvasItem);
             }
 
             // Stores the canvasItem locally and adds it to the view (canvas)
-            addCanvasItem(canvasItem) {
+            addCanvasItem(canvasItem, isPseudoCanvasItem = false) {
                 var items = this.items,
                     canvasItems = this.canvasItems,
                     canvasItemsGrid= this.canvasItemsGrid;
@@ -582,7 +607,8 @@
                     'id': canvasItem.id,
                     'item_id': canvasItem.item_id,
                     'position_x': canvasItem.position_x,
-                    'position_y': canvasItem.position_y
+                    'position_y': canvasItem.position_y,
+                    'pseudo_item': isPseudoCanvasItem
                 };
 
                 var item = items[canvasItem.item_id];
@@ -592,6 +618,33 @@
                 this.view.addCanvasItem(item, canvasItem); // Render canvas item to view
                 this.updateSelected([canvasItem.id]); // Select the newly added item
                 this.initializeDraggable(); // Allow it to be dragged
+            }
+
+            updatePseudoCanvasItemToReal(oldCanvasItemId, newCanvasItemId) {
+                var canvasItemsGrid = this.canvasItemsGrid,
+                    canvasItems = this.canvasItems;
+
+                console.log(newCanvasItemId);
+                console.log(oldCanvasItemId);
+                Object.defineProperty(canvasItems, newCanvasItemId,
+                    Object.getOwnPropertyDescriptor(canvasItems, oldCanvasItemId));
+
+                delete canvasItems[oldCanvasItemId];
+
+                var canvasItem = canvasItems[newCanvasItemId];
+
+                canvasItem.pseudo_item = false;
+                canvasItem.id = newCanvasItemId;
+
+                canvasItemsGrid[canvasItem.position_x][canvasItem.position_y] = newCanvasItemId;
+            }
+
+            deletePseudoCanvasItem() {
+
+            }
+
+            deleteCanvasItems() {
+
             }
 
             isCanvasItemInPosition(positionX, positionY) {
@@ -967,6 +1020,22 @@
                     }
                 }
             }
+
+            saveCanvasItems() {
+                var canvasItems = this.canvasItems,
+                    canvasItemModel = this.canvasItemModel,
+                    classId = this.classId;
+
+                for (var canvasItemId in canvasItems) {
+                    var canvasItem = canvasItems[canvasItemId];
+
+                    if (canvasItem.pseudo_item) {
+                        canvasItemModel.store(classId, canvasItem); // Ajax problems :(
+                    }
+                }
+
+                canvasItemModel.updateCanvasItems(classId, canvasItems);
+            }
         }
 
         class Utils {
@@ -1091,5 +1160,6 @@
                 )
             };
         }
+
     </script>
 @stop
