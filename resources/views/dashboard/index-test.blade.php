@@ -348,9 +348,7 @@
                 canvasItem.css('top', canvasItem.position_y * 32);
             }
 
-            removeCanvasItem(canvasItem) {
-                var canvasItemId = canvasItem.id;
-
+            removeCanvasItem(canvasItemId) {
                 $('.drag-item[canvas-item-id=' + canvasItemId + ']').remove();
             }
 
@@ -789,7 +787,7 @@
                                         newParentCanvasItemPositionX + childRelativePositionX,
                                         newParentCanvasItemPositionY + childRelativePositionY
                                     )) {
-                                        view.removeCanvasItem(childCanvasItem);
+                                        view.removeCanvasItem(childCanvasItem.id);
 
                                         selectedCanvasItemIds.push(childCanvasItemId);
 
@@ -1044,7 +1042,8 @@
                         var canvasItem = canvasItems[canvasItemId];
 
                         if (canvasItem.pseudo_item) {
-                            console.log('Lets remove ' + canvasItemId);
+                            console.log('LETS REMOVE pseudo');
+                            console.log(canvasItemId);
                             this.view.removeCanvasItem(canvasItemId);
                             canvasItemModel.store(classId, canvasItem);
                         }
