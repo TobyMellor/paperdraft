@@ -247,13 +247,11 @@
                 canvasController.createPseudoCanvasItem(itemId);
             });
 
-            $('#save-button').click(function()
-            {
+            $('#save-button').click(function() {
                 canvasController.saveCanvasItems();
             });
 
-            $('.class-button').click(function()
-            {
+            $('.class-button').click(function() {
                 if (!$(this).hasClass('class-button-active')) {
                     if (hasUserMadeChanges) {
                         canvasController.saveCanvasItems('Do you want to save the changes made to the seating plan for "' + $('.class-button.class-button-active').text() + '"?');
@@ -279,41 +277,37 @@
                 }
             });
 
-            $('#selected-delete').click(function()
-            {
+            $('#selected-delete').click(function() {
                 canvasController.softDeleteCanvasItems();
             });
 
-            // $(document).on('keydown', function(e)
-            // {
-            //     if ((e.which === 8 || e.which === 46) && !$(e.target).is('input, textarea')) {
-            //         e.preventDefault();
-            //         softDeleteActiveItems(selectedIds);
-            //     } else if ((e.ctrlKey && e.keyCode == 0x56) || (e.metaKey && e.keyCode == 0x56)) {
-            //         pasteActiveItem();
-            //     }
-            // }).bind('copy', function()
-            // {
-            //     copyActiveItem(false);
-            // }).bind('cut', function()
-            // {
-            //     copyActiveItem(true);
-            // }).keydown(function(e)
-            // {
-            //     if (e.ctrlKey || e.metaKey) {
-            //         if (e.which == 90) {
-            //             undoActionHistory();
-            //         } else if (e.which == 89) {
-            //             redoActionHistory();
-            //         }
-            //     }
-            // });
+            $(document).on('keydown', function(e) {
+                // if ((e.which === 8 || e.which === 46) && !$(e.target).is('input, textarea')) {
+                //     e.preventDefault();
+                //     softDeleteActiveItems(selectedIds);
+                // } else if ((e.ctrlKey && e.keyCode == 0x56) || (e.metaKey && e.keyCode == 0x56)) {
+                //     pasteActiveItem();
+                // }
+            }).bind('copy', function() {
+                //copyActiveItem(false);
+            }).bind('cut', function() {
+                //copyActiveItem(true);
+            }).keydown(function(e) {
+                if (e.ctrlKey || e.metaKey) { // The 'ctrl' (windows) or 'cmd' (mac) key
+                    if (e.which == 90) { // The 'z' key (combined with ctrl or cmd)
+                        historyController.undoCanvasAction();
+                    } else if (e.which == 89) { // The 'y' key (combined with ctrl or cmd)
+                        historyController.redoCanvasAction();
+                    }
+                }
+            });
         });
 
         var token = '{{ csrf_token() }}';
         var assetsBasePath = '{{ asset('assets/images/objects') }}/';
 
         var canvasController;
+        var historyController;
         var utils;
 
         var hasUserMadeChanges = false;
@@ -344,8 +338,8 @@
             updateCanvasItemPosition(canvasItemId, canvasItemPositionX, canvasItemPositionY) {
                 var canvasItem = $('.drag-item[canvas-item-id=' + canvasItemId + ']');
 
-                canvasItem.css('left', canvasItem.position_x * 32);
-                canvasItem.css('top', canvasItem.position_y * 32);
+                canvasItem.css('left', canvasItemPositionX * 32);
+                canvasItem.css('top', canvasItemPositionY * 32);
             }
 
             removeCanvasItem(canvasItemId) {
@@ -410,6 +404,51 @@
 
                     $('.drag-item[canvas-item-id=' + selectedBoardItemId + ']').addClass('outline-highlight');
                 }
+            }
+        }
+
+        // Canvas history is the previous actions a user has taken on the canvas
+        // e.g. canvasItem 1 movement to X: 5, Y: 8
+
+        // Example:
+        // [
+        //    {
+        //       "id": 1,
+        //       "canvas_item_id": "1",
+        //       "type": "movement",
+        //       "previous_position_x": 5,
+        //       "previous_position_y": 8 
+        //    }
+        // ]
+        class CanvasHistoryModel {
+            store(classId, canvasHistory, canvasActionUndoCount) {
+                $.ajax({
+                    url: '/canvas-history',
+                    type: 'POST',
+                    data: {
+                        _token: token,
+                        canvas_history: canvasHistory,
+                        canvas_action_undo_count: canvasActionUndoCount,
+                        class_id: classId
+                    }
+                }).done(function(statusMessage) {
+                    console.log(statusMessage);
+                });
+            }
+
+            getAll(classId) {
+                $.ajax({
+                    url: '/canvas-history',
+                    type: 'GET',
+                    data: {
+                        _token: token,
+                        class_id: classId
+                    }
+                }).done(function(jsonCanvasHistory) {
+                    historyController.jsonCanvasHistory = jsonCanvasHistory;
+
+                    historyController.init();
+                });
             }
         }
 
@@ -866,10 +905,16 @@
                             }
                         }
                     },
-                    // start: function() {
-                    //     var activeItemId = $(this).attr('canvas-item-id');
-                    //     storeActionHistory(activeItemId);
-                    // },
+                    start: function() {
+                        var canvasItemId = $(this).attr('canvas-item-id');
+
+                        historyController.addCanvasHistory({
+                            canvas_item_id: canvasItemId,
+                            type: 'movement',
+                            previous_position_x: canvasItems[canvasItemId].position_x,
+                            previous_position_y: canvasItems[canvasItemId].position_y
+                        });
+                    },
                     create: function() {
                         var canvasItemId = $(this).attr('canvas-item-id');
                         
@@ -1103,6 +1148,8 @@
                 }
 
                 this.deleteCanvasItems(this.softDeletedCanvasItemIds);
+
+                historyController.storeCanvasHistory();
             }
 
             clearSession() {
@@ -1110,11 +1157,148 @@
 
                 this.canvasItems = {};
                 this.canvasItemsGrid = [];
+                historyController.canvasHistory = [];
 
                 selectedCanvasItems = {
                     parent: {},
                     children: {}
                 };
+            }
+        }
+
+        class HistoryController {
+            constructor() {
+                this.jsonCanvasHistory = [];
+
+                this.canvasHistory = []; // Stores array of objects containing actions performed by the user
+                this.canvasActionUndoCount = 1; // How many times to undo away from most recent action
+
+                this.maxCanvasHistoryCount = 25; // Only used when storing to database
+
+                this.canvasHistoryModel = new CanvasHistoryModel;
+                this.view = new View;
+            }
+
+            loadCanvasHistory() {
+                var canvasHistoryModel = this.canvasHistoryModel;
+
+                canvasHistoryModel.getAll(canvasController.classId);
+            }
+
+            init() {
+                var jsonCanvasHistoryRecords = this.jsonCanvasHistory;
+
+                // Take JSON array of all items and store them locally
+                for (var index in jsonCanvasHistoryRecords.canvas_history) {
+                    var canvasHistoryRecord = jsonCanvasHistoryRecords.canvas_history[index];
+
+                    this.addCanvasHistory(canvasHistoryRecord);
+                }
+
+                this.canvasActionUndoCount = jsonCanvasHistoryRecords.canvas_action_undo_count;
+            } 
+
+            addCanvasHistory(canvasHistoryRecord) {
+                var canvasActionUndoCount = this.canvasActionUndoCount;
+
+                if (canvasActionUndoCount > 1) { // User has undone, then performed another action
+                    this.canvasHistory.splice(this.canvasHistory.length - canvasActionUndoCount + 1, canvasActionUndoCount);
+                    this.canvasActionUndoCount = 1;
+                }
+
+                this.canvasHistory[this.canvasHistory.length] = {
+                    canvas_item_id: canvasHistoryRecord.canvas_item_id,
+                    type: canvasHistoryRecord.type,
+                    previous_position_x: canvasHistoryRecord.previous_position_x,
+                    previous_position_y: canvasHistoryRecord.previous_position_y
+                }
+            }
+
+            removeCanvasHistory() {}
+
+            storeCanvasHistory() {
+                var canvasHistory = this.canvasHistory,
+                    canvasHistoryModel = this.canvasHistoryModel,
+                    maxCanvasHistoryCount = this.maxCanvasHistoryCount,
+                    canvasActionUndoCount = this.canvasActionUndoCount,
+                    classId = canvasController.classId;
+
+                canvasHistory.slice(Math.max(canvasHistory.length - maxCanvasHistoryCount, 0)); // Don't send > maxCanvasHistoryCount to DB
+
+                canvasHistoryModel.store(classId, canvasHistory, canvasActionUndoCount);
+            }
+
+            undoCanvasAction() {
+                var canvasHistory = this.canvasHistory,
+                    canvasActionUndoCount = this.canvasActionUndoCount,
+                    canvasItems = canvasController.canvasItems,
+                    view = this.view;
+
+                if (Object.keys(canvasHistory).length - canvasActionUndoCount >= 0) {
+                    var action = canvasHistory[canvasHistory.length - canvasActionUndoCount];
+
+                    var canvasItemId = action.canvas_item_id;
+                    var canvasItem = canvasItems[canvasItemId];
+
+                    var canvasItemPositionX = action.previous_position_x;
+                    var canvasItemPositionY = action.previous_position_y;
+
+                    if (canvasActionUndoCount == 1) {
+                        this.addCanvasHistory({
+                            canvas_item_id: canvasItemId,
+                            type: 'movement',
+                            previous_position_x: canvasItem.position_x,
+                            previous_position_y: canvasItem.position_y
+                        });
+
+                        canvasActionUndoCount++;
+                    }
+
+                    // TODO: Check action type
+
+                    canvasController.updateCanvasItemPosition(canvasItem, canvasItemPositionX, canvasItemPositionY)
+                    view.updateCanvasItemPosition(canvasItemId, canvasItemPositionX, canvasItemPositionY);
+
+                    canvasActionUndoCount++;
+
+                    this.canvasActionUndoCount = canvasActionUndoCount;
+                } else {
+                    alert('Nothing else to undo!');
+                }
+            }
+
+            redoCanvasAction() {
+                var canvasHistory = this.canvasHistory,
+                    canvasActionUndoCount = this.canvasActionUndoCount,
+                    canvasItems = canvasController.canvasItems,
+                    view = this.view;
+
+                if (canvasHistory.length - canvasActionUndoCount + 1 == 0) {
+                    canvasActionUndoCount--;
+                }
+
+                if (canvasActionUndoCount > 1) {
+                    var action = canvasHistory[canvasHistory.length - canvasActionUndoCount + 1];
+
+                    var canvasItemId = action.canvas_item_id;
+                    var canvasItem = canvasItems[canvasItemId];
+
+                    var canvasItemPositionX = action.previous_position_x;
+                    var canvasItemPositionY = action.previous_position_y;
+
+                    canvasController.updateCanvasItemPosition(canvasItem, canvasItemPositionX, canvasItemPositionY);
+                    view.updateCanvasItemPosition(canvasItemId, canvasItemPositionX, canvasItemPositionY);
+
+                    if (canvasActionUndoCount == 2) {
+                        canvasHistory.pop();
+                    }
+
+                    canvasActionUndoCount--;
+
+                    this.canvasActionUndoCount = canvasActionUndoCount;
+                } else {
+                    alert('Nothing left to redo!');
+                }
             }
         }
 
@@ -1134,6 +1318,9 @@
 
             canvasController = new CanvasController(classId);
             canvasController.loadItems();
+
+            historyController = new HistoryController();
+            historyController.loadCanvasHistory();
 
             utils = new Utils;
         }

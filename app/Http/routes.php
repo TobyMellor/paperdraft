@@ -51,5 +51,8 @@ Route::group(['middleware' => ['web', 'auth']], function () {
     Route::get('/canvas-items', 'ItemController@getCanvasItems');
     Route::put('/canvas-items', 'ItemController@updateCanvasItems');
     Route::delete('/canvas-items', 'ItemController@deleteCanvasItems');
+
+    Route::get('/canvas-history', 'CanvasHistoryController@getCanvasHistory');
+    Route::post('/canvas-history', 'CanvasHistoryController@storeCanvasHistory');
 });
 

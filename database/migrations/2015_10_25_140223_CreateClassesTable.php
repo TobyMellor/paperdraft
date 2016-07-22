@@ -28,6 +28,9 @@ class CreateClassesTable extends Migration
             */
 
             $table->string('class_name');
+            $table->integer('canvas_action_undo_count')
+                ->unsigned()
+                ->default(1);
 
             $table->timestamps();
         });
@@ -37,6 +40,11 @@ class CreateClassesTable extends Migration
                 'user_id' => 1,
                 //'period_id' => 1,
                 'class_name' => 'Year 11'
+            ],
+            [
+                'user_id' => 1,
+                //'period_id' => 1,
+                'class_name' => 'Year 12'
             ]
         ]);
     }
