@@ -285,6 +285,12 @@
                 if ((e.which === 8 || e.which === 46) && !$(e.target).is('input, textarea')) { // The 'delete' or 'backspace' key, but not when the user is typing
                     e.preventDefault();
                     canvasController.softDeleteCanvasItems();
+                } else if (e.ctrlKey || e.metaKey) { // The 'ctrl' (windows) or 'cmd' (mac) key
+                    if (e.which == 90) { // The 'z' key (combined with ctrl or cmd)
+                        historyController.undoCanvasAction();
+                    } else if (e.which == 89) { // The 'y' key (combined with ctrl or cmd)
+                        historyController.redoCanvasAction();
+                    }
                 }/* else if ((e.ctrlKey && e.keyCode == 0x56) || (e.metaKey && e.keyCode == 0x56)) {
                     pasteActiveItem();
                 }*/
@@ -292,14 +298,6 @@
                 //copyActiveItem(false);
             }).bind('cut', function() {
                 //copyActiveItem(true);
-            }).keydown(function(e) {
-                if (e.ctrlKey || e.metaKey) { // The 'ctrl' (windows) or 'cmd' (mac) key
-                    if (e.which == 90) { // The 'z' key (combined with ctrl or cmd)
-                        historyController.undoCanvasAction();
-                    } else if (e.which == 89) { // The 'y' key (combined with ctrl or cmd)
-                        historyController.redoCanvasAction();
-                    }
-                }
             });
         });
 
@@ -353,7 +351,6 @@
             }
 
             clearSelectedBoard(selectedCanvasItems) {
-                console.log(selectedCanvasItems);
                 if ($.isEmptyObject(selectedCanvasItems.parent)) {
                     $('#selected-no-items').parent().children(':nth-child(2)').fadeOut(250, function() {
                         $('#selected-no-items').fadeIn(250);
@@ -617,7 +614,7 @@
                         this.addCanvasItem(canvasItem);
                     }
                 } else {
-                    this.updateSelected([]);
+                    this.updateSelected([]); 
                 }
             }
 
@@ -765,10 +762,7 @@
             updateCanvasItemPosition(canvasItem, positionX, positionY) {
                 var canvasItemsGrid = this.canvasItemsGrid;
 
-                if (positionX >= 0
-                        && positionY >= 0
-                        && positionX < canvasItemsGrid.length
-                        && positionY < canvasItemsGrid.length) {
+                if (this.isPositionInBounds(positionX, positionY)) {
                     if (!this.isCanvasItemInPosition(positionX, positionY)) { // TODO: Also check if parent is moving into child and allow that
                         canvasItemsGrid[canvasItem.position_x][canvasItem.position_y] = -1; // Free up the old position
 
@@ -1014,7 +1008,7 @@
                         potentialEmptyX = x + positionX;
                         potentialEmptyY = y + positionY;
 
-                        if (potentialEmptyX >= 0 && potentialEmptyY >= 0 && potentialEmptyX <= 23 && potentialEmptyY <= 23) {
+                        if (this.isPositionInBounds(potentialEmptyX, potentialEmptyY)) {
                             if (!this.isCanvasItemInPosition(x + positionX, y + positionY)) {
                                 return [x + positionX, y + positionY];
                             }
@@ -1067,10 +1061,7 @@
                 }
 
                 if (canvasItemId == -1 || canvasItems[canvasItemId].item_id == 1) { // Tables are the only supported item type TODO: canvasItemId == -1?
-                    if (canvasItemPositionX >= 0
-                            && canvasItemPositionY >= 0
-                            && canvasItemPositionX < canvasItemsGrid.length
-                            && canvasItemPositionY < canvasItemsGrid.length) { // Check if check location is out of bounds
+                    if (this.isPositionInBounds(canvasItemPositionX, canvasItemPositionY)) { // Check if check location is out of bounds
                         for (let i = 0; i < 3; i++) {
                             for (let x = 0; x < 3; x++) {
                                 if (i == 1 && x == 1) { // Skip the position we're already in
@@ -1080,33 +1071,35 @@
                                 var checkPositionX = canvasItemPositionX - 1 + x;
                                 var checkPositionY = canvasItemPositionY - 1 + i;
 
-                                var canvasItemIdInCheckPosition = canvasItemsGrid[checkPositionX][checkPositionY];
-                                var hasAlreadyBeenChecked = utils.isArrayInArray(checkExemptions, [checkPositionX, checkPositionY]);
+                                if (this.isPositionInBounds(checkPositionX, checkPositionY)) {
+                                    var canvasItemIdInCheckPosition = canvasItemsGrid[checkPositionX][checkPositionY];
+                                    var hasAlreadyBeenChecked = utils.isArrayInArray(checkExemptions, [checkPositionX, checkPositionY]);
 
-                                var shouldCheckFurther = true; // Only used to check previously checked items
+                                    var shouldCheckFurther = true; // Only used to check previously checked items
 
-                                if (hasAlreadyBeenChecked) {
-                                    if (canvasItemIdInCheckPosition != -1 && canvasItems[canvasItemIdInCheckPosition].item_id == 1) { // Connect alreadyChecked item, but put isDirectConnected to false to prevent further checking
-                                        hasAlreadyBeenChecked = false;
-                                        shouldCheckFurther = false;
+                                    if (hasAlreadyBeenChecked) {
+                                        if (canvasItemIdInCheckPosition != -1 && canvasItems[canvasItemIdInCheckPosition].item_id == 1) { // Connect alreadyChecked item, but put isDirectConnected to false to prevent further checking
+                                            hasAlreadyBeenChecked = false;
+                                            shouldCheckFurther = false;
+                                        }
                                     }
-                                }
 
-                                if (!hasAlreadyBeenChecked) {
-                                    if (canvasItemIdInCheckPosition != -1 && canvasItems[canvasItemIdInCheckPosition].item_id == 1) { // There's a table item in the position we're checking
-                                        if (adjacentDirections[i][x].length == 9) { // Check position is northwest, northeast, southeast or southwest (all 9 characters long)
-                                            // We need to check to see if adjacent items are present. i.e. northwest requires north (center x, same y) and west (same x, center y)  to be present
-                                            var canvasItemIdAdjacentCheckPositionX = canvasItemsGrid[canvasItemPositionX][checkPositionY];
-                                            var canvasItemIdAdjacentCheckPositionY = canvasItemsGrid[checkPositionX][canvasItemPositionY];
+                                    if (!hasAlreadyBeenChecked) {
+                                        if (canvasItemIdInCheckPosition != -1 && canvasItems[canvasItemIdInCheckPosition].item_id == 1) { // There's a table item in the position we're checking
+                                            if (adjacentDirections[i][x].length == 9) { // Check position is northwest, northeast, southeast or southwest (all 9 characters long)
+                                                // We need to check to see if adjacent items are present. i.e. northwest requires north (center x, same y) and west (same x, center y)  to be present
+                                                var canvasItemIdAdjacentCheckPositionX = canvasItemsGrid[canvasItemPositionX][checkPositionY];
+                                                var canvasItemIdAdjacentCheckPositionY = canvasItemsGrid[checkPositionX][canvasItemPositionY];
 
-                                            if (canvasItemIdAdjacentCheckPositionX != -1 
-                                                    && canvasItems[canvasItemIdAdjacentCheckPositionX].item_id == 1
-                                                    && canvasItemIdAdjacentCheckPositionY != -1
-                                                    && canvasItems[canvasItemIdAdjacentCheckPositionY].item_id == 1) {
+                                                if (canvasItemIdAdjacentCheckPositionX != -1 
+                                                        && canvasItems[canvasItemIdAdjacentCheckPositionX].item_id == 1
+                                                        && canvasItemIdAdjacentCheckPositionY != -1
+                                                        && canvasItems[canvasItemIdAdjacentCheckPositionY].item_id == 1) {
+                                                    checkExemptions[checkExemptionsIndex][2].push([checkPositionX, checkPositionY, adjacentDirections[i][x], checkExemptionsIndex > 0 || !shouldCheckFurther ? false : true]);
+                                                }
+                                            } else {
                                                 checkExemptions[checkExemptionsIndex][2].push([checkPositionX, checkPositionY, adjacentDirections[i][x], checkExemptionsIndex > 0 || !shouldCheckFurther ? false : true]);
                                             }
-                                        } else {
-                                            checkExemptions[checkExemptionsIndex][2].push([checkPositionX, checkPositionY, adjacentDirections[i][x], checkExemptionsIndex > 0 || !shouldCheckFurther ? false : true]);
                                         }
                                     }
                                 }
@@ -1139,6 +1132,19 @@
                         $('div[canvas-item-id=' + canvasItemId + ']').css('background-image', 'url(\'' + assetsBasePath + items[canvasItems[canvasItemId].item_id].location + '\')');
                     }
                 }
+            }
+
+            isPositionInBounds(positionX, positionY) {
+                var gridSize = this.gridSize;
+
+                if (positionX >= 0
+                        && positionY >= 0
+                        && positionX < gridSize
+                        && positionY < gridSize) {
+                    return true;
+                }
+
+                return false;
             }
 
             saveCanvasItems(message = null) {
