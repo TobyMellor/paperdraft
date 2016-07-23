@@ -29,6 +29,8 @@ class CreateCanvasHistoryTable extends Migration
 
             $table->string('type');
 
+            $table->integer('position_x')->nullable();
+            $table->integer('position_y')->nullable();
             $table->integer('previous_position_x');
             $table->integer('previous_position_y');
 

@@ -717,7 +717,8 @@
 
             updatePseudoCanvasItemToReal(oldCanvasItemId, newCanvasItemId) {
                 var canvasItemsGrid = this.canvasItemsGrid,
-                    canvasItems = this.canvasItems;
+                    canvasItems = this.canvasItems,
+                    canvasHistory = historyController.canvasHistory;
 
                 Object.defineProperty(canvasItems, newCanvasItemId,
                     Object.getOwnPropertyDescriptor(canvasItems, oldCanvasItemId));
@@ -730,6 +731,14 @@
                 canvasItem.id = newCanvasItemId;
 
                 canvasItemsGrid[canvasItem.position_x][canvasItem.position_y] = newCanvasItemId;
+
+                $.grep(canvasHistory, function(e){
+                    if (e.canvas_item_id == oldCanvasItemId) {
+                        e.canvas_item_id = newCanvasItemId;
+                    }
+                });
+
+                historyController.canvasHistory = canvasHistory;
             }
 
 
@@ -931,9 +940,12 @@
                         }
                     },
                     start: function() {
-                        var canvasItemId = view.getCanvasItemId($(this));
+                        var canvasItemId = view.getCanvasItemId($(this)),
+                            pendingCanvasHistoryRecords = historyController.pendingCanvasHistoryRecords;
 
-                        historyController.addCanvasHistory({ // Store the parents history
+                        pendingCanvasHistoryRecords = [];
+
+                        pendingCanvasHistoryRecords.push({ // Store the parents history
                             canvas_item_id: canvasItemId,
                             type: 'movement',
                             previous_position_x: canvasItems[canvasItemId].position_x,
@@ -941,12 +953,27 @@
                         });
 
                         for (var childrenId in selectedCanvasItems.children) { // Store the childrens history too
-                            historyController.addCanvasHistory({
+                            pendingCanvasHistoryRecords.push({
                                 canvas_item_id: childrenId,
                                 type: 'movement',
                                 previous_position_x: canvasItems[childrenId].position_x,
                                 previous_position_y: canvasItems[childrenId].position_y
                             });
+                        }
+                        
+                        historyController.pendingCanvasHistoryRecords = pendingCanvasHistoryRecords;
+                    },
+                    stop: function() {
+                        var pendingCanvasHistoryRecords = historyController.pendingCanvasHistoryRecords;
+
+                        for (var index in pendingCanvasHistoryRecords) {
+                            var pendingCanvasHistoryRecord = pendingCanvasHistoryRecords[index];
+                            var canvasItemId = pendingCanvasHistoryRecord.canvas_item_id;
+
+                            pendingCanvasHistoryRecord.position_x = canvasItems[canvasItemId].position_x;
+                            pendingCanvasHistoryRecord.position_y = canvasItems[canvasItemId].position_y;
+
+                            historyController.addCanvasHistory(pendingCanvasHistoryRecord);
                         }
                     },
                     create: function() {
@@ -1228,6 +1255,7 @@
 
                 this.canvasHistory = []; // Stores array of objects containing actions performed by the user
                 this.canvasActionUndoCount = 1; // How many times to undo away from most recent action
+                this.pendingCanvasHistoryRecords = []; // Store positions when drag starts, store them in canvasHistory on stop
 
                 this.maxCanvasHistoryCount = 25; // Only used when storing to database
 
@@ -1266,7 +1294,9 @@
                     canvas_item_id: canvasHistoryRecord.canvas_item_id,
                     type: canvasHistoryRecord.type,
                     previous_position_x: canvasHistoryRecord.previous_position_x,
-                    previous_position_y: canvasHistoryRecord.previous_position_y
+                    previous_position_y: canvasHistoryRecord.previous_position_y,
+                    position_x: canvasHistoryRecord.position_x,
+                    position_y: canvasHistoryRecord.position_y
                 }
             }
 
@@ -1318,17 +1348,6 @@
                     var canvasItemPositionX = action.previous_position_x;
                     var canvasItemPositionY = action.previous_position_y;
 
-                    if (canvasActionUndoCount == 1) {
-                        this.addCanvasHistory({
-                            canvas_item_id: canvasItemId,
-                            type: 'movement',
-                            previous_position_x: canvasItem.position_x,
-                            previous_position_y: canvasItem.position_y
-                        });
-
-                        canvasActionUndoCount++;
-                    }
-
                     // TODO: Check action type
 
                     canvasController.updateCanvasItemPosition(canvasItem, canvasItemPositionX, canvasItemPositionY)
@@ -1352,9 +1371,13 @@
                     canvasItems = canvasController.canvasItems,
                     view = this.view;
 
-                if (canvasHistory.length - canvasActionUndoCount + 1 == 0) {
-                    canvasActionUndoCount--;
-                }
+                console.log(canvasHistory.length);
+                console.log(canvasHistory);
+                console.log(canvasActionUndoCount);
+                console.log(canvasHistory.length - canvasActionUndoCount + 1);
+
+                console.log(canvasActionUndoCount);
+                console.log(canvasHistory[canvasHistory.length - canvasActionUndoCount + 1]);
 
                 if (canvasActionUndoCount > 1) {
                     var action = canvasHistory[canvasHistory.length - canvasActionUndoCount + 1];
@@ -1365,8 +1388,8 @@
                     var currentItemPositionX = canvasItem.position_x;
                     var currentItemPositionY = canvasItem.position_y;
 
-                    var canvasItemPositionX = action.previous_position_x;
-                    var canvasItemPositionY = action.previous_position_y;
+                    var canvasItemPositionX = action.position_x;
+                    var canvasItemPositionY = action.position_y;
 
                     canvasController.updateCanvasItemPosition(canvasItem, canvasItemPositionX, canvasItemPositionY);
                     view.updateCanvasItemPosition(canvasItemId, canvasItemPositionX, canvasItemPositionY);
@@ -1374,10 +1397,6 @@
 
                     canvasController.updateConnectedCanvasItems(canvasItemPositionX, canvasItemPositionY, [], null);
                     canvasController.updateConnectedCanvasItems(currentItemPositionX, currentItemPositionY, [], null);
-
-                    if (canvasActionUndoCount == 2) {
-                        canvasHistory.pop();
-                    }
 
                     canvasActionUndoCount--;
 

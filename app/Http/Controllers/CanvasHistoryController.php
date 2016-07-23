@@ -94,6 +94,8 @@ class CanvasHistoryController extends Controller
                 'id' => $canvasHistoryRecord->id,
                 'canvas_item_id' => $canvasHistoryRecord->canvas_item_id,
                 'type' => $canvasHistoryRecord->type,
+                'position_x' => $canvasHistoryRecord->position_x,
+                'position_y' => $canvasHistoryRecord->position_y,
                 'previous_position_x' => $canvasHistoryRecord->previous_position_x,
                 'previous_position_y' => $canvasHistoryRecord->previous_position_y
             ]);

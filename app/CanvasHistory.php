@@ -22,6 +22,8 @@ class CanvasHistory extends Model
         'canvas_item_id',
         'class_id',
         'type',
+        'position_x',
+        'position_y',
         'previous_position_x',
         'previous_position_y'
     ];
