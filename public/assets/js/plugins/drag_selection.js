@@ -109,6 +109,7 @@ var canvasController;
     var offset = findPos(dropTarget);
     var isDragging = false;
     var checkAgain = true;
+    var rect = paper.rect(0, 0, 0, 0);
     
     dropTarget.onmousedown = function(event) {
         var mouseCoords = getCoords(event);
