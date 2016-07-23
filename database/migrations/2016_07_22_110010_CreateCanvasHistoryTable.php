@@ -18,12 +18,14 @@ class CreateCanvasHistoryTable extends Migration
             $table->integer('class_id')->unsigned();
             $table->foreign('class_id')
                 ->references('id')
-                ->on('classes');
+                ->on('classes')
+                ->onDelete('cascade');
 
             $table->integer('canvas_item_id')->unsigned();
             $table->foreign('canvas_item_id')
                 ->references('id')
-                ->on('canvas_items');
+                ->on('canvas_items')
+                ->onDelete('cascade');
 
             $table->string('type');
 

@@ -282,12 +282,12 @@
             });
 
             $(document).on('keydown', function(e) {
-                // if ((e.which === 8 || e.which === 46) && !$(e.target).is('input, textarea')) {
-                //     e.preventDefault();
-                //     softDeleteActiveItems(selectedIds);
-                // } else if ((e.ctrlKey && e.keyCode == 0x56) || (e.metaKey && e.keyCode == 0x56)) {
-                //     pasteActiveItem();
-                // }
+                if ((e.which === 8 || e.which === 46) && !$(e.target).is('input, textarea')) { // The 'delete' or 'backspace' key, but not when the user is typing
+                    e.preventDefault();
+                    canvasController.softDeleteCanvasItems();
+                }/* else if ((e.ctrlKey && e.keyCode == 0x56) || (e.metaKey && e.keyCode == 0x56)) {
+                    pasteActiveItem();
+                }*/
             }).bind('copy', function() {
                 //copyActiveItem(false);
             }).bind('cut', function() {
@@ -1221,11 +1221,27 @@
                     canvasHistoryModel = this.canvasHistoryModel,
                     maxCanvasHistoryCount = this.maxCanvasHistoryCount,
                     canvasActionUndoCount = this.canvasActionUndoCount,
-                    classId = canvasController.classId;
+                    classId = canvasController.classId,
+                    softDeletedCanvasItemIds = canvasController.softDeletedCanvasItemIds;
 
                 canvasHistory.slice(Math.max(canvasHistory.length - maxCanvasHistoryCount, 0)); // Don't send > maxCanvasHistoryCount to DB
 
+                for (let index = 0; index < canvasHistory.length; index++) {
+                    if (softDeletedCanvasItemIds.indexOf(canvasHistory[index].canvas_item_id.toString()) != -1) {
+
+                        canvasHistory.splice(index, 1);
+
+                        if (canvasActionUndoCount > 1) {
+                            canvasActionUndoCount--;
+                        }
+
+                        index--;
+                    }
+                }
+
                 canvasHistoryModel.store(classId, canvasHistory, canvasActionUndoCount);
+
+                this.canvasActionUndoCount = canvasActionUndoCount;
             }
 
             undoCanvasAction() {

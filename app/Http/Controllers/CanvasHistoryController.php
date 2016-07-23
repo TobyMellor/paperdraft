@@ -35,6 +35,10 @@ class CanvasHistoryController extends Controller
         $canvasActionUndoCount = $request->input('canvas_action_undo_count');
         $classId = $request->input('class_id');
 
+        if ($newCanvasHistoryRecords == null) {
+            $newCanvasHistoryRecords = [];
+        }
+
         $canvasHistoryCount = $this->getCanvasHistoryCount();
 
         $response = [];
@@ -107,7 +111,7 @@ class CanvasHistoryController extends Controller
     {
         return Validator::make($data, [
             'class_id' => 'required|integer|exists:classes,id',
-            'canvas_history' => 'required|array|max:' . $this->getCanvasHistoryCount(),
+            'canvas_history' => 'array|max:' . $this->getCanvasHistoryCount(),
             'canvas_action_undo_count' => 'required|integer|max:' . $this->getCanvasHistoryCount()
         ]);
     }
