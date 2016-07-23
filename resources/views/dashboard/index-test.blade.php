@@ -225,7 +225,7 @@
     <script>
         $(document).ready(function() {
             $('.drop-target').on('mousedown', '.drag-item', function() {
-                var canvasItemId = $(this).attr('canvas-item-id');
+                var canvasItemId = canvasController.view.getCanvasItemId($(this));
                 var selectedCanvasItemIds = [canvasItemId];
 
                 if (Object.keys(selectedCanvasItems.children).indexOf(canvasItemId) != -1) {
@@ -334,14 +334,14 @@
             }
 
             updateCanvasItemPosition(canvasItemId, canvasItemPositionX, canvasItemPositionY) {
-                var canvasItem = $('.drag-item[canvas-item-id=' + canvasItemId + ']');
+                var canvasItem = this.getCanvasItem(canvasItemId);
 
                 canvasItem.css('left', canvasItemPositionX * 32);
                 canvasItem.css('top', canvasItemPositionY * 32);
             }
 
             removeCanvasItem(canvasItemId) {
-                $('.drag-item[canvas-item-id=' + canvasItemId + ']').remove();
+                this.getCanvasItem(canvasItemId).remove();
             }
 
             removeCanvasItems() {
@@ -400,8 +400,32 @@
                         $('#selected-position').append('<strong>X:</strong> ' + selectedBoardItemPositionX + ', <strong>Y:</strong> ' + selectedBoardItemPositionY + '<br />');
                     }
 
-                    $('.drag-item[canvas-item-id=' + selectedBoardItemId + ']').addClass('outline-highlight');
+                    this.getCanvasItem(selectedBoardItemId).addClass('outline-highlight');
                 }
+            }
+
+            getCanvasItemId(element) {
+                return parseInt(element.attr('canvas-item-id'));
+            }
+
+            getCanvasItem(canvasItemId) {
+                return $('.drag-item[canvas-item-id=' + canvasItemId + ']');
+            }
+
+            isCanvasItemConnected(canvasItemId) {
+                var canvasItem = this.getCanvasItem(canvasItemId);
+
+                if (canvasItem.css('background-image').indexOf('desk-connected-') > -1) {
+                    return true;
+                }
+
+                return false;
+            }
+
+            updateCanvasItemBackgroundImage(canvasItemId, canvasBackgroundImage) {
+                var canvasItemElement = this.getCanvasItem(canvasItemId);
+                
+                canvasItemId.css('background-image', 'url(\'' + assetsBasePath + canvasBackgroundImage + '\')');
             }
         }
 
@@ -782,6 +806,8 @@
 
             // Generates a grid array (Size: size * size) that shows all of the locations of canvasItems
             // -1 indicates no item is stored in that spot, anything else is the canvasItem id.
+
+            // Example:
             // [
             //     [-1, -1, -1, 5, ..., 18],
             //     [2, -1, -1, -1, ..., -1],
@@ -814,7 +840,7 @@
                     drag: function() {
                         hasUserMadeChanges = true; // The users changed something. We'll use this to ask if they want to save
 
-                        var parentCanvasItemId = $(this).attr('canvas-item-id');
+                        var parentCanvasItemId = view.getCanvasItemId($(this));
 
                         // We need the new location of the canvasItem as it may be outdated in the canvasItems array
                         var newParentCanvasItemPositionX = $(this).position().left / 32;
@@ -905,7 +931,7 @@
                         }
                     },
                     start: function() {
-                        var canvasItemId = $(this).attr('canvas-item-id');
+                        var canvasItemId = view.getCanvasItemId($(this));
 
                         historyController.addCanvasHistory({
                             canvas_item_id: canvasItemId,
@@ -915,7 +941,7 @@
                         });
                     },
                     create: function() {
-                        var canvasItemId = $(this).attr('canvas-item-id');
+                        var canvasItemId = view.getCanvasItemId($(this));
                         
                         canvasController.updateConnectedCanvasItems(canvasItems[canvasItemId].position_x, canvasItems[canvasItemId].position_y, [], null);
                     }
@@ -1114,7 +1140,7 @@
                             connectedAdjacentDirections.push(checkExemptions[checkExemptionsIndex][2][x][2]);
                         }
 
-                        $('div[canvas-item-id=' + canvasItemId + ']').css('background-image', 'url(\'' + assetsBasePath + 'desk-connected-' + connectedAdjacentDirections.join('-') + '.png\')');
+                        view.updateCanvasItemBackgroundImage(canvasItemId, 'desk-connected-' + connectedAdjacentDirections.join('-') + '.png');
 
                         let isDirectConnection = checkExemptions[checkExemptionsIndex][2][0][3];
 
@@ -1128,8 +1154,8 @@
                                 }
                             }
                         }
-                    } else if (canvasItemId != -1 && $('div[canvas-item-id=' + canvasItemId + ']').css('background-image').indexOf('desk-connected-') > -1) {
-                        $('div[canvas-item-id=' + canvasItemId + ']').css('background-image', 'url(\'' + assetsBasePath + items[canvasItems[canvasItemId].item_id].location + '\')');
+                    } else if (canvasItemId != -1 && view.isCanvasItemConnected(canvasItemId)) {
+                        view.updateCanvasItemBackgroundImage(canvasItemId, items[canvasItems[canvasItemId].item_id].location);
                     }
                 }
             }
