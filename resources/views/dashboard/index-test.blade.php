@@ -405,7 +405,7 @@
             }
 
             getCanvasItemId(element) {
-                return parseInt(element.attr('canvas-item-id'));
+                return element.attr('canvas-item-id');
             }
 
             getCanvasItem(canvasItemId) {
@@ -425,7 +425,7 @@
             updateCanvasItemBackgroundImage(canvasItemId, canvasBackgroundImage) {
                 var canvasItemElement = this.getCanvasItem(canvasItemId);
                 
-                canvasItemId.css('background-image', 'url(\'' + assetsBasePath + canvasBackgroundImage + '\')');
+                canvasItemElement.css('background-image', 'url(\'' + assetsBasePath + canvasBackgroundImage + '\')');
             }
         }
 
@@ -933,12 +933,22 @@
                     start: function() {
                         var canvasItemId = view.getCanvasItemId($(this));
 
-                        historyController.addCanvasHistory({
+                        historyController.addCanvasHistory({ // Store the parents history
                             canvas_item_id: canvasItemId,
                             type: 'movement',
                             previous_position_x: canvasItems[canvasItemId].position_x,
                             previous_position_y: canvasItems[canvasItemId].position_y
                         });
+
+
+                        for (var childrenId in selectedCanvasItems.children) { // Store the childrens history too
+                            historyController.addCanvasHistory({
+                                canvas_item_id: childrenId,
+                                type: 'movement',
+                                previous_position_x: canvasItems[childrenId].position_x,
+                                previous_position_y: canvasItems[childrenId].position_y
+                            });
+                        }
                     },
                     create: function() {
                         var canvasItemId = view.getCanvasItemId($(this));
@@ -1055,7 +1065,8 @@
             updateConnectedCanvasItems(canvasItemPositionX, canvasItemPositionY, checkExemptions, checkExemptionsIndex = null) {
                 var canvasItemsGrid = this.canvasItemsGrid,
                     canvasItems = this.canvasItems,
-                    items = this.items;
+                    items = this.items,
+                    view = this.view;
 
                 var canvasItemId = canvasItemsGrid[canvasItemPositionX][canvasItemPositionY];
 
