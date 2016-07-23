@@ -353,6 +353,7 @@
             }
 
             clearSelectedBoard(selectedCanvasItems) {
+                console.log(selectedCanvasItems);
                 if ($.isEmptyObject(selectedCanvasItems.parent)) {
                     $('#selected-no-items').parent().children(':nth-child(2)').fadeOut(250, function() {
                         $('#selected-no-items').fadeIn(250);
@@ -608,11 +609,15 @@
                     this.addItem(item);
                 }
 
-                // Take JSON array of all canvasItems and store them locally
-                for (var jsonCanvasItem in jsonCanvasItems) {
-                    var canvasItem = jsonCanvasItems[jsonCanvasItem];
+                if (jsonCanvasItems.length > 0) {
+                    // Take JSON array of all canvasItems and store them locally
+                    for (var jsonCanvasItem in jsonCanvasItems) {
+                        var canvasItem = jsonCanvasItems[jsonCanvasItem];
 
-                    this.addCanvasItem(canvasItem);
+                        this.addCanvasItem(canvasItem);
+                    }
+                } else {
+                    this.updateSelected([]);
                 }
             }
 
@@ -734,7 +739,7 @@
                     this.removeCanvasItem(canvasItemId);
                 }
 
-                this.updateSelected([Object.keys(canvasItems)[0]]);
+                this.updateSelected(Object.keys(canvasItems).length > 0 ? [Object.keys(canvasItems)[0]] : []);
             }
 
             deleteCanvasItems() {
@@ -935,25 +940,46 @@
 
                 var selectedBoardItems = [];
 
-                canvasItemIds.forEach(function(canvasItemId, index) {
-                    var selectedParentId = selectedCanvasItems.parent.id;
-                    var childrenIndexOf = Object.keys(selectedCanvasItems.children).toString().split(',').map(Number).indexOf(canvasItemId); // Object.keys returns strings, lets change to integers to use indexOf
+                if (canvasItemIds.length > 0) {
+                    canvasItemIds.forEach(function(canvasItemId, index) {
+                        var selectedParentId = selectedCanvasItems.parent.id;
+                        var childrenIndexOf = Object.keys(selectedCanvasItems.children).toString().split(',').map(Number).indexOf(canvasItemId); // Object.keys returns strings, lets change to integers to use indexOf
 
-                    if (index == 0) {
-                        if (selectedParentId != canvasItemId) {
-                            if (childrenIndexOf != -1) { // If the new selected parent was a child, make the old selected parent a child (switch)
-                                selectedCanvasItems.children[selectedParentId] = {
-                                    relative_position_x: canvasItems[selectedParentId].position_x - canvasItems[canvasItemId].position_x,
-                                    relative_position_y: canvasItems[selectedParentId].position_y - canvasItems[canvasItemId].position_y
+                        if (index == 0) {
+                            if (selectedParentId != canvasItemId) {
+                                if (childrenIndexOf != -1) { // If the new selected parent was a child, make the old selected parent a child (switch)
+                                    selectedCanvasItems.children[selectedParentId] = {
+                                        relative_position_x: canvasItems[selectedParentId].position_x - canvasItems[canvasItemId].position_x,
+                                        relative_position_y: canvasItems[selectedParentId].position_y - canvasItems[canvasItemId].position_y
+                                    }
+
+                                    delete selectedCanvasItems.children[canvasItemId];
+                                } else {
+                                    selectedCanvasItems.children = {};
                                 }
+                            }
 
-                                delete selectedCanvasItems.children[canvasItemId];
-                            } else {
-                                selectedCanvasItems.children = {};
+                            selectedCanvasItems.parent.id = canvasItemId;
+
+                            selectedBoardItems[index] = {
+                                id: canvasItemId,
+                                position_x: canvasItems[canvasItemId].position_x,
+                                position_y: canvasItems[canvasItemId].position_y,
+                                location: items[canvasItems[canvasItemId].item_id].location,
+                                name: items[canvasItems[canvasItemId].item_id].name
+                            };
+                        } else {
+                            if (childrenIndexOf == -1) {
+                                selectedCanvasItems.children[canvasItemIds[index]] = {
+                                    relative_position_x: canvasItems[canvasItemId].position_x - canvasItems[selectedParentId].position_x,
+                                    relative_position_y: canvasItems[canvasItemId].position_y - canvasItems[selectedParentId].position_y
+                                }
                             }
                         }
+                    });
 
-                        selectedCanvasItems.parent.id = canvasItemId;
+                    for (var canvasItemId in selectedCanvasItems.children) {
+                        var index = Object.keys(selectedCanvasItems.children).indexOf(canvasItemId) + 1;
 
                         selectedBoardItems[index] = {
                             id: canvasItemId,
@@ -962,30 +988,18 @@
                             location: items[canvasItems[canvasItemId].item_id].location,
                             name: items[canvasItems[canvasItemId].item_id].name
                         };
-                    } else {
-                        if (childrenIndexOf == -1) {
-                            selectedCanvasItems.children[canvasItemIds[index]] = {
-                                relative_position_x: canvasItems[canvasItemId].position_x - canvasItems[selectedParentId].position_x,
-                                relative_position_y: canvasItems[canvasItemId].position_y - canvasItems[selectedParentId].position_y
-                            }
-                        }
                     }
-                });
 
-                for (var canvasItemId in selectedCanvasItems.children) {
-                    var index = Object.keys(selectedCanvasItems.children).indexOf(canvasItemId) + 1;
-
-                    selectedBoardItems[index] = {
-                        id: canvasItemId,
-                        position_x: canvasItems[canvasItemId].position_x,
-                        position_y: canvasItems[canvasItemId].position_y,
-                        location: items[canvasItems[canvasItemId].item_id].location,
-                        name: items[canvasItems[canvasItemId].item_id].name
+                    view.clearSelectedBoard(selectedCanvasItems);
+                    view.updateSelectedBoard(selectedBoardItems);
+                } else {
+                    selectedCanvasItems = {
+                        parent: {},
+                        children: {}
                     };
-                }
 
-                view.clearSelectedBoard(selectedCanvasItems);
-                view.updateSelectedBoard(selectedBoardItems);
+                    view.clearSelectedBoard(selectedCanvasItems);
+                }
             }
             
             getNearestEmpty(positionX, positionY, maxCheckHeight, maxCheckWidth) {
