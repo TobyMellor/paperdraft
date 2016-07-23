@@ -940,7 +940,6 @@
                             previous_position_y: canvasItems[canvasItemId].position_y
                         });
 
-
                         for (var childrenId in selectedCanvasItems.children) { // Store the childrens history too
                             historyController.addCanvasHistory({
                                 canvas_item_id: childrenId,
@@ -1313,6 +1312,9 @@
                     var canvasItemId = action.canvas_item_id;
                     var canvasItem = canvasItems[canvasItemId];
 
+                    var currentItemPositionX = canvasItem.position_x;
+                    var currentItemPositionY = canvasItem.position_y;
+
                     var canvasItemPositionX = action.previous_position_x;
                     var canvasItemPositionY = action.previous_position_y;
 
@@ -1331,6 +1333,9 @@
 
                     canvasController.updateCanvasItemPosition(canvasItem, canvasItemPositionX, canvasItemPositionY)
                     view.updateCanvasItemPosition(canvasItemId, canvasItemPositionX, canvasItemPositionY);
+
+                    canvasController.updateConnectedCanvasItems(canvasItemPositionX, canvasItemPositionY, [], null);
+                    canvasController.updateConnectedCanvasItems(currentItemPositionX, currentItemPositionY, [], null);
 
                     canvasActionUndoCount++;
 
@@ -1356,11 +1361,17 @@
                     var canvasItemId = action.canvas_item_id;
                     var canvasItem = canvasItems[canvasItemId];
 
+                    var currentItemPositionX = canvasItem.position_x;
+                    var currentItemPositionY = canvasItem.position_y;
+
                     var canvasItemPositionX = action.previous_position_x;
                     var canvasItemPositionY = action.previous_position_y;
 
                     canvasController.updateCanvasItemPosition(canvasItem, canvasItemPositionX, canvasItemPositionY);
                     view.updateCanvasItemPosition(canvasItemId, canvasItemPositionX, canvasItemPositionY);
+                    
+                    canvasController.updateConnectedCanvasItems(canvasItemPositionX, canvasItemPositionY, [], null);
+                    canvasController.updateConnectedCanvasItems(currentItemPositionX, currentItemPositionY, [], null);
 
                     if (canvasActionUndoCount == 2) {
                         canvasHistory.pop();
