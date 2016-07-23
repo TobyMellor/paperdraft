@@ -1333,6 +1333,7 @@
 
                     canvasController.updateCanvasItemPosition(canvasItem, canvasItemPositionX, canvasItemPositionY)
                     view.updateCanvasItemPosition(canvasItemId, canvasItemPositionX, canvasItemPositionY);
+                    canvasController.updateSelected([selectedCanvasItems.parent.id]);
 
                     canvasController.updateConnectedCanvasItems(canvasItemPositionX, canvasItemPositionY, [], null);
                     canvasController.updateConnectedCanvasItems(currentItemPositionX, currentItemPositionY, [], null);
@@ -1369,7 +1370,8 @@
 
                     canvasController.updateCanvasItemPosition(canvasItem, canvasItemPositionX, canvasItemPositionY);
                     view.updateCanvasItemPosition(canvasItemId, canvasItemPositionX, canvasItemPositionY);
-                    
+                    canvasController.updateSelected([selectedCanvasItems.parent.id]);
+
                     canvasController.updateConnectedCanvasItems(canvasItemPositionX, canvasItemPositionY, [], null);
                     canvasController.updateConnectedCanvasItems(currentItemPositionX, currentItemPositionY, [], null);
 
