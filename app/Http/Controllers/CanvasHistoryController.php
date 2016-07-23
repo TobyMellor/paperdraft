@@ -56,6 +56,7 @@ class CanvasHistoryController extends Controller
                 ->update([
                     'canvas_action_undo_count' => $canvasActionUndoCount
                 ]);
+                
             CanvasHistory::where('class_id', $classId)->delete();
 
             foreach ($newCanvasHistoryRecords as $key => $newCanvasHistoryRecord) {

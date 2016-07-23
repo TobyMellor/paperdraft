@@ -434,6 +434,7 @@
         // Canvas history is the previous actions a user has taken on the canvas
         // e.g. canvasItem 1 movement to X: 5, Y: 8
 
+        // TODO: update this
         // Example:
         // [
         //    {
@@ -531,26 +532,35 @@
                         canvas_item: canvasItem,
                         class_id: classId
                     }
-                }).done(function(canvasItemIds) {
-                    if (canvasItemIds != null || canvasItemIds.length == 1) {
-                        canvasController.updatePseudoCanvasItemToReal(canvasItem.id, canvasItemIds[0]);
+                }).done(function(canvasItems) {
+                    if (canvasItems != null || canvasItems.length == 1) {
+                        // TODO: Clean
+                        if (canvasItems[0].deleted_at == null) {
+                            canvasController.updatePseudoCanvasItemToReal(canvasItem.id, canvasItems[0].id);
 
-                        canvasItem.id = canvasItemIds[0];
+                            canvasItem.id = canvasItems[0].id;
 
-                        canvasController.addCanvasItem(canvasItem);
+                            canvasController.addCanvasItem(canvasItem);
+                        } else {
+                            canvasController.updateSoftPseudoCanvasItemToReal(canvasItem.id, canvasItems[0].id);
+
+                            canvasItem.id = canvasItems[0].id;
+
+                            canvasController.addSoftDeletedCanvasItem(canvasItem);
+                        }
                     } else {
                         console.log('Failed to load item.');
                     }
                 });
             }
 
-            delete(classId, canvasItemIds) {
+            delete(classId, softDeletedCanvasItems) {
                 $.ajax({
                     url: '/canvas-items',
                     type: 'DELETE',
                     data: {
                         _token: token,
-                        canvas_item_ids: canvasItemIds,
+                        canvas_items: softDeletedCanvasItems,
                         class_id: classId
                     }
                 }).done(function(response) {
@@ -596,7 +606,7 @@
                 this.canvasItems = {}, // e.g. Table is stored at X: 5, Y: 8 in the grid
                 this.items = {}, // e.g. A Table desk.png, A Teachers Desk teachers_desk.png
                 this.canvasItemsGrid = [], // e.g. Grid of all possible locations to store items
-                this.softDeletedCanvasItemIds = [];
+                this.softDeletedCanvasItems = {};
 
                 this.classId = classId;
                 this.gridSize = gridSize;
@@ -632,12 +642,18 @@
                     this.addItem(item);
                 }
 
-                if (jsonCanvasItems.length > 0) {
+                if (jsonCanvasItems.canvas_items.length > 0) {
                     // Take JSON array of all canvasItems and store them locally
-                    for (var jsonCanvasItem in jsonCanvasItems) {
-                        var canvasItem = jsonCanvasItems[jsonCanvasItem];
+                    for (var jsonCanvasItem in jsonCanvasItems.canvas_items) {
+                        var canvasItem = jsonCanvasItems.canvas_items[jsonCanvasItem];
 
                         this.addCanvasItem(canvasItem);
+                    }
+
+                    for (var jsonSoftDeletedCanvasItem in jsonCanvasItems.soft_deleted_canvas_items) {
+                        var softDeletedCanvasItem = jsonCanvasItems.soft_deleted_canvas_items[jsonSoftDeletedCanvasItem];
+
+                        this.addSoftDeletedCanvasItem(softDeletedCanvasItem);
                     }
                 } else {
                     this.updateSelected([]); 
@@ -671,7 +687,7 @@
                 };
 
                 if (isPseudoCanvasItem) {
-                    canvasItem.id = 'Pseudo-' + Math.floor(Math.random() * 99999) + 1 
+                    canvasItem.id = 'Pseudo-' + Math.floor(Math.random() * 99999) + 1
                 }
 
                 if (!$.isEmptyObject(selectedCanvasItems.parent)) {
@@ -705,7 +721,8 @@
                     'item_id': canvasItem.item_id,
                     'position_x': canvasItem.position_x,
                     'position_y': canvasItem.position_y,
-                    'pseudo_item': isPseudoCanvasItem
+                    'pseudo_item': isPseudoCanvasItem,
+                    'soft_deleted': false
                 };
 
                 var item = items[canvasItem.item_id];
@@ -715,6 +732,32 @@
                 this.view.addCanvasItem(item, canvasItem); // Render canvas item to view
                 this.updateSelected([canvasItem.id]); // Select the newly added item
                 this.initializeDraggable(); // Allow it to be dragged
+
+                if (isPseudoCanvasItem) {
+                    historyController.addCanvasHistory({
+                        canvas_item_id: canvasItem.id,
+                        item_id: canvasItem.item_id,
+                        type: 'addition',
+                        previous_position_x: canvasItem.position_x,
+                        previous_position_y: canvasItem.position_y,
+                        position_x: null,
+                        position_y: null
+                    });
+                }
+            }
+
+            addSoftDeletedCanvasItem(softDeletedCanvasItem) {
+                var items = this.items,
+                    softDeletedCanvasItems = this.softDeletedCanvasItems;
+
+                softDeletedCanvasItems[softDeletedCanvasItem.id] = {
+                    'id': softDeletedCanvasItem.id,
+                    'item_id': softDeletedCanvasItem.item_id,
+                    'position_x': softDeletedCanvasItem.position_x,
+                    'position_y': softDeletedCanvasItem.position_y,
+                    'pseudo_item': softDeletedCanvasItem.pseudo_item,
+                    'soft_deleted': true
+                };
             }
 
             updatePseudoCanvasItemToReal(oldCanvasItemId, newCanvasItemId) {
@@ -733,7 +776,7 @@
                 canvasItem.id = newCanvasItemId;
 
                 canvasItemsGrid[canvasItem.position_x][canvasItem.position_y] = newCanvasItemId;
-
+                
                 $.grep(canvasHistory, function(e){
                     if (e.canvas_item_id == oldCanvasItemId) {
                         e.canvas_item_id = newCanvasItemId;
@@ -743,11 +786,34 @@
                 historyController.canvasHistory = canvasHistory;
             }
 
+            // TODO: Clean
+            updateSoftPseudoCanvasItemToReal(oldSoftDeletedCanvasItemId, newSoftDeletedCanvasItemId) {
+                var softDeletedCanvasItems = this.softDeletedCanvasItems,
+                    canvasHistory = historyController.canvasHistory;
+
+                Object.defineProperty(softDeletedCanvasItems, newSoftDeletedCanvasItemId,
+                    Object.getOwnPropertyDescriptor(softDeletedCanvasItems, oldSoftDeletedCanvasItemId));
+
+                delete softDeletedCanvasItems[oldSoftDeletedCanvasItemId];
+
+                var softDeletedCanvasItem = softDeletedCanvasItems[newSoftDeletedCanvasItemId];
+
+                softDeletedCanvasItem.pseudo_item = false;
+                softDeletedCanvasItem.id = newSoftDeletedCanvasItemId;
+                
+                $.grep(canvasHistory, function(e){
+                    if (e.canvas_item_id == oldSoftDeletedCanvasItemId) {
+                        e.canvas_item_id = newSoftDeletedCanvasItemId;
+                    }
+                });
+
+                historyController.canvasHistory = canvasHistory;
+            }
 
             removeCanvasItem(canvasItemId) {
                 var canvasItems = this.canvasItems,
                     canvasItemsGrid = this.canvasItemsGrid,
-                    softDeletedCanvasItemIds = this.softDeletedCanvasItemIds, 
+                    softDeletedCanvasItems = this.softDeletedCanvasItems, 
                     view = this.view;
 
                 var canvasItem = canvasItems[canvasItemId];
@@ -756,19 +822,45 @@
 
                 this.updateConnectedCanvasItems(canvasItem.position_x, canvasItem.position_y, [], null)
 
-                delete canvasItems[canvasItemId];
-                softDeletedCanvasItemIds.push(canvasItemId);
+                this.addSoftDeletedCanvasItem(canvasItem);
+                delete canvasItems[canvasItem.id];
 
                 view.removeCanvasItem(canvasItemId);
+            }
+
+            restoreSoftDeletedCanvasItem(softDeletedCanvasItemId) {
+                var softDeletedCanvasItems = this.softDeletedCanvasItems;
+
+                this.addCanvasItem($.extend({}, softDeletedCanvasItems[softDeletedCanvasItemId]));
+
+                delete softDeletedCanvasItems[softDeletedCanvasItemId];
             }
 
             softDeleteCanvasItems() {
                 var canvasItems = this.canvasItems;
 
+                historyController.addCanvasHistory({
+                    canvas_item_id: selectedCanvasItems.parent.id,
+                    type: 'deletion',
+                    previous_position_x: canvasItems[selectedCanvasItems.parent.id].position_x,
+                    previous_position_y: canvasItems[selectedCanvasItems.parent.id].position_y,
+                    position_x: null,
+                    position_y: null
+                });
+
                 this.removeCanvasItem(selectedCanvasItems.parent.id);
 
                 for (var canvasItemId in selectedCanvasItems.children) {
-                    this.removeCanvasItem(canvasItemId);
+                    historyController.addCanvasHistory({
+                        canvas_item_id: canvasItemId,
+                        type: 'deletion',
+                        previous_position_x: canvasItems[canvasItemId].position_x,
+                        previous_position_y: canvasItems[canvasItemId].position_y,
+                        position_x: null,
+                        position_y: null
+                    });
+
+                    this.removeCanvasItem(canvasItemId); // TODO
                 }
 
                 this.updateSelected(Object.keys(canvasItems).length > 0 ? [Object.keys(canvasItems)[0]] : []);
@@ -776,10 +868,10 @@
 
             deleteCanvasItems() {
                 var canvasItemModel = this.canvasItemModel,
-                    softDeletedCanvasItemIds = this.softDeletedCanvasItemIds,
+                    softDeletedCanvasItems = this.softDeletedCanvasItems,
                     classId = this.classId;
 
-                canvasItemModel.delete(classId, softDeletedCanvasItemIds);
+                canvasItemModel.delete(classId, softDeletedCanvasItems);
             }
 
             isCanvasItemInPosition(positionX, positionY) {
@@ -1217,11 +1309,14 @@
 
                 if (userConfirmation) {      
                     var canvasItems = this.canvasItems,
+                        softDeletedCanvasItems = this.softDeletedCanvasItems,
                         canvasItemModel = this.canvasItemModel,
                         classId = this.classId;
 
-                    for (var canvasItemId in canvasItems) {
-                        var canvasItem = canvasItems[canvasItemId];
+                    var mergedCanvasItems = $.extend({}, canvasItems, softDeletedCanvasItems); // Merge canvasItems and softDeletedCanvasItems since we need to store softDeleted too so user use history to revert back later
+
+                    for (var canvasItemId in mergedCanvasItems) {
+                        var canvasItem = mergedCanvasItems[canvasItemId];
 
                         if (canvasItem.pseudo_item) {
                             this.view.removeCanvasItem(canvasItemId);
@@ -1232,7 +1327,7 @@
                     canvasItemModel.updateCanvasItems(classId, canvasItems);
                 }
 
-                this.deleteCanvasItems(this.softDeletedCanvasItemIds);
+                this.deleteCanvasItems(this.softDeletedCanvasItems);
 
                 historyController.storeCanvasHistory();
             }
@@ -1308,23 +1403,9 @@
                     canvasHistoryModel = this.canvasHistoryModel,
                     maxCanvasHistoryCount = this.maxCanvasHistoryCount,
                     canvasActionUndoCount = this.canvasActionUndoCount,
-                    classId = canvasController.classId,
-                    softDeletedCanvasItemIds = canvasController.softDeletedCanvasItemIds;
+                    classId = canvasController.classId;
 
                 canvasHistory.slice(Math.max(canvasHistory.length - maxCanvasHistoryCount, 0)); // Don't send > maxCanvasHistoryCount to DB
-
-                for (let index = 0; index < canvasHistory.length; index++) {
-                    if (softDeletedCanvasItemIds.indexOf(canvasHistory[index].canvas_item_id.toString()) != -1) {
-
-                        canvasHistory.splice(index, 1);
-
-                        if (canvasActionUndoCount > 1) {
-                            canvasActionUndoCount--;
-                        }
-
-                        index--;
-                    }
-                }
 
                 canvasHistoryModel.store(classId, canvasHistory, canvasActionUndoCount);
 
@@ -1335,28 +1416,39 @@
                 var canvasHistory = this.canvasHistory,
                     canvasActionUndoCount = this.canvasActionUndoCount,
                     canvasItems = canvasController.canvasItems,
-                    view = this.view;
+                    view = this.view,
+                    softDeletedCanvasItems = canvasController.softDeletedCanvasItems;
 
                 if (Object.keys(canvasHistory).length - canvasActionUndoCount >= 0) {
                     var action = canvasHistory[canvasHistory.length - canvasActionUndoCount];
 
                     var canvasItemId = action.canvas_item_id;
-                    var canvasItem = canvasItems[canvasItemId];
 
-                    var currentItemPositionX = canvasItem.position_x;
-                    var currentItemPositionY = canvasItem.position_y;
+                    switch (action.type) {
+                        case 'deletion':
+                            canvasController.restoreSoftDeletedCanvasItem(canvasItemId, action.item_id, action.previous_position_x, action.previous_position_y);
+                            break;
+                        case 'addition':
+                            canvasController.updateSelected([]); // Better way of selecting single item or soft deleting single item
+                            canvasController.updateSelected([canvasItemId]);
+                            canvasController.softDeleteCanvasItems();
+                            break;
+                        default:
+                            var canvasItem = canvasItems[canvasItemId];
 
-                    var canvasItemPositionX = action.previous_position_x;
-                    var canvasItemPositionY = action.previous_position_y;
+                            var currentItemPositionX = canvasItem.position_x;
+                            var currentItemPositionY = canvasItem.position_y;
 
-                    // TODO: Check action type
+                            var canvasItemPositionX = action.previous_position_x;
+                            var canvasItemPositionY = action.previous_position_y;
 
-                    canvasController.updateCanvasItemPosition(canvasItem, canvasItemPositionX, canvasItemPositionY)
-                    view.updateCanvasItemPosition(canvasItemId, canvasItemPositionX, canvasItemPositionY);
-                    canvasController.updateSelected([selectedCanvasItems.parent.id]);
+                            canvasController.updateCanvasItemPosition(canvasItem, canvasItemPositionX, canvasItemPositionY)
+                            view.updateCanvasItemPosition(canvasItemId, canvasItemPositionX, canvasItemPositionY);
+                            canvasController.updateSelected([selectedCanvasItems.parent.id]);
 
-                    canvasController.updateConnectedCanvasItems(canvasItemPositionX, canvasItemPositionY, [], null);
-                    canvasController.updateConnectedCanvasItems(currentItemPositionX, currentItemPositionY, [], null);
+                            canvasController.updateConnectedCanvasItems(canvasItemPositionX, canvasItemPositionY, [], null);
+                            canvasController.updateConnectedCanvasItems(currentItemPositionX, currentItemPositionY, [], null);
+                    } 
 
                     canvasActionUndoCount++;
 
@@ -1371,14 +1463,6 @@
                     canvasActionUndoCount = this.canvasActionUndoCount,
                     canvasItems = canvasController.canvasItems,
                     view = this.view;
-
-                console.log(canvasHistory.length);
-                console.log(canvasHistory);
-                console.log(canvasActionUndoCount);
-                console.log(canvasHistory.length - canvasActionUndoCount + 1);
-
-                console.log(canvasActionUndoCount);
-                console.log(canvasHistory[canvasHistory.length - canvasActionUndoCount + 1]);
 
                 if (canvasActionUndoCount > 1) {
                     var action = canvasHistory[canvasHistory.length - canvasActionUndoCount + 1];

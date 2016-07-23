@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Item;
 use App\CanvasItem;
+use App\CanvasHistory;
 
 use Auth;
 use Validator;
@@ -41,7 +42,11 @@ class ItemController extends Controller
 
             $storedCanvasItem->save();
 
-            $response = [$storedCanvasItem->id];
+            if ($canvasItem['soft_deleted'] === "true") {
+                $storedCanvasItem->delete();
+            }
+
+            $response = [$storedCanvasItem];
         }
 
         return $response;
@@ -60,6 +65,13 @@ class ItemController extends Controller
 
         if ($canvasItems != null) {
             foreach ($canvasItems as $canvasItem) {
+                if ($canvasItem['soft_deleted'] != null && $canvasItem['soft_deleted']) {
+                    $storedCanvasItem = CanvasItem::withTrashed()
+                        ->where('class_id', $classId)
+                        ->where('id', $canvasItem['id'])
+                        ->restore();
+                }
+
                 CanvasItem::where('class_id', $classId)
                     ->where('id', $canvasItem['id'])
                     ->update([
@@ -121,8 +133,23 @@ class ItemController extends Controller
         $request = $this->request;
         $classId = $request->input('class_id');
 
-        $canvasItems = CanvasItem::where('class_id', $classId)
+        $canvasItems = [
+            'canvas_items' => [],
+            'soft_deleted_canvas_items' => []
+        ];
+
+        $canvasItems['canvas_items'] = CanvasItem::where('class_id', $classId)
             ->get();
+
+        $canvasItems['soft_deleted_canvas_items'] = CanvasItem::onlyTrashed()
+            ->whereIn('id',
+                CanvasHistory::where('class_id', $classId)
+                    ->where('type', 'deletion')
+                    ->get()
+                    ->pluck('canvas_item_id')
+                    ->all()
+            )->get(); // Gets the required soft-deleted canvasItems by the canvasHistory
+
         return $canvasItems;
     }
 
@@ -130,9 +157,10 @@ class ItemController extends Controller
     {
         $request = $this->request;
         $classId = $request->input('class_id');
+        $canvasItems = $request->input('canvas_items');
 
-        if ($request->input('canvas_item_ids') != null) {
-            $canvasItemIds = $request->input('canvas_item_ids');
+        if ($canvasItems != null) {
+            $canvasItemIds = array_map(function($canvasItems) { return $canvasItems['id']; }, $canvasItems);
 
             CanvasItem::where('class_id', $classId)
                 ->whereIn('id', $canvasItemIds)

@@ -29,6 +29,7 @@ class CreateCanvasItemsTable extends Migration
             $table->integer('position_y');
 
             $table->timestamps();
+            $table->softDeletes();
         });
 
         DB::table('canvas_items')->insert([
