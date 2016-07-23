@@ -274,6 +274,8 @@
                     canvasController.classId = classId;
                     canvasController.clearSession();
                     canvasController.loadCanvasItems();
+
+                    historyController.loadCanvasHistory();
                 }
             });
 
@@ -1240,7 +1242,6 @@
 
                 this.canvasItems = {};
                 this.canvasItemsGrid = [];
-                historyController.canvasHistory = [];
 
                 selectedCanvasItems = {
                     parent: {},
