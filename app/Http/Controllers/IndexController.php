@@ -20,7 +20,7 @@ class IndexController extends Controller
     )
     {
         $classes = $classController->getClasses();
-        $items = $itemController->getItems(9);
+        $items = $itemController->index();
 
         if ($classes->first() != null) {
             $classStudents = $studentController->getClassStudents($classes->first()->id, 9);
@@ -44,6 +44,7 @@ class IndexController extends Controller
     public function getClassesDashboard(ClassController $classController)
     {
         $classes = $classController->getClasses();
+
         if ($classes->first() != null) {
             return redirect('/dashboard/classes/' . $classes->first()->id);
         } else {

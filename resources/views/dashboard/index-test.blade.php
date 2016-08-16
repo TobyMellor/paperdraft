@@ -476,35 +476,6 @@
             }
         }
 
-        // An 'item' is a classroom item from the database.
-        // e.g. Table - desk-1.png
-        // This is not specific to any single classroom nor is any position data stored here
-
-        // Example:
-        // [
-        //    {
-        //       "id": 1,
-        //       "item_name": "Student Desk",
-        //       "item_width": 32,
-        //       "item_height": 32,
-        //       "item_location": "desk.png"
-        //    }
-        // ]
-        class ItemModel {
-            getAll() {
-                $.ajax({
-                    url: '{{ url('api/items') }}',
-                    type: 'GET',
-                    data: {
-                        _token: token
-                    }
-                }).done(function(jsonItems) {
-                    canvasController.jsonItems = jsonItems;
-                    canvasController.loadCanvasItems();
-                });
-            }
-        }
-
         // An 'canvas item' is a classroom 'item' that is stored at a location for a given class
         // e.g. item: Table -- Canvas item: Table is stored at x: 25, y: 5
         // This is specific to a particular classroom, and the items can be any 'item' (a Table)
@@ -594,7 +565,19 @@
 
         class CanvasController {
             constructor(classId, gridSize = 23) {
-                this.jsonItems,
+                this.jsonItems = [
+                    @if (isset($items))
+                        @foreach ($items as $item)
+                            {
+                                'id': '{{ $item->id }}',
+                                'name': '{{ $item->name }}',
+                                'width': '{{ $item->width }}',
+                                'height': '{{ $item->height }}',
+                                'location': '{{ $item->location }}',
+                            },
+                        @endforeach
+                    @endif
+                ],
                 this.jsonCanvasItems;
 
                 this.canvasItems = {}, // e.g. Table is stored at X: 5, Y: 8 in the grid
@@ -606,14 +589,8 @@
                 this.gridSize = gridSize;
 
                 this.canvasItemModel = new CanvasItemModel,
-                this.itemModel = new ItemModel;
 
                 this.view = new View;
-            }
-
-            // TODO: Can't we just load this in with PHP?
-            loadItems() {
-                this.itemModel.getAll();
             }
 
             loadCanvasItems() {
@@ -635,6 +612,8 @@
 
                     this.addItem(item);
                 }
+
+                console.log(jsonCanvasItems);
 
                 if (jsonCanvasItems.canvas_items.canvas_items.length > 0) {
                     // Take JSON array of all canvasItems and store them locally
@@ -1500,7 +1479,7 @@
             var classId = parseInt($('.class-button:first').attr('class-id'));
 
             canvasController = new CanvasController(classId);
-            canvasController.loadItems();
+            canvasController.loadCanvasItems();
 
             historyController = new HistoryController();
             historyController.loadCanvasHistory();
