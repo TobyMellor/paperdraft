@@ -19,7 +19,7 @@ class CanvasItemController extends Controller
     {
         $classId = $request->input('class_id');
 
-        $validation = $this->validator(['class_id' => $classId]);
+        $validation = $this->classIdValidator(['class_id' => $classId]);
 
         if ($validation->fails()) {
             return response()->json([
@@ -228,7 +228,7 @@ class CanvasItemController extends Controller
     //     CanvasItem::insert($canvasItemsToPaste);
     // }
 
-    protected function validator(array $data)
+    protected function classIdValidator(array $data)
     {
         return Validator::make($data, [
             'class_id'     => 'required|integer|ownsclass'

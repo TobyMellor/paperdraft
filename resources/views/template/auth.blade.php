@@ -81,8 +81,9 @@
 	<!-- /page container -->
 
 	<script>
-	    function handleNotification(notificationContent, type)
-	    {
+		// notificationContent is the message e.g. 'hello' (string)
+		// type is the display type e.g. 'error' or 'success' (string)
+	    function handleNotification(notificationContent, type) {
 		    var n = noty({
 			    text: notificationContent,
 			    layout: 'topCenter',

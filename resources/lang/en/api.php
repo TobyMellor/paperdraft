@@ -37,5 +37,14 @@ return [
         'success' => [
             'index' => 'All of the items were successfully returned.'
         ]
+    ],
+    'canvas-history' => [
+        'success' => [
+            'index' => 'All of the history records were successfully returned.',
+            'store' => 'The history record was successfully stored.'
+        ],
+        'failure' => [
+            'store' => 'An error occured while storing the history record.'
+        ]
     ]
 ];

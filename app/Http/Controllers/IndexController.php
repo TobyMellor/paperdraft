@@ -4,9 +4,7 @@ namespace App\Http\Controllers;
 
 class IndexController extends Controller
 {
-    public function __construct()
-    {
-    }
+    public function __construct() {}
 
     /**
      * Display the appropriate dashboard.
@@ -30,7 +28,7 @@ class IndexController extends Controller
                 ->with('classes', $classes)
                 ->with('items', $items);
         } else {
-            //Lets do something here for new users e.g. redirect them to force make a class
+            // Lets do something here for new users e.g. redirect them to force make a class
             return view('dashboard.index')
                 ->with('items', $items);
         }
@@ -48,7 +46,7 @@ class IndexController extends Controller
         if ($classes->first() != null) {
             return redirect('/dashboard/classes/' . $classes->first()->id);
         } else {
-            //Lets do something here for new users
+            // Lets do something here for new users
             return view('dashboard.classes');
         }
     }

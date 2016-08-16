@@ -306,9 +306,10 @@
         var token = '{{ csrf_token() }}';
         var assetsBasePath = '{{ asset('assets/images/objects') }}/';
 
-        var canvasController;
-        var historyController;
-        var utils;
+        var canvasController,
+            historyController,
+            notificationController,
+            utils;
 
         var hasUserMadeChanges = false;
 
@@ -445,6 +446,25 @@
         //    }
         // ]
         class CanvasHistoryModel {
+            index(classId) {
+                $.ajax({
+                    url: '{{ url('api/canvas-history') }}',
+                    type: 'GET',
+                    data: {
+                        _token: token,
+                        class_id: classId
+                    }
+                }).done(function(jsonResponse) {
+                    if (jsonResponse.error == 0) {
+                        historyController.jsonCanvasHistory = jsonResponse;
+
+                        historyController.init();
+                    } else {
+                        notificationController.handleNotification(jsonResponse.message, 'error');
+                    }
+                });
+            }
+
             store(classId, canvasHistory, canvasActionUndoCount) {
                 $.ajax({
                     url: '{{ url('api/canvas-history') }}',
@@ -455,23 +475,10 @@
                         canvas_action_undo_count: canvasActionUndoCount,
                         class_id: classId
                     }
-                }).done(function(statusMessage) {
-                    console.log(statusMessage);
-                });
-            }
-
-            getAll(classId) {
-                $.ajax({
-                    url: '{{ url('api/canvas-history') }}',
-                    type: 'GET',
-                    data: {
-                        _token: token,
-                        class_id: classId
+                }).done(function(jsonResponse) {
+                    if (jsonResponse.error == 1) {
+                        notificationController.handleNotification(jsonResponse.message, 'error');
                     }
-                }).done(function(jsonCanvasHistory) {
-                    historyController.jsonCanvasHistory = jsonCanvasHistory;
-
-                    historyController.init();
                 });
             }
         }
@@ -491,19 +498,39 @@
         //     }
         // ]
         class CanvasItemModel {
-            // TODO: only accept array of items
+            index(classId) {
+                $.ajax({
+                    url: '{{ url('api/canvas-item') }}',
+                    type: 'GET',
+                    data: {
+                        _token: token,
+                        class_id: classId
+                    }
+                }).done(function(jsonResponse) {
+                    if (jsonResponse.error == 0) {
+                        canvasController.jsonCanvasItems = jsonResponse;
+
+                        canvasController.init();
+                    } else {
+                        notificationController.handleNotification(jsonResponse.message, 'error');
+                    }
+                });
+            }
+
             store(classId, canvasItem) {
                 $.ajax({
                     url: '{{ url('api/canvas-item') }}',
                     type: 'POST',
-                    async: false, // Needs better solution
+                    async: false, // TODO: Needs better solution
                     data: {
                         _token: token,
                         canvas_item: canvasItem,
                         class_id: classId
                     }
-                }).done(function(canvasItems) {
-                    if (canvasItems != null || canvasItems.length == 1) {
+                }).done(function(jsonResponse) {
+                    if (jsonResponse.error == 0) {
+                        var canvasItem = jsonResponse.canvas_item;
+
                         canvasController.updatePseudoCanvasItemToReal(canvasItem.id, canvasItems[0].id, canvasItems[0].deleted_at == null ? false : true);
 
                         canvasItem.id = canvasItems[0].id;
@@ -514,12 +541,12 @@
                             canvasController.addSoftDeletedCanvasItem(canvasItem);
                         }
                     } else {
-                        console.log('Failed to load item.');
+                        notificationController.handleNotification(jsonResponse.message, 'error');
                     }
                 });
             }
 
-            delete(classId, softDeletedCanvasItems) {
+            destroy(classId, softDeletedCanvasItems) {
                 $.ajax({
                     url: '{{ url('api/canvas-item') }}',
                     type: 'DELETE',
@@ -528,12 +555,14 @@
                         canvas_items: softDeletedCanvasItems,
                         class_id: classId
                     }
-                }).done(function(response) {
-                    console.log(response);
+                }).done(function(jsonResponse) {
+                    if (jsonResponse.error == 1) {
+                        notificationController.handleNotification(jsonResponse.message, 'error');
+                    }
                 });
             }
 
-            updateCanvasItems(classId, canvasItems) {
+            batchUpdate(classId, canvasItems) {
                 $.ajax({
                     url: '{{ url('api/canvas-item') }}',
                     type: 'PUT',
@@ -542,23 +571,10 @@
                         canvas_items: canvasItems,
                         class_id: classId
                     }
-                }).done(function(responseJson) {
-                    console.log(responseJson);
-                });
-            }
-
-            getAll(classId) {
-                $.ajax({
-                    url: '{{ url('api/canvas-item') }}',
-                    type: 'GET',
-                    data: {
-                        _token: token,
-                        class_id: classId
+                }).done(function(jsonResponse) {
+                    if (jsonResponse.error == 1) {
+                        notificationController.handleNotification(jsonResponse.message, 'error');
                     }
-                }).done(function(jsonCanvasItems) {
-                    canvasController.jsonCanvasItems = jsonCanvasItems;
-
-                    canvasController.init();
                 });
             }
         }
@@ -594,7 +610,7 @@
             }
 
             loadCanvasItems() {
-                this.canvasItemModel.getAll(this.classId);
+                this.canvasItemModel.index(this.classId);
             }
 
             init() {
@@ -612,8 +628,6 @@
 
                     this.addItem(item);
                 }
-
-                console.log(jsonCanvasItems);
 
                 if (jsonCanvasItems.canvas_items.canvas_items.length > 0) {
                     // Take JSON array of all canvasItems and store them locally
@@ -837,7 +851,9 @@
                     softDeletedCanvasItems = this.softDeletedCanvasItems,
                     classId = this.classId;
 
-                canvasItemModel.delete(classId, softDeletedCanvasItems);
+                if (softDeletedCanvasItems.length > 0) {
+                    canvasItemModel.destroy(classId, softDeletedCanvasItems);
+                }
             }
 
             isCanvasItemInPosition(positionX, positionY) {
@@ -1290,7 +1306,7 @@
                         }
                     }
 
-                    canvasItemModel.updateCanvasItems(classId, canvasItems);
+                    canvasItemModel.batchUpdate(classId, canvasItems);
                 }
 
                 this.deleteCanvasItems(this.softDeletedCanvasItems);
@@ -1328,7 +1344,7 @@
             loadCanvasHistory() {
                 var canvasHistoryModel = this.canvasHistoryModel;
 
-                canvasHistoryModel.getAll(canvasController.classId);
+                canvasHistoryModel.index(canvasController.classId);
             }
 
             init() {
@@ -1464,6 +1480,22 @@
             }
         }
 
+        class NotificationController {
+            // notificationContent is the message e.g. 'hello' (string)
+            // type is the display type e.g. 'error' or 'success' (string)
+            handleNotification(notificationContent, type, timeout = 7500) {
+                var n = noty({
+                    text: notificationContent,
+                    layout: 'topCenter',
+                    type: type
+                });
+
+                setTimeout(function() {
+                    n.close();
+                }, timeout);
+            }
+        }
+
         class Utils {
             isArrayInArray(arrayToSearch, arrayToFind) {
                 for (let i = 0; i < arrayToSearch.length; i++) {
@@ -1485,6 +1517,7 @@
             historyController.loadCanvasHistory();
 
             utils = new Utils;
+            notificationController = new NotificationController;
         }
 
         bootstrapper(); // Start initializing
