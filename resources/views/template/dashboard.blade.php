@@ -7,41 +7,41 @@
         <title>@yield('title') | SeatingPlanner</title>
         <!-- Global stylesheets -->
         <link href="https://fonts.googleapis.com/css?family=Roboto:400,300,100,500,700,900" rel="stylesheet" type="text/css">
-        <link href="/assets/css/icons/icomoon/styles.css" rel="stylesheet" type="text/css">
-        <link href="/assets/css/bootstrap.min.css" rel="stylesheet" type="text/css">
-        <link href="/assets/css/core.min.css" rel="stylesheet" type="text/css">
-        <link href="/assets/css/components.min.css" rel="stylesheet" type="text/css">
-        <link href="/assets/css/colors.min.css" rel="stylesheet" type="text/css">
-        <link href="/assets/css/seatingplanner.css" rel="stylesheet" type="text/css">
+        <link href="{{ asset('assets/css/icons/icomoon/styles.css') }}" rel="stylesheet" type="text/css">
+        <link href="{{ asset('assets/css/bootstrap.min.css') }}" rel="stylesheet" type="text/css">
+        <link href="{{ asset('assets/css/core.min.css') }}" rel="stylesheet" type="text/css">
+        <link href="{{ asset('assets/css/components.min.css') }}" rel="stylesheet" type="text/css">
+        <link href="{{ asset('assets/css/colors.min.css') }}" rel="stylesheet" type="text/css">
+        <link href="{{ asset('assets/css/seatingplanner.css') }}" rel="stylesheet" type="text/css">
         <!-- /global stylesheets -->
 
         <!-- Core JS files -->
-        <script type="text/javascript" src="/assets/js/plugins/loaders/pace.min.js"></script>
-        <script type="text/javascript" src="/assets/js/core/libraries/jquery.min.js"></script>
-        <script type="text/javascript" src="/assets/js/core/libraries/bootstrap.min.js"></script>
-        <script type="text/javascript" src="/assets/js/plugins/loaders/blockui.min.js"></script>
+        <script type="text/javascript" src="{{ asset('assets/js/plugins/loaders/pace.min.js') }}"></script>
+        <script type="text/javascript" src="{{ asset('assets/js/core/libraries/jquery.min.js') }}"></script>
+        <script type="text/javascript" src="{{ asset('assets/js/core/libraries/bootstrap.min.js') }}"></script>
+        <script type="text/javascript" src="{{ asset('assets/js/plugins/loaders/blockui.min.js') }}"></script>
         <!-- /core JS files -->
 
         <!-- Theme JS files -->
-        <script type="text/javascript" src="/assets/js/core/libraries/jquery_ui/interactions.min.js"></script>
-        <script type="text/javascript" src="/assets/js/pages/appearance_draggable_panels.js"></script>
-        <script type="text/javascript" src="/assets/js/core/libraries/jquery_ui/touch.min.js"></script>
-        <script type="text/javascript" src="/assets/js/core/libraries/jquery_ui/effects.min.js"></script>
-        <script type="text/javascript" src="/assets/js/plugins/uploaders/fileinput.min.js"></script>
-        <script type="text/javascript" src="/assets/js/plugins/buttons/spin.min.js"></script>
-        <script type="text/javascript" src="/assets/js/plugins/buttons/ladda.min.js"></script>
-        <script type="text/javascript" src="/assets/js/core/app.js"></script>
-        <script type="text/javascript" src="/assets/js/pages/components_buttons.js"></script>
-        <script type="text/javascript" src="/assets/js/pages/components_modals.js"></script>
-        <script type="text/javascript" src="/assets/js/pages/uploader_bootstrap.js"></script>
-        <script type="text/javascript" src="/assets/js/plugins/notifications/noty.min.js"></script>
+        <script type="text/javascript" src="{{ asset('assets/js/core/libraries/jquery_ui/interactions.min.js') }}"></script>
+        <script type="text/javascript" src="{{ asset('assets/js/pages/appearance_draggable_panels.js') }}"></script>
+        <script type="text/javascript" src="{{ asset('assets/js/core/libraries/jquery_ui/touch.min.js') }}"></script>
+        <script type="text/javascript" src="{{ asset('assets/js/core/libraries/jquery_ui/effects.min.js') }}"></script>
+        <script type="text/javascript" src="{{ asset('assets/js/plugins/uploaders/fileinput.min.js') }}"></script>
+        <script type="text/javascript" src="{{ asset('assets/js/plugins/buttons/spin.min.js') }}"></script>
+        <script type="text/javascript" src="{{ asset('assets/js/plugins/buttons/ladda.min.js') }}"></script>
+        <script type="text/javascript" src="{{ asset('assets/js/core/app.js') }}"></script>
+        <script type="text/javascript" src="{{ asset('assets/js/pages/components_buttons.js') }}"></script>
+        <script type="text/javascript" src="{{ asset('assets/js/pages/components_modals.js') }}"></script>
+        <script type="text/javascript" src="{{ asset('assets/js/pages/uploader_bootstrap.js') }}"></script>
+        <script type="text/javascript" src="{{ asset('assets/js/plugins/notifications/noty.min.js') }}"></script>
     </head>
 
     <body>
         <!-- Main navbar -->
         <div class="navbar navbar-inverse">
             <div class="navbar-header">
-                <a class="navbar-brand" href="index.html"><img src="/assets/images/logo_light.png" alt=""></a>
+                <a class="navbar-brand" href="{{ url('/') }}"><img src="{{ asset('assets/images/logo_light.png') }}" alt=""></a>
                 <ul class="nav navbar-nav visible-xs-block">
                     <li><a data-toggle="collapse" data-target="#navbar-mobile"><i class="icon-tree5"></i></a></li>
                     <li><a class="sidebar-mobile-main-toggle"><i class="icon-paragraph-justify3"></i></a></li>
@@ -79,7 +79,7 @@
                         <div class="sidebar-user">
                             <div class="category-content">
                                 <div class="media">
-                                    <a href="#" class="media-left"><img src="/assets/images/placeholder.jpg" class="img-circle img-sm" alt=""></a>
+                                    <a href="#" class="media-left"><img src="{{ asset('assets/images/placeholder.jpg') }}" class="img-circle img-sm" alt=""></a>
                                     <div class="media-body">
                                         <span class="media-heading text-semibold">{{ current(explode("@", Auth::user()->email, 2)) }}</span>
                                         <div class="text-size-mini text-muted">

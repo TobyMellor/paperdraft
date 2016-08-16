@@ -28,7 +28,7 @@ class CanvasHistoryController extends Controller
      *
      * @return \Illuminate\Http\Redirect
      */
-    public function storeCanvasHistory()
+    public function store()
     {
         $request = $this->request;
         $newCanvasHistoryRecords = $request->input('canvas_history');
@@ -56,7 +56,7 @@ class CanvasHistoryController extends Controller
                 ->update([
                     'canvas_action_undo_count' => $canvasActionUndoCount
                 ]);
-                
+
             CanvasHistory::where('class_id', $classId)->delete();
 
             foreach ($newCanvasHistoryRecords as $key => $newCanvasHistoryRecord) {
@@ -78,7 +78,7 @@ class CanvasHistoryController extends Controller
      *
      * @return \Illuminate\Http\Redirect
      */
-    public function getCanvasHistory()
+    public function index()
     {
         $request = $this->request;
         $classId = $request->input('class_id');

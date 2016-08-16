@@ -11,77 +11,186 @@ use Validator;
 
 use Illuminate\Http\Request;
 
-// TODO: Use built in json manager
 class ItemController extends Controller
 {
-    public function __construct(Request $request)
+    /**
+     * Display a listing of the canvas-items.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function index(Request $request)
     {
-        $this->request = $request;
+        $classId = $request->input('class_id');
+
+        $canvasItems = [];
+
+        $canvasItems['canvas_items'] = CanvasItem::where('class_id', $classId)
+            ->get();
+
+        $canvasItems['soft_deleted_canvas_items'] = CanvasItem::onlyTrashed()
+            ->whereIn('id',
+                CanvasHistory::where('class_id', $classId)
+                    ->where('type', 'deletion')
+                    ->get()
+                    ->pluck('canvas_item_id')
+                    ->all()
+            )->get(); // Gets the required soft-deleted canvasItems by the canvasHistory
+
+        return response()->json([
+            'canvas_items' => $canvasItems,
+            'error' => 0,
+            'message' => trans('api.canvas-item.success.index')
+        ]);
     }
 
     /**
-     * Store the canvas item in the database.
+     * Store a newly created resource in storage.
      *
-     * @return \Illuminate\Http\Redirect
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
      */
-    public function storeCanvasItem()
+    public function store(Request $request)
     {
-        $request = $this->request;
         $canvasItem = $request->input('canvas_item');
         $classId = $request->input('class_id');
 
-        $response = [];
+        $storedCanvasItem = new CanvasItem;
 
-        if ($canvasItem != null) {
-            $storedCanvasItem = new CanvasItem;
+        $storedCanvasItem->item_id = $canvasItem['item_id'];
+        $storedCanvasItem->class_id = $classId;
+        $storedCanvasItem->position_x = $canvasItem['position_x'];
+        $storedCanvasItem->position_y = $canvasItem['position_y'];
 
-            $storedCanvasItem->item_id = $canvasItem['item_id'];
-            $storedCanvasItem->class_id = $classId;
-            $storedCanvasItem->position_x = $canvasItem['position_x'];
-            $storedCanvasItem->position_y = $canvasItem['position_y'];
+        $storedCanvasItem->save();
 
-            $storedCanvasItem->save();
-
-            if ($canvasItem['soft_deleted'] === "true") {
-                $storedCanvasItem->delete();
-            }
-
-            $response = [$storedCanvasItem];
+        if ($canvasItem['soft_deleted'] === "true") {
+            $storedCanvasItem->delete();
         }
 
-        return $response;
+        return response()->json([
+            'canvas_item' => $storedCanvasItem,
+            'error' => 0,
+            'message' => trans('api.canvas-item.success.store')
+        ]);
     }
 
     /**
-     * Update all the canvas items for a class
+     * Display the specified resource.
      *
-     * @return \Illuminate\Http\Redirect
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
      */
-    public function updateCanvasItems()
+    public function show($id) {} // TODO
+
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function update(Request $request, $id)
     {
-        $request = $this->request;
+        $canvasItem = $request->input('canvas_item');
+        $classId = $request->input('class_id');
+
+        if ($canvasItem['soft_deleted'] != null && $canvasItem['soft_deleted']) {
+            $storedCanvasItem = CanvasItem::withTrashed()
+                ->where('class_id', $classId)
+                ->where('id', $id)
+                ->restore();
+        }
+
+        CanvasItem::where('class_id', $classId)
+            ->where('id', $id)
+            ->update([
+                'position_x' => $canvasItem['position_x'],
+                'position_y' => $canvasItem['position_y']
+            ]);
+
+        return response()->json([
+            'canvas_item' => $canvasItem,
+            'error' => 0,
+            'message' => trans('api.canvas-item.success.update')
+        ]);
+    }
+
+    /**
+     * Update a batch of resources in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function batchUpdate(Request $request)
+    {
         $canvasItems = $request->input('canvas_items');
         $classId = $request->input('class_id');
 
-        if ($canvasItems != null) {
-            foreach ($canvasItems as $canvasItem) {
-                if ($canvasItem['soft_deleted'] != null && $canvasItem['soft_deleted']) {
-                    $storedCanvasItem = CanvasItem::withTrashed()
-                        ->where('class_id', $classId)
-                        ->where('id', $canvasItem['id'])
-                        ->restore();
-                }
+        $responses = [];
 
-                CanvasItem::where('class_id', $classId)
-                    ->where('id', $canvasItem['id'])
-                    ->update([
-                        'position_x' => $canvasItem['position_x'],
-                        'position_y' => $canvasItem['position_y']
-                    ]);
-            }
+        foreach ($canvasItems as $canvasItem) {
+            $request->request->add(['canvas_item' => $canvasItem]);
+
+            array_push($responses, $this->update($request, $canvasItem['id'])->getData()->canvas_item);
         }
 
-        return $canvasItems;
+        return response()->json([
+            'canvas_items' => $responses,
+            'error' => 0,
+            'message' => trans('api.canvas-item.success.batch-update')
+        ]);
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function destroy(Request $request, $id)
+    {
+        $classId = $request->input('class_id');
+        $canvasItem = $request->input('canvas_item');
+
+        // $canvasItemIds = array_map(function($canvasItems) { return $canvasItems['id']; }, $canvasItems);
+
+        // CanvasItem::where('class_id', $classId)
+        //     ->whereIn('id', $canvasItemIds)
+        //     ->delete();
+
+        CanvasItem::where('class_id', $classId)
+            ->where('id', $id)
+            ->delete();
+
+        return response()->json([
+            'error' => 0,
+            'message' => trans('api.canvas-item.success.destroy')
+        ]);
+    }
+
+    /**
+     * Remove a batch of resources from storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function batchDestroy(Request $request)
+    {
+        $classId = $request->input('class_id');
+        $canvasItems = $request->input('canvas_items');
+
+        $canvasItemIds = array_map(function($canvasItems) { return $canvasItems['id']; }, $canvasItems);
+
+        CanvasItem::where('class_id', $classId)
+            ->whereIn('id', $canvasItemIds)
+            ->delete();
+
+        return response()->json([
+            'error' => 0,
+            'message' => trans('api.canvas-item.success.batch-destroy')
+        ]);
     }
 
     /**
@@ -123,50 +232,20 @@ class ItemController extends Controller
         return $items;
     }
 
-    /**
-     * Get all canvas items
-     *
-     * @return \Illuminate\Http\Redirect
-     */
-    public function getCanvasItems()
-    {
-        $request = $this->request;
-        $classId = $request->input('class_id');
+    // public function deleteCanvasItems()
+    // {
+    //     $request = $this->request;
+    //     $classId = $request->input('class_id');
+    //     $canvasItems = $request->input('canvas_items');
 
-        $canvasItems = [
-            'canvas_items' => [],
-            'soft_deleted_canvas_items' => []
-        ];
+    //     if ($canvasItems != null) {
+    //         $canvasItemIds = array_map(function($canvasItems) { return $canvasItems['id']; }, $canvasItems);
 
-        $canvasItems['canvas_items'] = CanvasItem::where('class_id', $classId)
-            ->get();
-
-        $canvasItems['soft_deleted_canvas_items'] = CanvasItem::onlyTrashed()
-            ->whereIn('id',
-                CanvasHistory::where('class_id', $classId)
-                    ->where('type', 'deletion')
-                    ->get()
-                    ->pluck('canvas_item_id')
-                    ->all()
-            )->get(); // Gets the required soft-deleted canvasItems by the canvasHistory
-
-        return $canvasItems;
-    }
-
-    public function deleteCanvasItems()
-    {
-        $request = $this->request;
-        $classId = $request->input('class_id');
-        $canvasItems = $request->input('canvas_items');
-
-        if ($canvasItems != null) {
-            $canvasItemIds = array_map(function($canvasItems) { return $canvasItems['id']; }, $canvasItems);
-
-            CanvasItem::where('class_id', $classId)
-                ->whereIn('id', $canvasItemIds)
-                ->delete(); 
-        }
-    }
+    //         CanvasItem::where('class_id', $classId)
+    //             ->whereIn('id', $canvasItemIds)
+    //             ->delete(); 
+    //     }
+    // }
 
     protected function validator(array $data)
     {

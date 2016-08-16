@@ -220,7 +220,7 @@
 @stop
 @section('scripts')
     <script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/raphael/2.1.0/raphael-min.js"></script>
-    <script type="text/javascript" src="/assets/js/plugins/drag_selection.js"></script>
+    <script type="text/javascript" src="{{ asset('assets/js/plugins/drag_selection.js') }}"></script>
 
     <script>
         $(document).ready(function() {
@@ -327,9 +327,8 @@
                 var itemWidth = item.width;
                 var itemHeight = item.height;
 
-                // TODO: correct path /w laravel
                 $('.drop-target').append(
-                    '<div class="drag-item" canvas-item-id="' + canvasItemId + '" style="display: none; left: ' + canvasItemPositionX + 'px; top: ' + canvasItemPositionY + 'px; background-image: url(\'/assets/images/objects/' + itemLocation + '\'); background-size: ' + itemWidth + 'px; height: ' + itemHeight + 'px; width: ' + itemWidth + 'px;"></div>'
+                    '<div class="drag-item" canvas-item-id="' + canvasItemId + '" style="display: none; left: ' + canvasItemPositionX + 'px; top: ' + canvasItemPositionY + 'px; background-image: url(\'{{ asset('assets/images/objects') }}/' + itemLocation + '\'); background-size: ' + itemWidth + 'px; height: ' + itemHeight + 'px; width: ' + itemWidth + 'px;"></div>'
                 );
 
                 $('.drop-target').children().show();
@@ -448,7 +447,7 @@
         class CanvasHistoryModel {
             store(classId, canvasHistory, canvasActionUndoCount) {
                 $.ajax({
-                    url: '/canvas-history',
+                    url: '{{ url('api/canvas-history') }}',
                     type: 'POST',
                     data: {
                         _token: token,
@@ -463,7 +462,7 @@
 
             getAll(classId) {
                 $.ajax({
-                    url: '/canvas-history',
+                    url: '{{ url('api/canvas-history') }}',
                     type: 'GET',
                     data: {
                         _token: token,
@@ -494,7 +493,7 @@
         class ItemModel {
             getAll() {
                 $.ajax({
-                    url: '/items',
+                    url: '{{ url('api/items') }}',
                     type: 'GET',
                     data: {
                         _token: token
@@ -524,7 +523,7 @@
             // TODO: only accept array of items
             store(classId, canvasItem) {
                 $.ajax({
-                    url: '/canvas-item',
+                    url: '{{ url('api/canvas-item') }}',
                     type: 'POST',
                     async: false, // Needs better solution
                     data: {
@@ -551,7 +550,7 @@
 
             delete(classId, softDeletedCanvasItems) {
                 $.ajax({
-                    url: '/canvas-items',
+                    url: '{{ url('api/canvas-item') }}',
                     type: 'DELETE',
                     data: {
                         _token: token,
@@ -565,7 +564,7 @@
 
             updateCanvasItems(classId, canvasItems) {
                 $.ajax({
-                    url: '/canvas-items',
+                    url: '{{ url('api/canvas-item') }}',
                     type: 'PUT',
                     data: {
                         _token: token,
@@ -579,7 +578,7 @@
 
             getAll(classId) {
                 $.ajax({
-                    url: '/canvas-items',
+                    url: '{{ url('api/canvas-item') }}',
                     type: 'GET',
                     data: {
                         _token: token,
@@ -637,16 +636,16 @@
                     this.addItem(item);
                 }
 
-                if (jsonCanvasItems.canvas_items.length > 0) {
+                if (jsonCanvasItems.canvas_items.canvas_items.length > 0) {
                     // Take JSON array of all canvasItems and store them locally
-                    for (var jsonCanvasItem in jsonCanvasItems.canvas_items) {
-                        var canvasItem = jsonCanvasItems.canvas_items[jsonCanvasItem];
+                    for (var jsonCanvasItem in jsonCanvasItems.canvas_items.canvas_items) {
+                        var canvasItem = jsonCanvasItems.canvas_items.canvas_items[jsonCanvasItem];
 
                         this.addCanvasItem(canvasItem);
                     }
 
-                    for (var jsonSoftDeletedCanvasItem in jsonCanvasItems.soft_deleted_canvas_items) {
-                        var softDeletedCanvasItem = jsonCanvasItems.soft_deleted_canvas_items[jsonSoftDeletedCanvasItem];
+                    for (var jsonSoftDeletedCanvasItem in jsonCanvasItems.canvas_items.soft_deleted_canvas_items) {
+                        var softDeletedCanvasItem = jsonCanvasItems.canvas_items.soft_deleted_canvas_items[jsonSoftDeletedCanvasItem];
 
                         this.addSoftDeletedCanvasItem(softDeletedCanvasItem);
                     }
@@ -1383,8 +1382,6 @@
                     position_y: canvasHistoryRecord.position_y
                 }
             }
-
-            removeCanvasHistory() {}
 
             storeCanvasHistory() {
                 var canvasHistory = this.canvasHistory,
