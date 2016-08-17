@@ -241,6 +241,13 @@
                 canvasController.updateSelected(selectedCanvasItemIds);
             });
 
+            $('.drop-target').on('click', '.drag-item', function() {
+                var canvasItemId = canvasController.view.getCanvasItemId($(this));
+
+                canvasController.updateSelected([], false);
+                canvasController.updateSelected([canvasItemId]);
+            });
+
             $('.create-canvas-item').click(function() {
                 var itemId = parseInt($(this).attr('item-id'));
 
@@ -1042,7 +1049,7 @@
             //     Children - Items (if any) that have a relative position to the parent
             // This will also update the selectedBoard in the view
             // Accepts array of canvasItemIds e.g. [2, 5, 7]
-            updateSelected(canvasItemIds) {
+            updateSelected(canvasItemIds, shouldClearView = true) {
                 var canvasItems = this.canvasItems,
                     items = this.items,
                     view = this.view;
@@ -1109,7 +1116,9 @@
                         children: {}
                     };
 
-                    view.clearSelectedBoard(selectedCanvasItems);
+                    if (shouldClearView) {
+                        view.clearSelectedBoard(selectedCanvasItems);
+                    }
                 }
             }
 
