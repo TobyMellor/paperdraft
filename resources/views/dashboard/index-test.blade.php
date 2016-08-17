@@ -320,6 +320,8 @@
             children: {}
         };
 
+        var rect; // The drag rectangle used in drag_selection.js
+
         class View {
             addCanvasItem(item, canvasItem) {
                 var canvasItemId = canvasItem.id;
@@ -1019,6 +1021,8 @@
                         }
                         
                         historyController.pendingCanvasHistoryRecords = pendingCanvasHistoryRecords;
+
+                        rect.remove();
                     },
                     stop: function() {
                         var pendingCanvasHistoryRecords = historyController.pendingCanvasHistoryRecords;

@@ -1,4 +1,5 @@
 var canvasController;
+var rect;
 
 (function() {
     'use strict';
@@ -32,34 +33,23 @@ var canvasController;
     
     // Draw the shape based on the current coordinates and position at onmousedown
     function doDraw(event) {
-        if (checkAgain) {
-            $('.drag-item').each(function() {
-                if ($(this).hasClass('ui-draggable-dragging')) {
-                    isDragging = true;
-                }
-            });
-        }
+        if (rect) {
+            var mousePos = getCoords(event);
+            var currentX = mousePos.x - offset[0];
+            var currentY = mousePos.y - offset[1];
+            var width = currentX - startX;
+            var height = currentY - startY;
 
-        if (!isDragging) {
-            checkAgain = false;
-            if (rect) {
-                var mousePos = getCoords(event);
-                var currentX = mousePos.x - offset[0];
-                var currentY = mousePos.y - offset[1];
-                var width = currentX - startX;
-                var height = currentY - startY;
+            if (width < 0) {
+                rect.attr({'x': currentX, 'width': width * -1});
+            } else {
+                rect.attr({'x': startX, 'width': width});
+            }
 
-                if (width < 0) {
-                    rect.attr({'x': currentX, 'width': width * -1});
-                } else {
-                    rect.attr({'x': startX, 'width': width});
-                }
-
-                if (height < 0) {
-                    rect.attr({'y': currentY, 'height': height * -1});
-                } else {
-                    rect.attr({'y': startY, 'height': height});
-                }
+            if (height < 0) {
+                rect.attr({'y': currentY, 'height': height * -1});
+            } else {
+                rect.attr({'y': startY, 'height': height});
             }
         }
     }
@@ -104,12 +94,9 @@ var canvasController;
     // Global variables
     var dropTarget = document.getElementsByClassName('drop-target')[0];
     var paper = new Raphael('paper');
-    var rect;
     var startX = 0, startY = 0, endX = 0, endY = 0;
     var offset = findPos(dropTarget);
-    var isDragging = false;
-    var checkAgain = true;
-    var rect = paper.rect(0, 0, 0, 0);
+    rect = paper.rect(0, 0, 0, 0);
     
     dropTarget.onmousedown = function(event) {
         var mouseCoords = getCoords(event);
@@ -120,19 +107,15 @@ var canvasController;
     };
     
     document.onmouseup = function(event) {
-        if (!isDragging) {
-            if (!rect.removed) {
-                rect.remove();
+        if (!rect.removed) {
+            rect.remove();
 
-                endX = getCoords(event).x - $('.drop-target').offset().left;
-                endY = getCoords(event).y - $('.drop-target').offset().top;
+            endX = getCoords(event).x - $('.drop-target').offset().left;
+            endY = getCoords(event).y - $('.drop-target').offset().top;
 
-                getCanvasItemsInsideSelection();
-            }
+            getCanvasItemsInsideSelection();
         }
 
         document.onmousemove = null;
-        isDragging = false;
-        checkAgain = true;
     };
 })();
