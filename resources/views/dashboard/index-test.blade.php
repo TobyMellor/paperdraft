@@ -301,6 +301,8 @@
             }).bind('cut', function() {
                 //copyActiveItem(true);
             });
+
+            bootstrapper(); // Start initializing
         });
 
         var token = '{{ csrf_token() }}';
@@ -1535,8 +1537,6 @@
             historyController = new HistoryController();
             historyController.loadCanvasHistory();
         }
-
-        bootstrapper(); // Start initializing
 
         // This is the function generating the position by calculating
         // mouse position, different offsets and option.
