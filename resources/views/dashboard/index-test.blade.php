@@ -818,7 +818,7 @@
                         position_y: null
                     });
 
-                    this.removeCanvasItem(selectedCanvasItems.parent.id);
+                    this.removeCanvasItem(canvasItemId);
                 }
 
                 this.updateSelected(Object.keys(canvasItems).length > 0 ? [Object.keys(canvasItems)[0]] : []);
