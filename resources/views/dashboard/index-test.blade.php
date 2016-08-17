@@ -587,7 +587,7 @@
                 this.canvasItemsGrid = [], // e.g. Grid of all possible locations to store items
                 this.softDeletedCanvasItems = {};
 
-                this.classId = classId;
+                this.classId = classId,
                 this.gridSize = gridSize;
 
                 this.canvasItemModel = new CanvasItemModel,
@@ -894,8 +894,7 @@
             initializeDraggable() {
                 var items = this.items,
                     canvasItems = this.canvasItems,
-                    view = this.view
-                    canvasController = this;
+                    view = this.view;
 
                 $('.drag-item').draggable({
                     grid: [32, 32],
@@ -1017,14 +1016,17 @@
                     stop: function() {
                         var pendingCanvasHistoryRecords = historyController.pendingCanvasHistoryRecords;
 
-                        for (var index in pendingCanvasHistoryRecords) {
-                            var pendingCanvasHistoryRecord = pendingCanvasHistoryRecords[index];
-                            var canvasItemId = pendingCanvasHistoryRecord.canvas_item_id;
+                        if (pendingCanvasHistoryRecords[0].previous_position_x != canvasItems[pendingCanvasHistoryRecords[0].canvas_item_id].position_x
+                                || pendingCanvasHistoryRecords[0].previous_position_y != canvasItems[pendingCanvasHistoryRecords[0].canvas_item_id].position_y) {
+                            for (var index in pendingCanvasHistoryRecords) {
+                                var pendingCanvasHistoryRecord = pendingCanvasHistoryRecords[index];
+                                var canvasItemId = pendingCanvasHistoryRecord.canvas_item_id;
 
-                            pendingCanvasHistoryRecord.position_x = canvasItems[canvasItemId].position_x;
-                            pendingCanvasHistoryRecord.position_y = canvasItems[canvasItemId].position_y;
+                                pendingCanvasHistoryRecord.position_x = canvasItems[canvasItemId].position_x;
+                                pendingCanvasHistoryRecord.position_y = canvasItems[canvasItemId].position_y;
 
-                            historyController.addCanvasHistory(pendingCanvasHistoryRecord);
+                                historyController.addCanvasHistory(pendingCanvasHistoryRecord);
+                            }
                         }
                     },
                     create: function() {
