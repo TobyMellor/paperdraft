@@ -12,25 +12,8 @@ use Illuminate\Http\Request;
 class CanvasHistoryController extends Controller
 {
     private $canvasHistoryCount = 25;
-    private $classId;
 
-    public function __construct(Request $request)
-    {
-        $classId = $request->input('class_id');
-
-        $validation = $this->classIdValidator(['class_id' => $classId]);
-
-        if ($validation->fails()) {
-            return response()->json([
-                'error' => 1,
-                'message' => trans('api.canvas-item.failure.invalid-class-id')
-            ]);
-        }
-
-        $this->classId = $classId;
-    }
-
-    private function getCanvasHistoryCount()
+    public function getCanvasHistoryCount()
     {
         return $this->canvasHistoryCount;
     }
@@ -40,9 +23,9 @@ class CanvasHistoryController extends Controller
      *
      * @return \Illuminate\Http\Redirect
      */
-    public function index()
+    public function index(Request $request)
     {
-        $classId = $this->classId;
+        $classId = $request->input('class_id');
 
         $canvasHistory = [];
         $canvasHistoryRecords = CanvasHistory::where('class_id', $classId)->get();
@@ -76,7 +59,7 @@ class CanvasHistoryController extends Controller
     {
         $newCanvasHistoryRecords = $request->input('canvas_history');
         $canvasActionUndoCount = $request->input('canvas_action_undo_count');
-        $classId = $this->classId;
+        $classId = $request->input('class_id');
 
         if ($newCanvasHistoryRecords == null) {
             $newCanvasHistoryRecords = [];
@@ -138,7 +121,7 @@ class CanvasHistoryController extends Controller
     protected function classIdValidator(array $data)
     {
         return Validator::make($data, [
-            'class_id'     => 'required|integer|ownsclass'
+            'class_id' => 'required|integer|ownsclass'
         ]);
     }
 }

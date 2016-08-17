@@ -44,23 +44,25 @@ Route::group(['middleware' => ['web', 'auth']], function () {
     Route::post('/class', 'ClassController@storeClass');
     Route::delete('/class', 'ClassController@deleteClass');
 
-    Route::resource('api/canvas-item', 'CanvasItemController',
-        [
-            'only' => [
-                'index',  // GET     api/canvas-item
-                'store',  // POST    api/canvas-item
-                'update', // PUT     api/canvas-item/{canvas-item-id}
-                'destroy' // DELETE  api/canvas-item/{canvas-item-id}
-            ],
-        ]
-    );
+    Route::group(['middleware' => ['api']], function () {
+        Route::resource('api/canvas-item', 'CanvasItemController',
+            [
+                'only' => [
+                    'index',  // GET     api/canvas-item
+                    'store',  // POST    api/canvas-item
+                    'update', // PUT     api/canvas-item/{canvas-item-id}
+                    'destroy' // DELETE  api/canvas-item/{canvas-item-id}
+                ],
+            ]
+        );
 
-    Route::put('api/canvas-item', 'CanvasItemController@batchUpdate');     // PUT    api/canvas-item accepts array
-    Route::delete('api/canvas-item', 'CanvasItemController@batchDestroy'); // DELETE api/canvas-item accepts array
+        Route::put('api/canvas-item', 'CanvasItemController@batchUpdate');     // PUT    api/canvas-item accepts array
+        Route::delete('api/canvas-item', 'CanvasItemController@batchDestroy'); // DELETE api/canvas-item accepts array
 
-    Route::resource('api/canvas-history', 'CanvasHistoryController', ['only' => [
-        'index', // GET  api/canvas-history
-        'store'  // POST api/canvas-history
-    ]]);
+        Route::resource('api/canvas-history', 'CanvasHistoryController', ['only' => [
+            'index', // GET  api/canvas-history
+            'store'  // POST api/canvas-history
+        ]]);
+    });
 });
 

@@ -447,38 +447,31 @@
         // ]
         class CanvasHistoryModel {
             index(classId) {
-                $.ajax({
+                $.APIAjax({
                     url: '{{ url('api/canvas-history') }}',
                     type: 'GET',
                     data: {
-                        _token: token,
                         class_id: classId
-                    }
-                }).done(function(jsonResponse) {
-                    if (jsonResponse.error == 0) {
+                    },
+                    success: function(jsonResponse) {
                         historyController.jsonCanvasHistory = jsonResponse;
 
                         historyController.init();
-                    } else {
-                        notificationController.handleNotification(jsonResponse.message, 'error');
-                    }
+                    },
+                    error: function(jsonResponse) {}
                 });
             }
 
             store(classId, canvasHistory, canvasActionUndoCount) {
-                $.ajax({
+                $.APIAjax({
                     url: '{{ url('api/canvas-history') }}',
                     type: 'POST',
                     data: {
-                        _token: token,
                         canvas_history: canvasHistory,
                         canvas_action_undo_count: canvasActionUndoCount,
                         class_id: classId
-                    }
-                }).done(function(jsonResponse) {
-                    if (jsonResponse.error == 1) {
-                        notificationController.handleNotification(jsonResponse.message, 'error');
-                    }
+                    },
+                    error: function(jsonReponse) {}
                 });
             }
         }
@@ -499,36 +492,31 @@
         // ]
         class CanvasItemModel {
             index(classId) {
-                $.ajax({
+                $.APIAjax({
                     url: '{{ url('api/canvas-item') }}',
                     type: 'GET',
                     data: {
-                        _token: token,
                         class_id: classId
-                    }
-                }).done(function(jsonResponse) {
-                    if (jsonResponse.error == 0) {
+                    },
+                    success: function(jsonResponse) {
                         canvasController.jsonCanvasItems = jsonResponse;
 
                         canvasController.init();
-                    } else {
-                        notificationController.handleNotification(jsonResponse.message, 'error');
-                    }
+                    },
+                    error: function(jsonResponse) {}
                 });
             }
 
             store(classId, canvasItem) {
-                $.ajax({
+                $.APIAjax({
                     url: '{{ url('api/canvas-item') }}',
                     type: 'POST',
                     async: false, // TODO: Needs better solution
                     data: {
-                        _token: token,
                         canvas_item: canvasItem,
                         class_id: classId
-                    }
-                }).done(function(jsonResponse) {
-                    if (jsonResponse.error == 0) {
+                    },
+                    success: function(jsonResponse) {
                         var returnedCanvasItem = jsonResponse.canvas_item;
 
                         canvasController.updatePseudoCanvasItemToReal(canvasItem.id, returnedCanvasItem.id, returnedCanvasItem.deleted_at == null ? false : true);
@@ -540,41 +528,32 @@
                         } else {
                             canvasController.addSoftDeletedCanvasItem(canvasItem);
                         }
-                    } else {
-                        notificationController.handleNotification(jsonResponse.message, 'error');
-                    }
+                    },
+                    error: function(jsonResponse) {}
                 });
             }
 
             batchDestroy(classId, softDeletedCanvasItems) {
-                $.ajax({
+                $.APIAjax({
                     url: '{{ url('api/canvas-item') }}',
                     type: 'DELETE',
                     data: {
-                        _token: token,
                         canvas_items: softDeletedCanvasItems,
                         class_id: classId
-                    }
-                }).done(function(jsonResponse) {
-                    if (jsonResponse.error == 1) {
-                        notificationController.handleNotification(jsonResponse.message, 'error');
-                    }
+                    },
+                    error: function(jsonReponse) {}
                 });
             }
 
             batchUpdate(classId, canvasItems) {
-                $.ajax({
+                $.APIAjax({
                     url: '{{ url('api/canvas-item') }}',
                     type: 'PUT',
                     data: {
-                        _token: token,
                         canvas_items: canvasItems,
                         class_id: classId
-                    }
-                }).done(function(jsonResponse) {
-                    if (jsonResponse.error == 1) {
-                        notificationController.handleNotification(jsonResponse.message, 'error');
-                    }
+                    },
+                    error: function(jsonReponse) {}
                 });
             }
         }
@@ -1505,19 +1484,56 @@
                 }
                 return false;
             }
+
+            isValidJson(jsonResponse) {
+                return $.isPlainObject(jsonResponse);
+            }
         }
 
         function bootstrapper() {
             var classId = parseInt($('.class-button:first').attr('class-id'));
+
+            utils = new Utils;
+            notificationController = new NotificationController;
+
+            $.ajaxSetup({
+                headers: {
+                    'X-CSRF-TOKEN': token
+                }
+            });
+
+            $.extend({
+                APIAjax: function(params){
+                    params.error = function() {
+                        notificationController.handleNotification('A server-side error occured. Try refreshing if the problem persists.', 'error');
+                    };
+
+                    if (params.success && typeof params.success == 'function') {
+                        var successCallback = params.success;
+                        var ourCallback = function(responseJson) {
+                            if (utils.isValidJson(responseJson)) { // Validate the data
+                                if (responseJson.error == 0) {
+                                    successCallback(responseJson); // Continue to function
+                                } else {
+                                    notificationController.handleNotification(responseJson.message, 'error');
+                                }
+                            } else {
+                                notificationController.handleNotification('A server-side error occured. Try refreshing if the problem persists.', 'error');
+                            }
+                        }
+
+                        params.success = ourCallback;
+                    }
+
+                    return $.ajax(params);
+                }
+            });
 
             canvasController = new CanvasController(classId);
             canvasController.loadCanvasItems();
 
             historyController = new HistoryController();
             historyController.loadCanvasHistory();
-
-            utils = new Utils;
-            notificationController = new NotificationController;
         }
 
         bootstrapper(); // Start initializing

@@ -13,33 +13,15 @@ use Illuminate\Http\Request;
 
 class CanvasItemController extends Controller
 {
-    private $classId;
-
-    public function __construct(Request $request)
-    {
-        $classId = $request->input('class_id');
-
-        $validation = $this->classIdValidator(['class_id' => $classId]);
-
-        if ($validation->fails()) {
-            return response()->json([
-                'error' => 1,
-                'message' => trans('api.canvas-item.failure.invalid-class-id')
-            ]);
-        }
-
-        $this->classId = $classId;
-    }
-
     /**
      * Display a listing of the canvas-items.
      *
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function index()
+    public function index(Request $request)
     {
-        $classId = $this->classId;
+        $classId = $request->input('class_id');
 
         $canvasItems = [];
 
@@ -71,7 +53,7 @@ class CanvasItemController extends Controller
     public function store(Request $request)
     {
         $canvasItem = $request->input('canvas_item');
-        $classId = $this->classId;
+        $classId = $request->input('class_id');
 
         $storedCanvasItem = new CanvasItem;
 
@@ -103,7 +85,7 @@ class CanvasItemController extends Controller
     public function update(Request $request, $id)
     {
         $canvasItem = $request->input('canvas_item');
-        $classId = $this->classId;
+        $classId = $request->input('class_id');
 
         if ($canvasItem['soft_deleted'] != null && $canvasItem['soft_deleted']) {
             $storedCanvasItem = CanvasItem::withTrashed()
@@ -135,7 +117,7 @@ class CanvasItemController extends Controller
     public function batchUpdate(Request $request)
     {
         $canvasItems = $request->input('canvas_items');
-        $classId = $this->classId;
+        $classId = $request->input('class_id');
 
         $responses = [];
 
@@ -162,7 +144,7 @@ class CanvasItemController extends Controller
     public function destroy(Request $request, $id)
     {
         $canvasItem = $request->input('canvas_item');
-        $classId = $this->classId;
+        $classId = $request->input('class_id');
 
         CanvasItem::where('class_id', $classId)
             ->where('id', $id)
@@ -183,7 +165,7 @@ class CanvasItemController extends Controller
     public function batchDestroy(Request $request)
     {
         $canvasItems = $request->input('canvas_items');
-        $classId = $this->classId;
+        $classId = $request->input('class_id');
 
         if ($canvasItems != null) {
             $canvasItemIds = array_map(function($canvasItems) { return $canvasItems['id']; }, $canvasItems);

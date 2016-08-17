@@ -29,8 +29,7 @@ return [
             'update'           => 'An error occured while updating the canvas-items.',
             'batch-update'     => 'An error occured while updating all of the canvas-items.',
             'destroy'          => 'An error occured while deleting the canvas-items.',
-            'batch-destroy'    => 'An error occured while deleting all of the canvas-items.',
-            'invalid-class-id' => 'An error occured since you don\'t own this class or it doesn\'t exist.'
+            'batch-destroy'    => 'An error occured while deleting all of the canvas-items.'
         ]
     ],
     'item' => [

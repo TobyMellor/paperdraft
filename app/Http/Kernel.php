@@ -36,6 +36,7 @@ class Kernel extends HttpKernel
         ],
         
         'api' => [
+            \App\Http\Middleware\VerifyParametersMiddleware::class,
             'throttle:60,1',
         ],
     ];
