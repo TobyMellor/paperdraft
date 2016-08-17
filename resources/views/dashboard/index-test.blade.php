@@ -803,20 +803,12 @@
             }
 
             softDeleteCanvasItems() {
-                var canvasItems = this.canvasItems;
+                var canvasItems = this.canvasItems,
+                    selectedIds = this.getSelectedIds();
 
-                historyController.addCanvasHistory({
-                    canvas_item_id: selectedCanvasItems.parent.id,
-                    type: 'deletion',
-                    previous_position_x: canvasItems[selectedCanvasItems.parent.id].position_x,
-                    previous_position_y: canvasItems[selectedCanvasItems.parent.id].position_y,
-                    position_x: null,
-                    position_y: null
-                });
+                for (var index in selectedIds) {
+                    var canvasItemId = selectedIds[index];
 
-                this.removeCanvasItem(selectedCanvasItems.parent.id);
-
-                for (var canvasItemId in selectedCanvasItems.children) {
                     historyController.addCanvasHistory({
                         canvas_item_id: canvasItemId,
                         type: 'deletion',
@@ -826,7 +818,7 @@
                         position_y: null
                     });
 
-                    this.removeCanvasItem(canvasItemId);
+                    this.removeCanvasItem(selectedCanvasItems.parent.id);
                 }
 
                 this.updateSelected(Object.keys(canvasItems).length > 0 ? [Object.keys(canvasItems)[0]] : []);
@@ -1002,30 +994,25 @@
                         }
                     },
                     start: function() {
-                        var canvasItemId = view.getCanvasItemId($(this)),
-                            pendingCanvasHistoryRecords = historyController.pendingCanvasHistoryRecords;
+                        var pendingCanvasHistoryRecords = historyController.pendingCanvasHistoryRecords,
+                            selectedIds = canvasController.getSelectedIds();
 
                         pendingCanvasHistoryRecords = [];
 
-                        pendingCanvasHistoryRecords.push({ // Store the parents history
-                            canvas_item_id: canvasItemId,
-                            type: 'movement',
-                            previous_position_x: canvasItems[canvasItemId].position_x,
-                            previous_position_y: canvasItems[canvasItemId].position_y
-                        });
+                        for (var index in selectedIds) {
+                            var canvasItemId = selectedIds[index];
 
-                        for (var childrenId in selectedCanvasItems.children) { // Store the childrens history too
-                            pendingCanvasHistoryRecords.push({
-                                canvas_item_id: childrenId,
+                            pendingCanvasHistoryRecords.push({ // Store the canvasItem's history
+                                canvas_item_id: canvasItemId,
                                 type: 'movement',
-                                previous_position_x: canvasItems[childrenId].position_x,
-                                previous_position_y: canvasItems[childrenId].position_y
+                                previous_position_x: canvasItems[canvasItemId].position_x,
+                                previous_position_y: canvasItems[canvasItemId].position_y
                             });
                         }
                         
                         historyController.pendingCanvasHistoryRecords = pendingCanvasHistoryRecords;
 
-                        rect.remove();
+                        rect.remove(); // Remove the drag rectangle on canvasItem drag
                     },
                     stop: function() {
                         var pendingCanvasHistoryRecords = historyController.pendingCanvasHistoryRecords;
@@ -1122,6 +1109,16 @@
 
                     view.clearSelectedBoard(selectedCanvasItems);
                 }
+            }
+
+            getSelectedIds() {
+                var selectedIds = [selectedCanvasItems.parent.id];
+
+                for (var canvasItemId in selectedCanvasItems.children) {
+                    selectedIds.push(canvasItemId);
+                }
+
+                return selectedIds;
             }
             
             getNearestEmpty(positionX, positionY, maxCheckHeight, maxCheckWidth) {
