@@ -1094,13 +1094,15 @@
                     for (var canvasItemId in selectedCanvasItems.children) {
                         var index = Object.keys(selectedCanvasItems.children).indexOf(canvasItemId) + 1;
 
-                        selectedBoardItems[index] = {
-                            id: canvasItemId,
-                            position_x: canvasItems[canvasItemId].position_x,
-                            position_y: canvasItems[canvasItemId].position_y,
-                            location: items[canvasItems[canvasItemId].item_id].location,
-                            name: items[canvasItems[canvasItemId].item_id].name
-                        };
+                        if (canvasItemId in canvasItems) { // We might have just deleted the child
+                            selectedBoardItems[index] = {
+                                id: canvasItemId,
+                                position_x: canvasItems[canvasItemId].position_x,
+                                position_y: canvasItems[canvasItemId].position_y,
+                                location: items[canvasItems[canvasItemId].item_id].location,
+                                name: items[canvasItems[canvasItemId].item_id].name
+                            };
+                        }
                     }
 
                     view.clearSelectedBoard(selectedCanvasItems);
