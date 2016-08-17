@@ -72,7 +72,6 @@ class CanvasItemController extends Controller
     {
         $canvasItem = $request->input('canvas_item');
         $classId = $this->classId;
-        var_dump($this->classId);
 
         $storedCanvasItem = new CanvasItem;
 

@@ -529,13 +529,13 @@
                     }
                 }).done(function(jsonResponse) {
                     if (jsonResponse.error == 0) {
-                        var canvasItem = jsonResponse.canvas_item;
+                        var returnedCanvasItem = jsonResponse.canvas_item;
 
-                        canvasController.updatePseudoCanvasItemToReal(canvasItem.id, canvasItems[0].id, canvasItems[0].deleted_at == null ? false : true);
+                        canvasController.updatePseudoCanvasItemToReal(canvasItem.id, returnedCanvasItem.id, returnedCanvasItem.deleted_at == null ? false : true);
 
-                        canvasItem.id = canvasItems[0].id;
+                        canvasItem.id = returnedCanvasItem.id;
 
-                        if (canvasItems[0].deleted_at == null) {
+                        if (returnedCanvasItem.deleted_at == null) {
                             canvasController.addCanvasItem(canvasItem);
                         } else {
                             canvasController.addSoftDeletedCanvasItem(canvasItem);
@@ -546,7 +546,7 @@
                 });
             }
 
-            destroy(classId, softDeletedCanvasItems) {
+            batchDestroy(classId, softDeletedCanvasItems) {
                 $.ajax({
                     url: '{{ url('api/canvas-item') }}',
                     type: 'DELETE',
@@ -851,8 +851,8 @@
                     softDeletedCanvasItems = this.softDeletedCanvasItems,
                     classId = this.classId;
 
-                if (softDeletedCanvasItems.length > 0) {
-                    canvasItemModel.destroy(classId, softDeletedCanvasItems);
+                if (Object.keys(softDeletedCanvasItems).length > 0) {
+                    canvasItemModel.batchDestroy(classId, softDeletedCanvasItems);
                 }
             }
 

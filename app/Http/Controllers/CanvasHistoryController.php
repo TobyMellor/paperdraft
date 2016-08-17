@@ -89,8 +89,6 @@ class CanvasHistoryController extends Controller
             'canvas_action_undo_count' => $canvasActionUndoCount
         ];
 
-        var_dump($data);
-
         $validation = $this->validator($data);
 
         if (!$validation->fails()) {
@@ -112,8 +110,6 @@ class CanvasHistoryController extends Controller
                 'message' => trans('api.canvas-history.success.store')
             ]);
         }
-
-        var_dump($validation->errors());
 
         return response()->json([
             'error' => 1,
