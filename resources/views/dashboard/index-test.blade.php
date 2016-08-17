@@ -475,6 +475,7 @@
                         canvas_action_undo_count: canvasActionUndoCount,
                         class_id: classId
                     },
+                    success: function(jsonResponse) {},
                     error: function(jsonReponse) {}
                 });
             }
@@ -545,6 +546,7 @@
                         canvas_items: softDeletedCanvasItems,
                         class_id: classId
                     },
+                    success: function(jsonResponse) {},
                     error: function(jsonReponse) {}
                 });
             }
@@ -557,6 +559,7 @@
                         canvas_items: canvasItems,
                         class_id: classId
                     },
+                    success: function(jsonResponse) {},
                     error: function(jsonReponse) {}
                 });
             }
@@ -1293,7 +1296,9 @@
                         }
                     }
 
-                    canvasItemModel.batchUpdate(classId, canvasItems);
+                    if (Object.keys(canvasItems).length > 0) {
+                        canvasItemModel.batchUpdate(classId, canvasItems);
+                    }
                 }
 
                 this.deleteCanvasItems(this.softDeletedCanvasItems);
@@ -1372,9 +1377,9 @@
                     canvasActionUndoCount = this.canvasActionUndoCount,
                     classId = canvasController.classId;
 
-                canvasHistory.slice(Math.max(canvasHistory.length - maxCanvasHistoryCount, 0)); // Don't send > maxCanvasHistoryCount to DB
+                var slicedHistory = canvasHistory.slice(Math.max(canvasHistory.length - maxCanvasHistoryCount, 0)); // Don't send > maxCanvasHistoryCount to DB
 
-                canvasHistoryModel.store(classId, canvasHistory, canvasActionUndoCount);
+                canvasHistoryModel.store(classId, slicedHistory, canvasActionUndoCount);
 
                 this.canvasActionUndoCount = canvasActionUndoCount;
             }
