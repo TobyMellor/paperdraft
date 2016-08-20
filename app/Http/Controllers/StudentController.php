@@ -64,7 +64,7 @@ class StudentController extends Controller
         if (!$validation->fails()) {
             $storedStudent = Student::create([
                 'name'          => $studentName,
-                'pupil_premium' => $pupilPremium,
+                'pupil_premium' => (boolean) $pupilPremium,
                 'user_id'       => Auth::user()->id
             ]);
 
@@ -114,7 +114,7 @@ class StudentController extends Controller
         $studentImage = $request->input('student_image');
 
         $classId = $request->input('class_id');
-        
+
         $data = [
             'student_name'             => $studentName,
             'pupil_premium'            => $pupilPremium,
@@ -182,7 +182,7 @@ class StudentController extends Controller
         }
 
         return response()->json([
-            'error' => 0,
+            'error'   => 0,
             'message' => trans('api.student.success.destroy')
         ]);
     }
@@ -191,7 +191,7 @@ class StudentController extends Controller
     {
         return Validator::make($data, [
             'student_name'             => 'required|between:2,30|regex:/^[a-zA-Z0-9\s-]+$/',
-            'pupil_premium'            => 'boolean',
+            'pupil_premium'            => 'in:true,false',
             'ability_cap'              => 'in:H,M,L',
             'current_attainment_level' => 'in:A*,A,B,C,D,E,F,G,U',
             'target_attainment_level'  => 'in:A*,A,B,C,D,E,F,G,U'

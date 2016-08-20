@@ -531,20 +531,20 @@
 						            '</a>' +
 						        '</div>' +
 						        '<div class="media-body media-middle">' +
-						            '<h6 class="display-inline-block text-default text-semibold letter-icon-title editable-input" href="javascript:void(0);" style="margin-bottom: 3px; margin-top: 3px;">' + formData['student_name'] + '</h6>' +
+						            '<h6 class="display-inline-block text-default text-semibold letter-icon-title" href="javascript:void(0);" style="margin-bottom: 3px; margin-top: 3px;">' + formData['student_name'] + '</h6>' +
 						        '</div>' +
 						    '</td>' +
 						    '<td>' +
-						        '<h6 class="no-margin editable-select">' + ((formData['current_attainment_level'] === undefined) ? 'N/A' : formData['current_attainment_level']) + '</h6>' +
+						        '<h6 class="no-margin">' + ((formData['current_attainment_level'] === undefined) ? 'N/A' : formData['current_attainment_level']) + '</h6>' +
 						    '</td>' +
 						    '<td>' +
-						        '<h6 class="no-margin editable-select">' + ((formData['target_attainment_level'] === undefined) ? 'N/A' : formData['target_attainment_level']) + '</h6>' +
+						        '<h6 class="no-margin">' + ((formData['target_attainment_level'] === undefined) ? 'N/A' : formData['target_attainment_level']) + '</h6>' +
 						    '</td>' +
 						    '<td>' +
-						        '<i class="editable-select ' + (formData['pupil_premium'] ? 'icon-checkmark3 text-success' : 'icon-cross2 text-danger-400') + '"></i>' +
+						        '<i class="' + (formData['pupil_premium'] ? "icon-checkmark3 text-success" : "icon-cross2 text-danger-400") + '"></i>' +
 						    '</td>' +
 						    '<td>' +
-						        '<h6 class="no-margin editable-select">' + formData['ability_cap'] + '</h6>' +
+						        '<h6 class="no-margin">' + formData['ability_cap'] + '</h6>' +
 						    '</td>' +
 						    '<td>' +
 			                    '<div class="btn-group">' + 
@@ -556,6 +556,10 @@
 			                    '</div>' +
 						    '</td>' +
 						'</tr>';
+
+						if ($('#no-students').is(":visible")) {
+							$('#no-students').fadeOut();
+						}
 
 						$('tbody').append(html);
 						$('tr[student-id=' + jsonResponse.student.id + ']').fadeIn();
@@ -602,7 +606,7 @@
 	            	$('#update-student select[name=current_attainment_level]').val(currentAttainmentLevel);
 	            }
 
-	            if (currentAttainmentLevel != 'N/A') {
+	            if (targetAttainmentLevel != 'N/A') {
 	            	$('#update-student select[name=target_attainment_level]').val(targetAttainmentLevel);
 	            }
 
@@ -613,12 +617,21 @@
         var classId = {{ $classId }};
         var token = '{{ csrf_token() }}';
 
+        $('tbody').prepend('<tr id="no-students" @if (isset($classStudents) && sizeOf($classStudents) > 0) style="display: none;" @endif></tr>');
+        $('#no-students').html(
+        	'<div class="media-body media-middle">' +
+				'<h6 class="display-inline-block text-default text-semibold letter-icon-title" style="margin-top: 30px; margin-left: 20px;">' +
+					'This class has no students. Create one using the form below.' +
+				'</h6>' +
+			'</div>'
+		);
+
         function updateClassStudent(form) {
 	        var formData = form.serializeArray().reduce(function(obj, item) {
 			    obj[item.name] = item.value;
 			    return obj;
 			}, {});
-			
+
 			if (formData['pupil_premium'] == 'on') {
 				formData['pupil_premium'] = true;
 			} else {
@@ -671,6 +684,10 @@
                 success: function(jsonResponse) {
                 	$('tr[student-id=' + studentId + ']').fadeOut(300, function() {
                 		$(this).remove();
+
+	            		if ($('tbody').length == 1) {
+	            			$('tr').fadeIn();
+	            		}
                 	});
 
                     handleNotification(jsonResponse.message, 'success');
