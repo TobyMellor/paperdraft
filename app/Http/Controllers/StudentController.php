@@ -51,12 +51,6 @@ class StudentController extends Controller
 
         $classId = $request->input('class_id');
 
-        if ($pupilPremium == 'on') {
-            $pupilPremium = true;
-        } else {
-            $pupilPremium = false;
-        }
-
         $data = [
             'student_name'             => $studentName,
             'pupil_premium'            => $pupilPremium,
@@ -120,13 +114,7 @@ class StudentController extends Controller
         $studentImage = $request->input('student_image');
 
         $classId = $request->input('class_id');
-
-        if ($pupilPremium == 'on') {
-            $pupilPremium = true;
-        } else {
-            $pupilPremium = false;
-        }
-
+        
         $data = [
             'student_name'             => $studentName,
             'pupil_premium'            => $pupilPremium,

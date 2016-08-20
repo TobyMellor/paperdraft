@@ -503,6 +503,12 @@
 				    return obj;
 				}, {});
 
+				if (formData['pupil_premium'] == 'on') {
+					formData['pupil_premium'] = true;
+				} else {
+					formData['pupil_premium'] = false;
+				}
+
 		        $.APIAjax({
 		        	url: '{{ url('api/student') }}',
 		        	type: 'POST',
@@ -568,7 +574,6 @@
 	        });
 
 	        $(document).delegate('.delete-student', 'click', function() {
-	        	console.log('commonnn!!!');
 	        	deleteClassStudent($(this).closest('tr').attr('student-id'));
 	        });
 
@@ -613,6 +618,12 @@
 			    obj[item.name] = item.value;
 			    return obj;
 			}, {});
+			
+			if (formData['pupil_premium'] == 'on') {
+				formData['pupil_premium'] = true;
+			} else {
+				formData['pupil_premium'] = false;
+			}
 
             $.APIAjax({
                 url: '{{ url('api/student') }}/' + formData['student_id'],
