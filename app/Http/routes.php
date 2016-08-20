@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\ClassController;
+
 /*
 |--------------------------------------------------------------------------
 | Application Routes
@@ -32,10 +34,17 @@ Route::group(['middleware' => ['web', 'guest']], function () {
 //The user needs to be authenticated to perform these actions
 Route::group(['middleware' => ['web', 'auth']], function () {
     Route::get('dashboard', 'IndexController@getDashboard');
+
     Route::get('dashboard/classes', 'IndexController@getClassesDashboard');
     Route::get('dashboard/classes/{classId}', 'IndexController@getClassDashboard');
     Route::get('dashboard/classes/{classId}/create', function($classId) {
         return redirect('dashboard/classes/' . $classId)->with('create', true);
+    });
+
+    Route::get('dashboard/classes/{classId}/duplicate', function(ClassController $classController, $classId) {
+        $classId = $classController->duplicateClass($classId);
+
+        return redirect('dashboard/classes/' . $classId);
     });
 
     Route::get('logout', 'UserController@getLogout');

@@ -37,7 +37,7 @@ class ClassController extends Controller
 
         if (!$validation->fails()) {
             $class = SchoolClass::create([
-                'user_id' => Auth::user()->id,
+                'user_id'    => Auth::user()->id,
                 'class_name' => $className
             ]);
 
@@ -90,13 +90,15 @@ class ClassController extends Controller
      */
     public function getRecentClassId()
     {   
-        $classId = CanvasItem::whereHas('SchoolClass', function($query){                           
+        $class = CanvasItem::whereHas('SchoolClass', function($query){                           
             $query->where('classes.user_id', Auth::user()->id);                             
-        })->orderBy('created_at', 'desc')->first()->class_id;
+        })->orderBy('created_at', 'desc')->first();
 
-        // 'SELECT * FROM canvas_items JOIN canvas_items.class_id ON classes.id WHERE classes.user_id = 1 ORDER BY canvas_items.created_at'
+        if ($class != null) {
+            return $class->id;
+        }
 
-        return $classId;
+        return null;
     }
 
     /**
@@ -119,10 +121,41 @@ class ClassController extends Controller
             ->delete(); 
     }
 
+
+    /**
+     * Duplicate class items from one class to another
+     *
+     * @return $classIdToPaste
+     */
+    public function duplicateClass($classId)
+    {
+        $classIdToPaste = SchoolClass::create([
+            'user_id' => Auth::user()->id,
+            'class_name' => substr(SchoolClass::where('id', $classId)->first()->class_name, 0, 23) . ' (copy)'
+        ])->id;
+
+        $canvasItemsToCopy = CanvasItem::where('class_id', $classId)->get();
+
+        $canvasItemsToPaste = [];
+
+        foreach ($canvasItemsToCopy as $canvasItemToCopy) {
+            array_push($canvasItemsToPaste, [
+                'item_id'    => $canvasItemToCopy->item_id,
+                'class_id'   => $classIdToPaste,
+                'position_x' => $canvasItemToCopy->position_x,
+                'position_y' => $canvasItemToCopy->position_y,
+            ]);
+        }
+
+        CanvasItem::insert($canvasItemsToPaste);
+
+        return $classIdToPaste;
+    }
+
     protected function validator(array $data)
     {
         return Validator::make($data, [
-            'class_name' => 'required|between:1,30',
+            'class_name'     => 'required|between:1,30',
             'class_template' => 'integer|exists:classes,id'
         ]);
     }

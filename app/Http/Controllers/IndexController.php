@@ -49,7 +49,7 @@ class IndexController extends Controller
         if ($classes->first() != null) {
             return redirect('/dashboard/classes/' . $classes->first()->id);
         } else {
-            return view('dashboard.classes');
+            return abort(503);
         }
     }
 

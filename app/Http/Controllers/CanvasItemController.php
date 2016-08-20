@@ -186,29 +186,6 @@ class CanvasItemController extends Controller
         ]);
     }
 
-    /**
-     * Duplicate class items from one class to another
-     *
-     * @return null
-     */
-    // public function duplicateCanvasItems($classIdToCopy, $classIdToPaste)
-    // {
-    //     $canvasItemsToCopy = CanvasItem::where('class_id', $classIdToCopy)->get();
-
-    //     $canvasItemsToPaste = [];
-
-    //     foreach ($canvasItemsToCopy as $classObjectToCopy) {
-    //         array_push($canvasItemsToPaste, [
-    //             'item_id' => $canvasItemToCopy->item_id,
-    //             'class_id' => $classIdToPaste,
-    //             'position_x' => $canvasItemToCopy->position_x,
-    //             'position_y' => $canvasItemToCopy->position_y,
-    //         ]);
-    //     }
-
-    //     CanvasItem::insert($canvasItemsToPaste);
-    // }
-
     protected function classIdValidator(array $data)
     {
         return Validator::make($data, [

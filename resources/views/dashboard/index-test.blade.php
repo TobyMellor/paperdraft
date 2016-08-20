@@ -15,18 +15,18 @@
 
                 <ul class="breadcrumb-elements">
                     <li class="dropdown">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                        <a href="javascript:void(0);" class="dropdown-toggle" data-toggle="dropdown">
                             <i class="icon-gear position-left"></i>
                             Settings
                             <span class="caret"></span>
                         </a>
 
                         <ul class="dropdown-menu dropdown-menu-right">
-                            <li><a href="#"><i class="icon-user-lock"></i> Account security</a></li>
-                            <li><a href="#"><i class="icon-statistics"></i> Analytics</a></li>
-                            <li><a href="#"><i class="icon-accessibility"></i> Accessibility</a></li>
+                            <li><a href="javascript:void(0);"><i class="icon-user-lock"></i> Account security</a></li>
+                            <li><a href="javascript:void(0);"><i class="icon-statistics"></i> Analytics</a></li>
+                            <li><a href="javascript:void(0);"><i class="icon-accessibility"></i> Accessibility</a></li>
                             <li class="divider"></li>
-                            <li><a href="#"><i class="icon-gear"></i> All settings</a></li>
+                            <li><a href="javascript:void(0);"><i class="icon-gear"></i> All settings</a></li>
                         </ul>
                     </li>
                 </ul>
@@ -42,11 +42,11 @@
                             <h6 class="panel-title"><span class="text-semibold">Seating Planner</span> <span class="text-muted"><small id="class-name">Year 11<small></span></h6>
                             <div class="heading-elements">
                                 <ul class="pagination pagination-flat pagination-sm">
-                                    <li><a href="#">←</a></li>
-                                    <li class="active"><a href="#">1</a></li>
-                                    <li><a href="#">2</a></li>
-                                    <li><a href="#">3</a></li>
-                                    <li><a href="#">→</a></li>
+                                    <li><a href="javascript:void(0);">←</a></li>
+                                    <li class="active"><a href="javascript:void(0);">1</a></li>
+                                    <li><a href="javascript:void(0);">2</a></li>
+                                    <li><a href="javascript:void(0);">3</a></li>
+                                    <li><a href="javascript:void(0);">→</a></li>
                                 </ul>
                                 <ul class="icons-list" style="margin-top: 11px;">
                                     <li>
@@ -64,8 +64,8 @@
                 <div class="col-md-4">
                     <div class="tabbable">
                         <ul class="nav nav-pills nav-pills-bordered nav-stacked">
-                            @if(isset($classes))
-                                @foreach($classes as $key => $class)
+                            @if (isset($classes))
+                                @foreach ($classes as $key => $class)
                                     <li>
                                         <a href="javascript:void(0);" class="class-button" class-id="{{ $class->id }}">{{ $class->class_name }}</a>
                                         <div class="btn-group">
@@ -74,10 +74,10 @@
                                                 <span class="caret"></span>
                                             </a>
                                             <ul class="dropdown-menu dropdown-menu-right">
-                                                <li><a href="#" class="duplicate-class" data-toggle="modal" data-target="#modal_form_inline">Duplicate class template</a></li>
+                                                <li><a href="{{ url('dashboard/classes/' . $class->id . '/duplicate') }}" data-toggle="modal" data-target="#modal_form_inline">Duplicate class template</a></li>
                                                 <li class="divider"></li>
-                                                <li><a href="#" class="delete-seatingplan" data-toggle="modal" data-target="#modal_delete_seatingplan">Clear seating plan</a></li>
-                                                <li><a href="#" class="delete-class" data-toggle="modal" data-target="#modal_delete_class">Delete class</a></li>
+                                                <li><a href="javascript:void(0);" class="clear-seatingplan" data-toggle="modal" data-target="#modal_delete_seatingplan">Clear seating plan</a></li>
+                                                <li><a href="javascript:void(0);" class="delete-class" data-toggle="modal" data-target="#modal_delete_class">Delete class</a></li>
                                             </ul>
                                         </div> 
                                     </li>
@@ -101,10 +101,10 @@
                             </h6>
                             <div class="heading-elements">
                                 <ul class="icons-list">
-                                    <li><a title="" data-popup="tooltip" data-action="move" href="#" data-original-title="Move" class="ui-sortable-handle"></a></li>
+                                    <li><a title="" data-popup="tooltip" data-action="move" href="javascript:void(0);" data-original-title="Move" class="ui-sortable-handle"></a></li>
                                     <li><a title="" data-popup="tooltip" data-action="collapse" data-original-title="Collapse" class=""></a></li>
                                 </ul>
-                                <form class="heading-form" action="#" hidden>
+                                <form class="heading-form" action="javascript:void(0);" hidden>
                                     <div class="form-group">
                                         <label class="checkbox-inline checkbox-switchery checkbox-right switchery-xs">
                                             <input type="checkbox" class="switchery" checked="checked">
@@ -165,7 +165,7 @@
                         <div class="panel-heading">
                             <h6 class="panel-title">Items</h6>
                             <div class="heading-elements">
-                                <form action="#" class="heading-form" style="margin-left: 0px; margin-right: -12px;">
+                                <form action="javascript:void(0);" class="heading-form" style="margin-left: 0px; margin-right: -12px;">
                                     <div class="form-group has-feedback">
                                         <input type="search" placeholder="Search..." class="form-control" style="width: 180px;">
                                         <div class="form-control-feedback">
@@ -174,7 +174,7 @@
                                     </div>
                                 </form>
                                 <ul class="icons-list">
-                                    <li><a title="" data-popup="tooltip" data-action="move" href="#" data-original-title="Move" class="ui-sortable-handle"></a></li>
+                                    <li><a title="" data-popup="tooltip" data-action="move" href="javascript:void(0);" data-original-title="Move" class="ui-sortable-handle"></a></li>
                                     <li><a title="" data-popup="tooltip" data-action="collapse" data-original-title="Collapse" class=""></a></li>
                                 </ul>
                             </div>
@@ -195,7 +195,7 @@
                                             </div>
 
                                             <div class="caption" style="padding-top: 5px; padding-bottom: 5px; padding-left: 5px;">
-                                                <h6 class="no-margin"><a href="#" class="text-default" style="font-size: 10px;">{{ $item->name }}</a></h6>
+                                                <h6 class="no-margin"><a href="javascript:void(0);" class="text-default" style="font-size: 10px;">{{ $item->name }}</a></h6>
                                             </div>
                                         </div>
                                     </div>
@@ -292,12 +292,14 @@
             });
 
             $(document).on('click', 'a', function(event) {
-                event.preventDefault();
+                if (hasUserMadeChanges) {
+                    event.preventDefault();
 
-                var clickedLink = $(this).attr('href');
+                    var clickedLink = $(this).attr('href');
 
-                if (clickedLink != 'javascript:void(0);') {
-                    canvasController.confirmPageLeave(null, clickedLink);
+                    if (clickedLink != 'javascript:void(0);') {
+                        canvasController.confirmPageLeave(null, clickedLink);
+                    }
                 }
             });
 
@@ -1612,7 +1614,7 @@
             notificationController = new NotificationController;
 
             var queryParameters = utils.getQueryParams();
-            var classId = {{ $recentClassId or 'parseInt($(".class-button:first").attr("class-id"))' }};
+            var classId = @if ($recentClassId != null) {{ $recentClassId }} @else parseInt($(".class-button:first").attr("class-id")); @endif
 
             if (queryParameters.hasOwnProperty('class')) {
                 if (utils.isInt(queryParameters.class) && $('.class-button[class-id=' + queryParameters.class + ']').length > 0) {
