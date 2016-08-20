@@ -64,7 +64,7 @@ class StudentController extends Controller
         if (!$validation->fails()) {
             $storedStudent = Student::create([
                 'name'          => $studentName,
-                'pupil_premium' => (boolean) $pupilPremium,
+                'pupil_premium' => $pupilPremium == 'true' ? true : false,
                 'user_id'       => Auth::user()->id
             ]);
 
@@ -130,7 +130,7 @@ class StudentController extends Controller
                 ->where('id', $id)
                 ->update([
                     'name'          => $studentName,
-                    'pupil_premium' => $pupilPremium
+                    'pupil_premium' => $pupilPremium == 'true' ? true : false
                 ]);
 
             ClassStudent::where('class_id', $classId)

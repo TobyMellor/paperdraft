@@ -531,20 +531,20 @@
 						            '</a>' +
 						        '</div>' +
 						        '<div class="media-body media-middle">' +
-						            '<h6 class="display-inline-block text-default text-semibold letter-icon-title" href="javascript:void(0);" style="margin-bottom: 3px; margin-top: 3px;">' + formData['student_name'] + '</h6>' +
+						            '<h6 class="display-inline-block text-default text-semibold letter-icon-title student-name" href="javascript:void(0);" style="margin-bottom: 3px; margin-top: 3px;">' + formData['student_name'] + '</h6>' +
 						        '</div>' +
 						    '</td>' +
 						    '<td>' +
-						        '<h6 class="no-margin">' + ((formData['current_attainment_level'] === undefined) ? 'N/A' : formData['current_attainment_level']) + '</h6>' +
+						        '<h6 class="no-margin current-attainment-level">' + ((formData['current_attainment_level'] === undefined) ? 'N/A' : formData['current_attainment_level']) + '</h6>' +
 						    '</td>' +
 						    '<td>' +
-						        '<h6 class="no-margin">' + ((formData['target_attainment_level'] === undefined) ? 'N/A' : formData['target_attainment_level']) + '</h6>' +
+						        '<h6 class="no-margin target-attainment-level">' + ((formData['target_attainment_level'] === undefined) ? 'N/A' : formData['target_attainment_level']) + '</h6>' +
 						    '</td>' +
 						    '<td>' +
-						        '<i class="' + (formData['pupil_premium'] ? "icon-checkmark3 text-success" : "icon-cross2 text-danger-400") + '"></i>' +
+						        '<span class="pupil-premium"><i class="' + (formData['pupil_premium'] ? "icon-checkmark3 text-success" : "icon-cross2 text-danger-400") + '"></i></span>' +
 						    '</td>' +
 						    '<td>' +
-						        '<h6 class="no-margin">' + formData['ability_cap'] + '</h6>' +
+						        '<h6 class="no-margin ability-cap">' + formData['ability_cap'] + '</h6>' +
 						    '</td>' +
 						    '<td>' +
 			                    '<div class="btn-group">' + 
@@ -652,7 +652,7 @@
                 success: function(jsonResponse) {
 	            	var classStudent = $('tr[student-id=' + formData['student_id'] + ']').closest('tr');
 
-	            	if (formData['pupil_premium'] == 'on') {
+	            	if (formData['pupil_premium']) {
 	            		formData['pupil_premium'] = '<i class="icon-checkmark3 text-success"></i>';
 	            	} else {
 	            		formData['pupil_premium'] = '<i class="icon-cross2 text-danger-400"></i>';
@@ -712,7 +712,7 @@
 
         // notificationContent is the message e.g. 'hello' (string)
         // type is the display type e.g. 'error' or 'success' (string)
-        function handleNotification(notificationContent, type, timeout = 7500) {
+        function handleNotification(notificationContent, type, timeout = 5000) {
             var n = noty({
                 text: notificationContent,
                 layout: 'topCenter',
