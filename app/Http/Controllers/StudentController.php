@@ -2,147 +2,159 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Http\Request;
+
+use App\Http\Requests;
+
 use App\Student;
 use App\ClassStudent;
 
-use Auth;
 use Validator;
-
-use Illuminate\Http\Request;
+use Auth;
 
 class StudentController extends Controller
 {
-    public function __construct(Request $request)
+    /**
+     * Display a listing of the resource.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function index(Request $request)
     {
-        $this->request = $request;
+        $classId = $request->input('class_id');
+
+        $students = Student::where('class_id', $classId)
+            ->get();
+
+        return response()->json([
+            'students' => $students,
+            'error' => 0,
+            'message' => trans('api.student.success.index')
+        ]);
     }
 
     /**
-     * Store the student in the database.
+     * Store a newly created resource in storage.
      *
-     * @return \Illuminate\Http\Redirect
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
      */
-    public function storeStudent()
+    public function store(Request $request)
     {
-        $request = $this->request;
-
         $studentName = $request->input('student_name');
         $pupilPremium = $request->input('pupil_premium');
         $classId = $request->input('class_id');
         $abilityCap = $request->input('ability_cap');
+        $currentAttainmentLevel = $request->input('current_attainment_level');
+        $targetAttainmentLevel = $request->input('target_attainment_level');
+        $studentImage = $request->input('student_image');
 
-        if($pupilPremium == 'on') {
+        if ($pupilPremium == 'on') {
             $pupilPremium = true;
         } else {
             $pupilPremium = false;
         }
 
-        $currentAttainmentLevel = $request->input('current_attainment_level');
-        $targetAttainmentLevel = $request->input('target_attainment_level');
-
-        $studentImage = $request->input('student_image');
-
         $data = [
-            'student_name' => $studentName,
-            'pupil_premium' => $pupilPremium,
-            'class_id' => $classId,
-            'ability_cap' => $abilityCap,
+            'student_name'             => $studentName,
+            'pupil_premium'            => $pupilPremium,
+            'ability_cap'              => $abilityCap,
             'current_attainment_level' => $currentAttainmentLevel,
-            'target_attainment_level' => $targetAttainmentLevel
+            'target_attainment_level'  => $targetAttainmentLevel
         ];
 
         $validation = $this->validator($data);
 
-        if(!$validation->fails()) {
-            $student = Student::create([
-                'name' => $studentName,
+        if (!$validation->fails()) {
+            $storedStudent = Student::create([
+                'name'          => $studentName,
                 'pupil_premium' => $pupilPremium,
-                'user_id' => Auth::user()->id
+                'user_id'       => Auth::user()->id
             ]);
-            ClassStudent::create([
-                'student_id' => $student->id,
-                'class_id' => $classId,
-                'ability_cap' => $abilityCap,
+
+            $storedClassStudent = ClassStudent::create([
+                'student_id'               => $storedStudent->id,
+                'class_id'                 => $classId,
+                'ability_cap'              => $abilityCap,
                 'current_attainment_level' => $currentAttainmentLevel,
-                'target_attainment_level' => $targetAttainmentLevel,
+                'target_attainment_level'  => $targetAttainmentLevel,
             ]);
-            return;
+
+            return response()->json([
+                'student'       => $storedStudent,
+                'class_student' => $storedClassStudent,
+                'error'         => 0,
+                'message'       => trans('api.student.success.store')
+            ]);
         }
 
-        $response = $validation->messages();
-        echo json_encode([
-            'There were error(s) with the data you gave us:',
-            $response
+        $errorMessages = $validation->errors()->all();
+        $responseMessage = '';
+
+        foreach ($errorMessages as $errorMessage) {
+            $responseMessage .= $errorMessage;
+        }
+        
+        return response()->json([
+            'error'   => 1,
+            'message' => $responseMessage
         ]);
     }
 
     /**
-     * Get all students from a given class
-     * TODO: Check if user owns class
+     * Display the specified resource.
      *
-     * @return \Illuminate\Http\Redirect
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
      */
-    public function getClassStudents($classId, $paginate = null)
+    public function show($id)
     {
-        $classStudents = ClassStudent::where('class_id', $classId);
-        if($paginate != null) {
-            $classStudents = $classStudents->paginate($paginate);
-        } else {
-            $classStudents = $classStudents->get();
-        }
-        return $classStudents;
+        //
     }
 
     /**
-     * Get all students of a teacher
+     * Show the form for editing the specified resource.
      *
-     * @return \Illuminate\Http\Redirect
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
      */
-    public function getStudents()
+    public function edit($id)
     {
-        $students = Student::where('user_id', Auth::user()->id)->get();
-        return $students;
+        //
     }
 
     /**
-     * Get a specific student of a teacher
-     * TODO: Check if user owns student
+     * Update the specified resource in storage.
      *
-     * @return \Illuminate\Http\Redirect
+     * @param  \Illuminate\Http\Request  $request
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
      */
-    public function getStudent($studentId)
+    public function update(Request $request, $id)
     {
-        $student = Student::where('id', $studentId)->first();
-        return $student;
+        //
     }
 
-    public function updateClassStudent()
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function destroy($id)
     {
-        $request = $this->request;
-        $classStudentId = $request->input('class_student_id');
-
-        ClassStudent::where('class_id', $classId)
-            ->delete();
-    }
-
-    public function deleteClassStudents()
-    {
-        $request = $this->request;
-        $classId = $request->input('class_id');
-
-        ClassStudent::where('class_id', $classId)
-            ->delete();
+        //
     }
 
     protected function validator(array $data)
     {
         return Validator::make($data, [
-            'student_name' => 'required|between:2,30',
-            'class_id' => 'required|integer|exists:classes,id,user_id,' . Auth::user()->id,
-            'pupil_premium' => 'required|boolean',
-            'ability_cap' => 'required|in:H,M,L',
+            'student_name'             => 'required|between:2,30|regex:/^[a-zA-Z0-9\s-]+$/',
+            'pupil_premium'            => 'boolean',
+            'ability_cap'              => 'in:H,M,L',
             'current_attainment_level' => 'in:A*,A,B,C,D,E,F,G,U',
-            'target_attainment_level' => 'in:A*,A,B,C,D,E,F,G,U'
+            'target_attainment_level'  => 'in:A*,A,B,C,D,E,F,G,U'
         ]);
     }
 }

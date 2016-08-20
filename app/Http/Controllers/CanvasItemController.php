@@ -212,7 +212,7 @@ class CanvasItemController extends Controller
     protected function classIdValidator(array $data)
     {
         return Validator::make($data, [
-            'class_id'     => 'required|integer|ownsclass'
+            'class_id' => 'required|integer|ownsclass'
         ]);
     }
 }

@@ -21,7 +21,7 @@ class ClassController extends Controller
      *
      * @return \Illuminate\Http\Redirect
      */
-    public function storeClass(ObjectController $objectController)
+    public function storeClass(CanvasItemController $canvasItemController)
     {
         $request = $this->request;
 
@@ -34,22 +34,22 @@ class ClassController extends Controller
 
         $validation = $this->validator($data);
 
-        if(!$validation->fails()) {
+        if (!$validation->fails()) {
             $class = SchoolClass::create([
                 'user_id' => Auth::user()->id,
                 'class_name' => $className
             ]);
 
-            if(!empty($classTemplate)) {
-                $objectController->duplicateClassObjects($classTemplate, $class->id);
+            if (!empty($classTemplate)) {
+                $canvasItemController->duplicateClassObjects($classTemplate, $class->id);
             }
 
-            return redirect()
-                ->intended('/dashboard/classes')
+            return redirect('/dashboard/classes/' . $class->id)
                 ->with('successMessage', 'The class has been successfully created');
         }
 
         $response = $validation->messages();
+
         return redirect()
             ->intended('/dashboard/classes')
             ->with('errorMessage', 'There were error(s) with the data you gave us:')
@@ -64,6 +64,7 @@ class ClassController extends Controller
     public function getClasses()
     {   
         $classes = SchoolClass::where('user_id', Auth::user()->id)->get();
+
         return $classes;
     }
 
@@ -77,6 +78,7 @@ class ClassController extends Controller
         $class = SchoolClass::where('user_id', Auth::user()->id)
             ->where('id', $classId)
             ->first();
+
         return $class;
     }
 

@@ -6,6 +6,7 @@ use App\Http\Controllers\CanvasHistoryController;
 
 use Closure;
 use Validator;
+use Auth;
 
 class VerifyParametersMiddleware
 {
@@ -61,7 +62,7 @@ class VerifyParametersMiddleware
         $canvasHistoryCount = $this->canvasHistoryController->getCanvasHistoryCount();
 
         return Validator::make($data, [
-            'class_id' => 'required|integer|ownsclass',
+            'class_id' => 'required|integer|exists:classes,id,user_id,' . Auth::user()->id,
             'canvas_item' => 'array',
             'canvas_history' => 'array|max:' . $canvasHistoryCount,
             'canvas_action_undo_count' => 'integer|max:' . $canvasHistoryCount

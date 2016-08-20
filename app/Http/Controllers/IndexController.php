@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\ClassStudent;
+
 class IndexController extends Controller
 {
     public function __construct() {}
@@ -21,14 +23,13 @@ class IndexController extends Controller
         $items = $itemController->index();
 
         if ($classes->first() != null) {
-            $classStudents = $studentController->getClassStudents($classes->first()->id, 9);
+            $classStudents = ClassStudent::where('class_id', $classes->first()->id)->paginate(9);
 
             return view('dashboard.index-test')
                 ->with('classStudents', $classStudents)
                 ->with('classes', $classes)
                 ->with('items', $items);
         } else {
-            // Lets do something here for new users e.g. redirect them to force make a class
             return view('dashboard.index')
                 ->with('items', $items);
         }
@@ -46,7 +47,6 @@ class IndexController extends Controller
         if ($classes->first() != null) {
             return redirect('/dashboard/classes/' . $classes->first()->id);
         } else {
-            // Lets do something here for new users
             return view('dashboard.classes');
         }
     }
@@ -64,7 +64,7 @@ class IndexController extends Controller
     {
         $classes = $classController->getClasses();
         $selectedClass = $classController->getClass($classId);
-        $classStudents = $studentController->getClassStudents($classId);
+        $classStudents = ClassStudent::where('class_id', $classId)->get();
 
         return view('dashboard.classes')
             ->with('classStudents', $classStudents)

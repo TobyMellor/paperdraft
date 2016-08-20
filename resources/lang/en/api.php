@@ -45,5 +45,11 @@ return [
         'failure' => [
             'store' => 'An error occured while storing the history record.'
         ]
+    ],
+    'student' => [
+        'success' => [
+            'index' => 'All of the students were successfully returned.',
+            'store' => 'The student was successfully stored.',
+        ]
     ]
 ];

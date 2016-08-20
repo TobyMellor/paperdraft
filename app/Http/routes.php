@@ -37,10 +37,6 @@ Route::group(['middleware' => ['web', 'auth']], function () {
 
     Route::get('/logout', 'UserController@getLogout');
 
-    Route::post('/student', 'StudentController@storeStudent');
-
-    Route::put('/class-student', 'StudentController@updateClassStudent');
-
     Route::post('/class', 'ClassController@storeClass');
     Route::delete('/class', 'ClassController@deleteClass');
 
@@ -63,6 +59,17 @@ Route::group(['middleware' => ['web', 'auth']], function () {
             'index', // GET  api/canvas-history
             'store'  // POST api/canvas-history
         ]]);
+
+        Route::resource('api/student', 'StudentController',
+            [
+                'only' => [
+                    'index',  // GET     api/student
+                    'store',  // POST    api/student
+                    'update', // PUT     api/student/{student-id}
+                    'destroy' // DELETE  api/student/{student-id}
+                ],
+            ]
+        );
     });
 });
 

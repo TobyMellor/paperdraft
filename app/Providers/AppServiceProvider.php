@@ -4,11 +4,6 @@ namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
 
-use App\SchoolClass;
-
-use Validator;
-use Auth;
-
 class AppServiceProvider extends ServiceProvider
 {
     /**
@@ -18,17 +13,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        Validator::extend('ownsclass', function($attribute, $value, $parameters, $validator) {
-            $result = SchoolClass::where('id', $value)
-                ->where('user_id', Auth::user()->id)
-                ->count();
-
-            if ($result > 0) {
-                return true;
-            }
-
-            return false;
-        });
+        //
     }
 
     /**

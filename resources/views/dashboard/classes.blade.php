@@ -62,8 +62,8 @@
 								</tr>
 							</thead>
 							<tbody>
-								@if(isset($classStudents))
-                                    @foreach($classStudents as $classStudent)
+								@if (isset($classStudents))
+                                    @foreach ($classStudents as $classStudent)
                                 		<tr class-student-id="{{ $classStudent->id }}">
 											<td>
 												<div class="media-left media-middle">
@@ -106,6 +106,7 @@
 						</table>
 						<form action="/student" method="POST" id="create-student">
 							<input name="_token" value="{{ csrf_token() }}" hidden>
+							<input name="class_id" value="{{ $classId }}" hidden>
 						    <div class="content">
 						        <div class="row">
 						            <div class="col-md-12">
@@ -121,14 +122,7 @@
 													</li>
 
 													<li>
-														<a data-toggle="tab" href="#icon-only-tab2" title="" data-popup="tooltip" data-original-title="Achievements">
-															<i class="icon-stats-bars"></i>
-															<span class="visible-xs-inline-block position-right">Achievements</span>
-														</a>
-													</li>
-
-													<li>
-														<a data-toggle="tab" href="#icon-only-tab3" title="" data-popup="tooltip" data-original-title="Picture">
+														<a data-toggle="tab" href="#icon-only-tab2" title="" data-popup="tooltip" data-original-title="Picture">
 															<i class="icon-stack-picture"></i>
 															<span class="visible-xs-inline-block position-right">Picture</span>
 														</a>
@@ -170,9 +164,9 @@
 																</div>
 															</div>
 														</div>
-													</div>
 
-													<div id="icon-only-tab2" class="tab-pane has-padding">
+														<br />
+
 														<div class="row">
 															<label class="display-block text-bold" style="margin-left: 10px;">Student Achievements</label>
 															<div class="col-md-6">
@@ -214,7 +208,7 @@
 														</div>
 													</div>
 
-													<div id="icon-only-tab3" class="tab-pane has-padding">
+													<div id="icon-only-tab2" class="tab-pane has-padding">
 														<div class="row">
 															<label class="display-block text-bold" style="margin-left: 10px;">Student Image</label>
 															<div class="col-md-6">
@@ -240,12 +234,12 @@
 				<div class="col-md-4">
                     <div class="tabbable">
                         <ul class="nav nav-pills nav-pills-bordered nav-stacked">
-                            @if(isset($classes))
-                                @foreach($classes as $key => $class)
+                            @if (isset($classes))
+                                @foreach ($classes as $key => $class)
                                     <li>
                                         <a href="/dashboard/classes/{{ $class->id }}" class="class-button @if($selectedClass->id == $class->id) class-button-active @endif" class-id="{{ $class->id }}">{{ $class->class_name }}</a>
                                         <div class="btn-group">
-                                            <a href="javascript:;" class="btn btn-primary btn-icon dropdown-toggle @if($selectedClass->id == $class->id) class-options-active @else class-options @endif" data-toggle="dropdown" class-id="{{ $class->id }}">
+                                            <a href="javascript:void(0);" class="btn btn-primary btn-icon dropdown-toggle @if($selectedClass->id == $class->id) class-options-active @else class-options @endif" data-toggle="dropdown" class-id="{{ $class->id }}">
                                                 <i class="icon-menu7"></i>
                                                 <span class="caret"></span>
                                             </a>
@@ -263,7 +257,7 @@
                             @else
                             	<li>
                             @endif
-                                <a href="javascript:;" class="class-button class-button-create" data-toggle="modal" data-target="#modal_form_inline">Create a new class</a>
+                                <a href="javascript:void(0);" class="class-button class-button-create" data-toggle="modal" data-target="#modal_form_inline">Create a new class</a>
                             </li>
                         </ul>
                     </div>
@@ -274,7 +268,7 @@
 
 			<!-- Footer -->
 			<div class="footer text-muted">
-				&copy; 2015 SeatingPlanner by Toby Mellor
+				&copy; 2016 SeatingPlanner by Toby Mellor
 			</div>
 			<!-- /footer -->
 		</div>
@@ -298,15 +292,15 @@
 								<i class="icon-book text-muted"></i>
 							</div>
 						</div>
-						@if(isset($classes))
+						@if (isset($classes))
 							<br />
 							<br />
 							<div class="form-group">
-								<label class="display-block text-bold">Should we take a seating template from another class?</label>
+								<label class="display-block text-bold">Should we use a seating template?</label>
 								<select class="form-control" name="class_template" id="template-picker">
 									<optgroup label="Available class templates">
 										<option value="" selected>Select a class template to copy</option>
-										@foreach($classes as $class)
+										@foreach ($classes as $class)
 											<option value="{{ $class->id }}">{{ $class->class_name }}</option>
 										@endforeach
 									</optgroup>
@@ -357,7 +351,7 @@
 	    	let errorValidationResponses = {!! session('errorValidationResponse') !!};
 	    	var errorValidationResponse = '<br />';
 
-	    	for(var key in errorValidationResponses) {
+	    	for (var key in errorValidationResponses) {
 	    		errorValidationResponse += errorValidationResponses[key] + '<br />';
 	    	}
 
@@ -368,10 +362,8 @@
 	    @endif
 	</script>
 	<script>
-        $(document).ready(function()
-        {
-		    $('.duplicate-class').click(function()
-	        {
+        $(document).ready(function() {
+		    $('.duplicate-class').click(function() {
 	            $('#template-picker').val($(this)
 	            	.parent()
 	            	.parent()
@@ -381,13 +373,11 @@
 	            ).parent().hide();
 	        });
 
-	        $('.class-button-create').click(function()
-	        {
+	        $('.class-button-create').click(function() {
 	        	$('#template-picker').parent().show();
 	        });
 
-	        $('.delete-class').click(function()
-	        {
+	        $('.delete-class').click(function() {
 	        	classId = $(this)
 	            	.parent()
 	            	.parent()
@@ -396,8 +386,7 @@
 	            	.attr('class-id');
 	        });
 
-	        $('.delete-seatingplan').click(function()
-	        {
+	        $('.delete-seatingplan').click(function() {
 	        	classId = $(this)
 	            	.parent()
 	            	.parent()
@@ -406,7 +395,7 @@
 	            	.attr('class-id');
 	        });
 
-	        $('#create-student').submit(function(event){
+	        $('#create-student').submit(function(event) {
 		        event.preventDefault();
 
 		        var formData = $('#create-student').serializeArray().reduce(function(obj, item) {
@@ -414,21 +403,20 @@
 				    return obj;
 				}, {});
 
-		        $.ajax({
-		        	url: '/student',
+		        $.APIAjax({
+		        	url: '{{ url('api/student') }}',
 		        	type: 'POST',
 		        	data: {
-						_token: token,
 						student_name: formData['student_name'],
 						pupil_premium: formData['pupil_premium'],
 						class_id: formData['class_id'],
 						ability_cap: formData['ability_cap'],
 						current_attainment_level: formData['current_attainment_level'],
 						target_attainment_level: formData['target_attainment_level']
-		        	}
-		        }).done(function(data) {
-					if(data == "") {
+		        	},
+		        	success: function(jsonResponse) {
 						handleNotification(formData['student_name'] + ' has been added to the class!', 'success');
+
 						$.get('/html-snippets/table_element.html', function(html) {
 	                        html = html.replace('%firstLetter%', formData['student_name'].charAt(0).toUpperCase())
 	                        		   .replace('%studentName%', formData['student_name'])
@@ -438,27 +426,17 @@
 	                        		   .replace('%targetAttainmentLevel%', (formData['target_attainment_level'] === undefined) ? 'N/A' : formData['target_attainment_level']);
 	                        $(html).appendTo('tbody').fadeIn();
 	                    });
-	                    $('#create-student').trigger('reset');
-	                    $('a[data-original-title="Information"]').tab('show')
-					} else {
-						data = JSON.parse(data);
-						var errorMessage = data[0] + '<br />';
-						errorMessage += $.map(data[1], function(e){
-						    return e;
-						}).join('<br />');
 
-						handleNotification(errorMessage, 'error');
-					}
+	                    $('#create-student').trigger('reset');
+	                    $('a[data-original-title="Information"]').tab('show');
+					},
+					error: function(jsonResponse) {}
 		        });
 		    });
 
-	        $('.delete-student').click(function()
-	        {
+	        $('.delete-student').click(function() {});
 
-	        });
-
-	        $('.edit-student').click(function()
-	        {
+	        $('.edit-student').click(function() {
                 classStudent = $(this).closest('tr');
                 classStudentId = classStudent.attr('class-student-id');
 
@@ -467,7 +445,7 @@
                     if (index != length - 1) {
                         var editableInput = $(this).find('h6, span');
 
-                        if(editableInput.hasClass('current-attainment-level')
+                        if (editableInput.hasClass('current-attainment-level')
                                 || editableInput.hasClass('target-attainment-level')) {
                             editableInput.html(
                                 '<select class="form-control" name="' + (editableInput.hasClass('current-attainment-level') ? 'current_attainment_level' : 'target_attainment_level') + '" value="' + editableInput.html() + '">' +
@@ -484,9 +462,9 @@
                                     '</optgroup>' +
                                 '</select>'
                             );
-                        } else if(editableInput.hasClass('pupil-premium')) {
+                        } else if (editableInput.hasClass('pupil-premium')) {
                             editableInput.html('<input class="styled" type="checkbox" name="pupil_premium">');
-                        } else if(editableInput.hasClass('ability-cap')) {
+                        } else if (editableInput.hasClass('ability-cap')) {
                             editableInput.html(
                                 '<select class="form-control" name="ability_cap">' +
                                     '<optgroup label="Ability Cap">' +
@@ -516,8 +494,7 @@
         var classId = {{ $classId }};
         var token = '{{ csrf_token() }}';
 
-        function updateStudentInformation(classStudentId)
-        {
+        function updateStudentInformation(classStudentId) {
             console.log(classStudentId);
             classStudent = $('tr[class-student-id=' + classStudentId + ']');
 
@@ -534,11 +511,10 @@
             console.log(currentAttainmentLevel);
             console.log(targetAttainmentLevel);
 
-        	$.ajax({
-                url: '/class-student',
+        	$.APIAjax({
+                url: '{{ url('api/student') }}',
                 type: 'PUT',
                 data: {
-                    _token: token,
                     class_student_id: classStudentId,
                     student_name: studentName,
                     pupil_premium: pupilPremium,
@@ -546,48 +522,86 @@
                     ability_cap: abilityCap,
                     current_attainment_level: currentAttainmentLevel,
                     target_attainment_level: targetAttainmentLevel
-                }
-            }).done(function(data) {
-
-            console.log('test2');
-            	classStudent.find('.student-save').parent().html(
-                    '<div class="btn-group">' + 
-                        '<button type="button" class="btn btn-danger dropdown-toggle" data-toggle="dropdown">Options <span class="caret"></span></button>' +
-                        '<ul class="dropdown-menu dropdown-menu-right">' +
-                            '<li><a class="delete-student"><i class="icon-user-minus"></i> Delete</a></li>' +
-                            '<li><a class="edit-student"><i class="icon-pencil"></i> Edit</a></li>' +
-                        '</ul>' +
-                    '</div>'
-                );
+                },
+                success: function(jsonResponse) {
+	            	classStudent.find('.student-save').parent().html(
+	                    '<div class="btn-group">' + 
+	                        '<button type="button" class="btn btn-danger dropdown-toggle" data-toggle="dropdown">Options <span class="caret"></span></button>' +
+	                        '<ul class="dropdown-menu dropdown-menu-right">' +
+	                            '<li><a class="delete-student"><i class="icon-user-minus"></i> Delete</a></li>' +
+	                            '<li><a class="edit-student"><i class="icon-pencil"></i> Edit</a></li>' +
+	                        '</ul>' +
+	                    '</div>'
+	                );
+                },
+                error: function(jsonResponse) {}
             });
         }
 
-        function submitDeleteForm(URL, successMessage)
-        {                
-        	$.ajax({
+        function submitDeleteForm(URL, successMessage) {                
+        	$.APIAjax({
                 url: URL,
                 type: 'DELETE',
                 data: {
-                    _token: token,
                     class_id: classId
-                }
-            }).done(function(data) {
-            	handleNotification(successMessage, 'success')
+                },
+                success: function(jsonResponse) {
+                    handleNotification(jsonResponse.message, 'success');
+                },
+                error: function(jsonResponse) {}
             });
         }
 
-	    function handleNotification(notificationContent, type)
-	    {
-		    var n = noty({
-			    text: notificationContent,
-			    layout: 'topCenter',
-			    type: type
-			});
+        // notificationContent is the message e.g. 'hello' (string)
+        // type is the display type e.g. 'error' or 'success' (string)
+        function handleNotification(notificationContent, type, timeout = 7500) {
+            var n = noty({
+                text: notificationContent,
+                layout: 'topCenter',
+                type: type
+            });
 
-			setTimeout(function() {
-				n.close();
-			}, 5000);
-	    }
+            setTimeout(function() {
+                n.close();
+            }, timeout);
+        }
+
+        function isValidJson(jsonResponse) {
+            return $.isPlainObject(jsonResponse);
+        }
+
+        $.ajaxSetup({
+            headers: {
+                'X-CSRF-TOKEN': token
+            }
+        });
+
+        $.extend({
+            APIAjax: function(params){
+                params.error = function() {
+                    handleNotification('A server-side error occured. Try refreshing if the problem persists.', 'error');
+                };
+
+                if (params.success && typeof params.success == 'function') {
+                    var successCallback = params.success;
+                    var ourCallback = function(responseJson) {
+                        if (isValidJson(responseJson)) { // Validate the data
+                            if (responseJson.error == 0) {
+                                successCallback(responseJson); // Continue to function
+                            } else {
+                                handleNotification(responseJson.message, 'error');
+                            }
+                        } else {
+                            handleNotification('A server-side error occured. Try refreshing if the problem persists.', 'error');
+                        }
+                    }
+
+                    params.success = ourCallback;
+                }
+
+                return $.ajax(params);
+            }
+        });
     </script>
 
 @stop

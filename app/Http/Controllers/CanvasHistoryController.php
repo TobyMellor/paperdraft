@@ -112,16 +112,4 @@ class CanvasHistoryController extends Controller
             'canvas_action_undo_count' => 'required|integer|max:' . $this->getCanvasHistoryCount()
         ]);
     }
-
-    /**
-     * Validates an array of information.
-     *
-     * @return Validator
-     */
-    protected function classIdValidator(array $data)
-    {
-        return Validator::make($data, [
-            'class_id' => 'required|integer|ownsclass'
-        ]);
-    }
 }
