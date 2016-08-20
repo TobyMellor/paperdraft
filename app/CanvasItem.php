@@ -34,4 +34,12 @@ class CanvasItem extends Model
         'position_x',
         'position_y',
     ];
+
+    /**
+     * Get the user that owns the school class.
+     */
+    public function schoolClass()
+    {
+        return $this->belongsTo(SchoolClass::class, 'class_id', 'id');
+    }
 }

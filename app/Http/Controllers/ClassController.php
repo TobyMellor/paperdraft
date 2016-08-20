@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\SchoolClass;
+use App\CanvasItem;
 
 use Auth;
 use Validator;
@@ -80,6 +81,22 @@ class ClassController extends Controller
             ->first();
 
         return $class;
+    }
+
+    /**
+     * Get most recent class id of a teacher
+     *
+     * @return \Illuminate\Http\Redirect
+     */
+    public function getRecentClassId()
+    {   
+        $classId = CanvasItem::whereHas('SchoolClass', function($query){                           
+            $query->where('classes.user_id', Auth::user()->id);                             
+        })->orderBy('created_at', 'desc')->first()->class_id;
+
+        // 'SELECT * FROM canvas_items JOIN canvas_items.class_id ON classes.id WHERE classes.user_id = 1 ORDER BY canvas_items.created_at'
+
+        return $classId;
     }
 
     /**

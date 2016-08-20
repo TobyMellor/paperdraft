@@ -224,7 +224,7 @@
 						                </fieldset>
 						                <br />
 						                <div class="text-right">
-						                    <button type="submit" class="btn btn-primary">Create Student<i class="icon-arrow-right14 position-right"></i></button>
+						                    <button type="submit" class="btn btn-primary">Add Student<i class="icon-arrow-right14 position-right"></i></button>
 						                </div>
 						            </div>
 						        </div>

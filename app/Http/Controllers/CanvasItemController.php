@@ -39,8 +39,8 @@ class CanvasItemController extends Controller
 
         return response()->json([
             'canvas_items' => $canvasItems,
-            'error' => 0,
-            'message' => trans('api.canvas-item.success.index')
+            'error'        => 0,
+            'message'      => trans('api.canvas-item.success.index')
         ]);
     }
 
@@ -70,8 +70,8 @@ class CanvasItemController extends Controller
 
         return response()->json([
             'canvas_item' => $storedCanvasItem,
-            'error' => 0,
-            'message' => trans('api.canvas-item.success.store')
+            'error'       => 0,
+            'message'     => trans('api.canvas-item.success.store')
         ]);
     }
 
@@ -103,8 +103,8 @@ class CanvasItemController extends Controller
 
         return response()->json([
             'canvas_item' => $canvasItem,
-            'error' => 0,
-            'message' => trans('api.canvas-item.success.update')
+            'error'       => 0,
+            'message'     => trans('api.canvas-item.success.update')
         ]);
     }
 
@@ -129,8 +129,8 @@ class CanvasItemController extends Controller
 
         return response()->json([
             'canvas_items' => $responses,
-            'error' => 0,
-            'message' => trans('api.canvas-item.success.batch-update')
+            'error'        => 0,
+            'message'      => trans('api.canvas-item.success.batch-update')
         ]);
     }
 
@@ -151,7 +151,7 @@ class CanvasItemController extends Controller
             ->delete();
 
         return response()->json([
-            'error' => 0,
+            'error'   => 0,
             'message' => trans('api.canvas-item.success.destroy')
         ]);
     }
@@ -175,13 +175,13 @@ class CanvasItemController extends Controller
                 ->delete();
 
             return response()->json([
-                'error' => 0,
+                'error'   => 0,
                 'message' => trans('api.canvas-item.success.batch-destroy')
             ]);
         }
 
         return response()->json([
-            'error' => 1,
+            'error'   => 1,
             'message' => trans('api.canvas-item.failure.batch-destroy')
         ]);
     }

@@ -67,9 +67,9 @@
                             @if(isset($classes))
                                 @foreach($classes as $key => $class)
                                     <li>
-                                        <a href="javascript:void(0);" class="class-button @if($key == 0) class-button-active @endif" class-id="{{ $class->id }}">{{ $class->class_name }}</a>
+                                        <a href="javascript:void(0);" class="class-button" class-id="{{ $class->id }}">{{ $class->class_name }}</a>
                                         <div class="btn-group">
-                                            <a href="javascript:void(0);" class="btn btn-primary btn-icon dropdown-toggle @if($key == 0) class-options-active @else class-options @endif" data-toggle="dropdown" class-id="{{ $class->id }}">
+                                            <a href="javascript:void(0);" class="btn btn-primary btn-icon dropdown-toggle class-options" data-toggle="dropdown" class-id="{{ $class->id }}">
                                                 <i class="icon-menu7"></i>
                                                 <span class="caret"></span>
                                             </a>
@@ -277,6 +277,7 @@
                         .removeClass('class-options');
 
                     var classId = parseInt($(this).attr('class-id'));
+                    canvasController.view.setActiveClass(classId);
 
                     canvasController.classId = classId;
                     canvasController.clearSession();
@@ -439,6 +440,14 @@
                 var canvasItemElement = this.getCanvasItem(canvasItemId);
                 
                 canvasItemElement.css('background-image', 'url(\'' + assetsBasePath + canvasBackgroundImage + '\')');
+            }
+
+            setActiveClass(classId) {
+                $('.class-button-active').removeClass('class-button-active').addClass('class-button');
+                $('.class-options-active').removeClass('class-options-active').addClass('class-options');
+
+                $('.class-button[class-id=' + classId + ']').removeClass('class-button').addClass('class-button-active');
+                $('.class-options[class-id=' + classId + ']').removeClass('class-options').addClass('class-options-active');
             }
         }
 
@@ -1509,13 +1518,51 @@
             isValidJson(jsonResponse) {
                 return $.isPlainObject(jsonResponse);
             }
+
+            getQueryParams() {
+                var query_string = {};
+                var query = window.location.search.substring(1);
+                var vars = query.split("&");
+                for (var i=0;i<vars.length;i++) {
+                    var pair = vars[i].split("=");
+                    // If first entry with this name
+                    if (typeof query_string[pair[0]] === "undefined") {
+                        query_string[pair[0]] = decodeURIComponent(pair[1]);
+                        // If second entry with this name
+                    } else if (typeof query_string[pair[0]] === "string") {
+                        var arr = [ query_string[pair[0]],decodeURIComponent(pair[1]) ];
+                        query_string[pair[0]] = arr;
+                    // If third or later entry with this name
+                    } else {
+                        query_string[pair[0]].push(decodeURIComponent(pair[1]));
+                    }
+                } 
+
+                return query_string;
+            }
+
+            isInt(value) {
+              return !isNaN(value) && 
+                     parseInt(Number(value)) == value && 
+                     !isNaN(parseInt(value, 10));
+            }
         }
 
         function bootstrapper() {
-            var classId = parseInt($('.class-button:first').attr('class-id'));
-
             utils = new Utils;
             notificationController = new NotificationController;
+
+            var queryParameters = utils.getQueryParams();
+            var classId = {{ $recentClassId or 'parseInt($(".class-button:first").attr("class-id"))' }};
+
+            if (queryParameters.hasOwnProperty('class')) {
+                if (utils.isInt(queryParameters.class) && $('.class-button[class-id=' + queryParameters.class + ']').length > 0) {
+                    classId = queryParameters.class;
+                }
+            }
+
+            var view = new View;
+            view.setActiveClass(classId);
 
             $.ajaxSetup({
                 headers: {
