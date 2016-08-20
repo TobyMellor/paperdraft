@@ -38,17 +38,18 @@ class StudentController extends Controller
      * Store a newly created resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      */
     public function store(Request $request)
     {
         $studentName = $request->input('student_name');
         $pupilPremium = $request->input('pupil_premium');
-        $classId = $request->input('class_id');
         $abilityCap = $request->input('ability_cap');
         $currentAttainmentLevel = $request->input('current_attainment_level');
         $targetAttainmentLevel = $request->input('target_attainment_level');
         $studentImage = $request->input('student_image');
+
+        $classId = $request->input('class_id');
 
         if ($pupilPremium == 'on') {
             $pupilPremium = true;
@@ -103,48 +104,99 @@ class StudentController extends Controller
     }
 
     /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //
-    }
-
-    /**
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      */
     public function update(Request $request, $id)
     {
-        //
+        $studentName = $request->input('student_name');
+        $pupilPremium = $request->input('pupil_premium');
+        $abilityCap = $request->input('ability_cap');
+        $currentAttainmentLevel = $request->input('current_attainment_level');
+        $targetAttainmentLevel = $request->input('target_attainment_level');
+        $studentImage = $request->input('student_image');
+
+        $classId = $request->input('class_id');
+
+        if ($pupilPremium == 'on') {
+            $pupilPremium = true;
+        } else {
+            $pupilPremium = false;
+        }
+
+        $data = [
+            'student_name'             => $studentName,
+            'pupil_premium'            => $pupilPremium,
+            'ability_cap'              => $abilityCap,
+            'current_attainment_level' => $currentAttainmentLevel,
+            'target_attainment_level'  => $targetAttainmentLevel
+        ];
+
+        $validation = $this->validator($data);
+
+        if (!$validation->fails()) {
+            Student::where('user_id', Auth::user()->id)
+                ->where('id', $id)
+                ->update([
+                    'name'          => $studentName,
+                    'pupil_premium' => $pupilPremium
+                ]);
+
+            ClassStudent::where('class_id', $classId)
+                ->where('student_id', $id)
+                ->update([
+                    'ability_cap'              => $abilityCap,
+                    'current_attainment_level' => $currentAttainmentLevel,
+                    'target_attainment_level'  => $targetAttainmentLevel
+                ]);
+
+            return response()->json([
+                'error'   => 0,
+                'message' => trans('api.student.success.update')
+            ]);
+        }
+
+        $errorMessages = $validation->errors()->all();
+        $responseMessage = '';
+
+        foreach ($errorMessages as $errorMessage) {
+            $responseMessage .= $errorMessage;
+        }
+
+        return response()->json([
+            'error'   => 1,
+            'message' => $responseMessage
+        ]);
     }
 
     /**
      * Remove the specified resource from storage.
      *
+     * @param  \Illuminate\Http\Request  $request
      * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      */
-    public function destroy($id)
+    public function destroy(Request $request, $id)
     {
-        //
+        $studentId = $request->input('student_id');
+        $classId = $request->input('class_id');
+
+        ClassStudent::where('class_id', $classId)
+            ->where('student_id', $id)
+            ->delete();
+
+        if (ClassStudent::where('student_id', $id)->count() == 0 && Student::where('id', $id)->first()->user_id == Auth::user()->id) {
+            Student::where('id', $id)
+                ->delete();
+        }
+
+        return response()->json([
+            'error' => 0,
+            'message' => trans('api.student.success.destroy')
+        ]);
     }
 
     protected function validator(array $data)

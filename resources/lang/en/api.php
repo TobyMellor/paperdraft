@@ -48,8 +48,10 @@ return [
     ],
     'student' => [
         'success' => [
-            'index' => 'All of the students were successfully returned.',
-            'store' => 'The student was successfully stored.',
+            'index'   => 'All of the students were successfully returned.',
+            'store'   => 'The student was successfully stored.',
+            'update'  => 'The student was successfully updated.',
+            'destroy' => 'The student was successfully deleted.'
         ]
     ]
 ];

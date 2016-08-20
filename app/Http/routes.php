@@ -13,11 +13,11 @@
 
 //The user cannot be logged in to perform these actions
 Route::group(['middleware' => ['web', 'guest']], function () {
-    Route::get('/login', 'UserController@getLogin');
-    Route::post('/login', 'UserController@authenticateUser');
+    Route::get('login', 'UserController@getLogin');
+    Route::post('login', 'UserController@authenticateUser');
 
-    Route::get('/register', 'UserController@getRegister');
-    Route::post('/register', 'UserController@storeUser');
+    Route::get('register', 'UserController@getRegister');
+    Route::post('register', 'UserController@storeUser');
 
     Route::get('email/confirmation', 'UserController@confirmEmail');
     Route::get('email/confirmation/send/{email}', 'UserController@sendConfirmationEmail');
@@ -31,23 +31,23 @@ Route::group(['middleware' => ['web', 'guest']], function () {
 
 //The user needs to be authenticated to perform these actions
 Route::group(['middleware' => ['web', 'auth']], function () {
-    Route::get('/dashboard', 'IndexController@getDashboard');
-    Route::get('/dashboard/classes', 'IndexController@getClassesDashboard');
-    Route::get('/dashboard/classes/{classId}', 'IndexController@getClassDashboard');
+    Route::get('dashboard', 'IndexController@getDashboard');
+    Route::get('dashboard/classes', 'IndexController@getClassesDashboard');
+    Route::get('dashboard/classes/{classId}', 'IndexController@getClassDashboard');
 
-    Route::get('/logout', 'UserController@getLogout');
+    Route::get('logout', 'UserController@getLogout');
 
-    Route::post('/class', 'ClassController@storeClass');
-    Route::delete('/class', 'ClassController@deleteClass');
+    Route::post('class', 'ClassController@storeClass');
+    Route::delete('class', 'ClassController@deleteClass');
 
     Route::group(['middleware' => ['api']], function () {
         Route::resource('api/canvas-item', 'CanvasItemController',
             [
                 'only' => [
-                    'index',  // GET     api/canvas-item
-                    'store',  // POST    api/canvas-item
-                    'update', // PUT     api/canvas-item/{canvas-item-id}
-                    'destroy' // DELETE  api/canvas-item/{canvas-item-id}
+                    'index',  // GET    api/canvas-item
+                    'store',  // POST   api/canvas-item
+                    'update', // PUT    api/canvas-item/{canvas-item-id}
+                    'destroy' // DELETE api/canvas-item/{canvas-item-id}
                 ],
             ]
         );
@@ -63,10 +63,10 @@ Route::group(['middleware' => ['web', 'auth']], function () {
         Route::resource('api/student', 'StudentController',
             [
                 'only' => [
-                    'index',  // GET     api/student
-                    'store',  // POST    api/student
-                    'update', // PUT     api/student/{student-id}
-                    'destroy' // DELETE  api/student/{student-id}
+                    'index',  // GET    api/student
+                    'store',  // POST   api/student
+                    'update', // PUT    api/student/{student-id}
+                    'destroy' // DELETE api/student/{student-id}
                 ],
             ]
         );
