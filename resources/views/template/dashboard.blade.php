@@ -35,6 +35,7 @@
         <script type="text/javascript" src="{{ asset('assets/js/pages/components_modals.js') }}"></script>
         <script type="text/javascript" src="{{ asset('assets/js/pages/uploader_bootstrap.js') }}"></script>
         <script type="text/javascript" src="{{ asset('assets/js/plugins/notifications/noty.min.js') }}"></script>
+        <script type="text/javascript" src="{{ asset('assets/js/plugins/notifications/sweet_alert.min.js') }}"></script>
     </head>
 
     <body>

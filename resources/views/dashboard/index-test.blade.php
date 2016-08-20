@@ -39,7 +39,7 @@
                 <div class="col-md-8">
                     <div class="panel panel-white">
                         <div class="panel-heading">
-                            <h6 class="panel-title"><span class="text-semibold">Seating Planner</span> <span class="text-muted"><small>Year 11<small></span></h6>
+                            <h6 class="panel-title"><span class="text-semibold">Seating Planner</span> <span class="text-muted"><small id="class-name">Year 11<small></span></h6>
                             <div class="heading-elements">
                                 <ul class="pagination pagination-flat pagination-sm">
                                     <li><a href="#">←</a></li>
@@ -261,29 +261,10 @@
             $('.class-button').click(function() {
                 if (!$(this).hasClass('class-button-active')) {
                     if (hasUserMadeChanges) {
-                        canvasController.saveCanvasItems('Do you want to save the changes made to the seating plan for "' + $('.class-button.class-button-active').text() + '"?');
+                        canvasController.confirmPageLeave($(this));
+                    } else {
+                        canvasController.view.changeClass($(this));
                     }
-
-                    hasUserMadeChanges = false;
-
-                    $('.class-button.class-button-active').removeClass('class-button-active');
-                    $(this).addClass('class-button-active');
-
-                    $('.class-options-active').removeClass('class-options-active').addClass('class-options');
-                    $(this).parent()
-                        .children().eq(1)
-                        .children().eq(0)
-                        .addClass('class-options-active')
-                        .removeClass('class-options');
-
-                    var classId = parseInt($(this).attr('class-id'));
-                    canvasController.view.setActiveClass(classId);
-
-                    canvasController.classId = classId;
-                    canvasController.clearSession();
-                    canvasController.loadCanvasItems();
-
-                    historyController.loadCanvasHistory();
                 }
             });
 
@@ -308,6 +289,16 @@
                 //copyActiveItem(false);
             }).bind('cut', function() {
                 //copyActiveItem(true);
+            });
+
+            $(document).on('click', 'a', function(event) {
+                event.preventDefault();
+
+                var clickedLink = $(this).attr('href');
+
+                if (clickedLink != 'javascript:void(0);') {
+                    canvasController.confirmPageLeave(null, clickedLink);
+                }
             });
 
             bootstrapper(); // Start initializing
@@ -451,6 +442,31 @@
 
                 $('#classes-href').attr('href', '{{ url('dashboard/classes') }}/' + classId);
                 $('.class-button-create').attr('href', '{{ url('dashboard/classes') }}/' + classId + '/create');
+
+                $('#class-name').text($('.class-button-active[class-id=' + classId + ']').text());
+            }
+
+            changeClass(buttonElement) {
+                hasUserMadeChanges = false;
+
+                $('.class-button.class-button-active').removeClass('class-button-active');
+                buttonElement.addClass('class-button-active');
+
+                $('.class-options-active').removeClass('class-options-active').addClass('class-options');
+                buttonElement.parent()
+                    .children().eq(1)
+                    .children().eq(0)
+                    .addClass('class-options-active')
+                    .removeClass('class-options');
+
+                var classId = parseInt(buttonElement.attr('class-id'));
+                canvasController.view.setActiveClass(classId);
+
+                canvasController.classId = classId;
+                canvasController.clearSession();
+                canvasController.loadCanvasItems();
+
+                historyController.loadCanvasHistory();
             }
         }
 
@@ -485,7 +501,7 @@
                 });
             }
 
-            store(classId, canvasHistory, canvasActionUndoCount) {
+            store(classId, canvasHistory, canvasActionUndoCount, buttonElement = null, externalLink = null) {
                 $.APIAjax({
                     url: '{{ url('api/canvas-history') }}',
                     type: 'POST',
@@ -494,7 +510,15 @@
                         canvas_action_undo_count: canvasActionUndoCount,
                         class_id: classId
                     },
-                    success: function(jsonResponse) {},
+                    success: function(jsonResponse) {
+                        setTimeout(function() {
+                            if (buttonElement != null) {
+                                canvasController.view.changeClass(buttonElement);
+                            } else if (externalLink != null) {
+                                window.location.href = externalLink;
+                            }
+                        }, 2000);
+                    },
                     error: function(jsonReponse) {}
                 });
             }
@@ -677,6 +701,8 @@
                 var canvasItem = {
                     item_id: itemId
                 };
+
+                hasUserMadeChanges = true;
 
                 if (isPseudoCanvasItem) {
                     canvasItem.id = 'Pseudo-' + Math.floor(Math.random() * 99999) + 1
@@ -1296,34 +1322,64 @@
                 return false;
             }
 
-            saveCanvasItems(message = null) {
-                var userConfirmation = message !== null ? confirm(message) : true;
+            confirmPageLeave(buttonElement = null, externalLink = null) {
+                swal({
+                    title: "Do you want to save changes made to '" + $('#class-name').text() + "'?",
+                    text: "Your changes will be lost if you don’t save them.",
+                    type: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#66BB6A",
+                    confirmButtonText: "Save seating plan",
+                    cancelButtonText: "Continue without saving",
+                    closeOnConfirm: false,
+                    closeOnCancel: true
+                }, function(isConfirm){
+                    if (isConfirm) {
+                        $('.confirm').html('Loading <i class="icon-spinner2 spinner" style="margin-left: 5px;"></i>');
 
-                if (userConfirmation) {      
-                    var canvasItems = this.canvasItems,
-                        softDeletedCanvasItems = this.softDeletedCanvasItems,
-                        canvasItemModel = this.canvasItemModel,
-                        classId = this.classId;
+                        canvasController.saveCanvasItems(buttonElement, externalLink);
 
-                    var mergedCanvasItems = $.extend({}, canvasItems, softDeletedCanvasItems); // Merge canvasItems and softDeletedCanvasItems since we need to store softDeleted too so user use history to revert back later
-
-                    for (var canvasItemId in mergedCanvasItems) {
-                        var canvasItem = mergedCanvasItems[canvasItemId];
-
-                        if (canvasItem.pseudo_item) {
-                            this.view.removeCanvasItem(canvasItemId);
-                            canvasItemModel.store(classId, canvasItem);
+                        swal({
+                            title: "Saved!",
+                            text: "Your changes to '" + $('#class-name').text() + "' have been saved.",
+                            confirmButtonColor: "#66BB6A",
+                            type: "success",
+                            timer: 2000
+                        });
+                    } else {
+                        if (buttonElement != null) {
+                            canvasController.view.changeClass(buttonElement);
+                        } else if (externalLink != null) {
+                            window.location.href = externalLink;
                         }
                     }
+                });
+            }
 
-                    if (Object.keys(canvasItems).length > 0) {
-                        canvasItemModel.batchUpdate(classId, canvasItems);
+            saveCanvasItems(buttonElement = null, externalLink = null) {   
+                var canvasItems = this.canvasItems,
+                    softDeletedCanvasItems = this.softDeletedCanvasItems,
+                    canvasItemModel = this.canvasItemModel,
+                    classId = this.classId;
+
+                var mergedCanvasItems = $.extend({}, canvasItems, softDeletedCanvasItems); // Merge canvasItems and softDeletedCanvasItems since we need to store softDeleted too so user use history to revert back later
+
+                for (var canvasItemId in mergedCanvasItems) {
+                    var canvasItem = mergedCanvasItems[canvasItemId];
+
+                    if (canvasItem.pseudo_item) {
+                        this.view.removeCanvasItem(canvasItemId);
+                        canvasItemModel.store(classId, canvasItem);
                     }
+                }
+
+                if (Object.keys(canvasItems).length > 0) {
+                    canvasItemModel.batchUpdate(classId, canvasItems);
                 }
 
                 this.deleteCanvasItems(this.softDeletedCanvasItems);
 
-                historyController.storeCanvasHistory();
+                historyController.storeCanvasHistory(buttonElement, externalLink);
             }
 
             clearSession() {
@@ -1390,7 +1446,7 @@
                 }
             }
 
-            storeCanvasHistory() {
+            storeCanvasHistory(buttonElement = null, externalLink = null) {
                 var canvasHistory = this.canvasHistory,
                     canvasHistoryModel = this.canvasHistoryModel,
                     maxCanvasHistoryCount = this.maxCanvasHistoryCount,
@@ -1399,7 +1455,7 @@
 
                 var slicedHistory = canvasHistory.slice(Math.max(canvasHistory.length - maxCanvasHistoryCount, 0)); // Don't send > maxCanvasHistoryCount to DB
 
-                canvasHistoryModel.store(classId, slicedHistory, canvasActionUndoCount);
+                canvasHistoryModel.store(classId, slicedHistory, canvasActionUndoCount, buttonElement, externalLink);
 
                 this.canvasActionUndoCount = canvasActionUndoCount;
             }
