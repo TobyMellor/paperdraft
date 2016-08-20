@@ -87,7 +87,7 @@
                             @else
                                 <li>
                             @endif
-                                <a href="javascript:void(0);" class="class-button class-button-create" data-toggle="modal" data-target="#modal_form_inline">Create a new class</a>
+                                <a href="javascript:void(0);" class="class-button-create">Create a new class</a>
                             </li>
                         </ul>
                     </div>
@@ -448,6 +448,9 @@
 
                 $('.class-button[class-id=' + classId + ']').removeClass('class-button').addClass('class-button-active');
                 $('.class-options[class-id=' + classId + ']').removeClass('class-options').addClass('class-options-active');
+
+                $('#classes-href').attr('href', '{{ url('dashboard/classes') }}/' + classId);
+                $('.class-button-create').attr('href', '{{ url('dashboard/classes') }}/' + classId + '/create');
             }
         }
 

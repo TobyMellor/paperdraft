@@ -79,7 +79,7 @@
                         <div class="sidebar-user">
                             <div class="category-content">
                                 <div class="media">
-                                    <a href="#" class="media-left"><img src="{{ asset('assets/images/placeholder.jpg') }}" class="img-circle img-sm" alt=""></a>
+                                    <a href="javascript:void(0);" class="media-left"><img src="{{ asset('assets/images/placeholder.jpg') }}" class="img-circle img-sm" alt=""></a>
                                     <div class="media-body">
                                         <span class="media-heading text-semibold">{{ current(explode("@", Auth::user()->email, 2)) }}</span>
                                         <div class="text-size-mini text-muted">
@@ -89,7 +89,7 @@
                                     <div class="media-right media-middle">
                                         <ul class="icons-list">
                                             <li>
-                                                <a href="#"><i class="icon-cog3"></i></a>
+                                                <a href="javascript:void(0);"><i class="icon-cog3"></i></a>
                                             </li>
                                         </ul>
                                     </div>
@@ -106,14 +106,14 @@
                                         <span>Main</span>
                                         <i class="icon-menu" title="Main pages"></i>
                                     </li>
-                                    <li @if(app('url')->current() == url('/dashboard')) class="active" @endif>
-                                        <a href="/dashboard">
+                                    <li @if(app('url')->current() == url('dashboard')) class="active" @endif>
+                                        <a id="planner-href" href="{{ url('dashboard') }}">
                                             <i class="icon-home4"></i>
                                             <span>Dashboard</span>
                                         </a>
                                     </li>
-                                    <li @if(strpos(app('url')->current(), url('/dashboard/classes')) !== false) class="active" @endif>
-                                        <a href="/dashboard/classes">
+                                    <li @if(strpos(app('url')->current(), url('dashboard/classes')) !== false) class="active" @endif>
+                                        <a id="classes-href" href="{{ url('dashboard/classes') }}">
                                             <i class="icon-design"></i>
                                             <span>Manage Classes</span>
                                         </a>

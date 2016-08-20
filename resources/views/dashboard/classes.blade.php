@@ -47,7 +47,7 @@
 								</span>
 							</h6>
 							<div class="heading-elements">
-								<a class="btn bg-teal-400" href="javascript:void(0);"><i class="icon-statistics position-left"></i> View Seating Plan</a>
+								<a class="btn bg-teal-400" href="{{ url('dashboard') }}?class={{ $classId }}"><i class="icon-statistics position-left"></i> View Seating Plan</a>
 		                	</div>
 						<a class="heading-elements-toggle"><i class="icon-menu"></i></a></div>
 						<table class="table text-nowrap">
@@ -245,7 +245,7 @@
                                                 <span class="caret"></span>
                                             </a>
                                             <ul class="dropdown-menu dropdown-menu-right">
-                                                <li><a href="javascript:void(0);" class="duplicate-class" data-toggle="modal" data-target="#modal_form_inline">Duplicate class template</a></li>
+                                                <li><a href="javascript:void(0);" class="duplicate-class" data-toggle="modal" data-target="#modal_create_class">Duplicate class template</a></li>
                                                 <li class="divider"></li>
                                                 <li><a href="javascript:void(0);" class="delete-seatingplan" data-toggle="modal" data-target="#modal_delete_seatingplan">Clear seating plan</a></li>
                                                 <li><a href="javascript:void(0);" class="delete-class" data-toggle="modal" data-target="#modal_delete_class">Delete class</a></li>
@@ -258,7 +258,7 @@
                             @else
                             	<li>
                             @endif
-                                <a href="javascript:void(0);" class="class-button class-button-create" data-toggle="modal" data-target="#modal_form_inline">Create a new class</a>
+                                <a href="javascript:void(0);" class="class-button class-button-create" data-toggle="modal" data-target="#modal_create_class">Create a new class</a>
                             </li>
                         </ul>
                     </div>
@@ -276,7 +276,7 @@
 		<!-- /content area -->
 	</div>
 	<!-- /main content -->
-	<div id="modal_form_inline" class="modal fade">
+	<div id="modal_create_class" class="modal fade">
 		<div class="modal-dialog">
 			<div class="modal-content text-center">
 				<div class="modal-header bg-primary">
@@ -626,6 +626,12 @@
 			'</div>'
 		);
 
+		setActiveClass(classId);
+
+		@if (session('create'))
+			$('#modal_create_class').modal('show');
+		@endif
+
         function updateClassStudent(form) {
 	        var formData = form.serializeArray().reduce(function(obj, item) {
 			    obj[item.name] = item.value;
@@ -708,6 +714,10 @@
                 },
                 error: function(jsonResponse) {}
             });
+        }
+
+        function setActiveClass(classId) {
+            $('#planner-href').attr('href', '{{ url('dashboard') }}?class=' + classId);
         }
 
         // notificationContent is the message e.g. 'hello' (string)

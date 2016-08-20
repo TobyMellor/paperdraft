@@ -34,6 +34,9 @@ Route::group(['middleware' => ['web', 'auth']], function () {
     Route::get('dashboard', 'IndexController@getDashboard');
     Route::get('dashboard/classes', 'IndexController@getClassesDashboard');
     Route::get('dashboard/classes/{classId}', 'IndexController@getClassDashboard');
+    Route::get('dashboard/classes/{classId}/create', function($classId) {
+        return redirect('dashboard/classes/' . $classId)->with('create', true);
+    });
 
     Route::get('logout', 'UserController@getLogout');
 
