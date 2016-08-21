@@ -48,9 +48,9 @@ class IndexController extends Controller
 
         if ($classes->first() != null) {
             return redirect('/dashboard/classes/' . $classes->first()->id);
-        } else {
-            return abort(503);
         }
+        
+        return view('dashboard.wizard');
     }
 
     /**
