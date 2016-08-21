@@ -90,12 +90,12 @@ class ClassController extends Controller
      */
     public function getRecentClassId()
     {   
-        $class = CanvasItem::whereHas('SchoolClass', function($query){                           
+        $canvasItem = CanvasItem::whereHas('SchoolClass', function($query){                           
             $query->where('classes.user_id', Auth::user()->id);                             
         })->orderBy('created_at', 'desc')->first();
 
-        if ($class != null) {
-            return $class->id;
+        if ($canvasItem != null) {
+            return $canvasItem->class_id;
         }
 
         return null;
