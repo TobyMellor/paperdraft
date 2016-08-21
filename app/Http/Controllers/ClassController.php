@@ -18,6 +18,54 @@ class ClassController extends Controller
     }
 
     /**
+     * Store a newly created resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function store(Request $request)
+    {
+        $className = $request->input('class_name');
+        $classSubject = $request->input('class_subject');
+        $classRoom = $request->input('class_room');
+
+        $data = [
+            'class_name'    => $className,
+            'class_subject' => $classSubject,
+            'class_room'    => $classRoom,
+        ];
+
+        $validation = $this->validateClass($data);
+
+        if (!$validation->fails()) {
+            $storedClass = SchoolClass::create([
+                'user_id'       => Auth::user()->id,
+                'class_name'    => $className,
+                'class_subject' => $classSubject,
+                'class_room'    => $classRoom,
+            ]);
+
+            return response()->json([
+                'class'   => $storedClass,
+                'error'   => 0,
+                'message' => trans('api.class.success.store')
+            ]);
+        }
+
+        $errorMessages = $validation->errors()->all();
+        $responseMessage = '';
+
+        foreach ($errorMessages as $errorMessage) {
+            $responseMessage .= $errorMessage;
+        }
+        
+        return response()->json([
+            'error'   => 1,
+            'message' => $responseMessage
+        ]);
+    }
+
+    /**
      * Store the class in the database.
      *
      * @return \Illuminate\Http\Redirect
@@ -157,6 +205,15 @@ class ClassController extends Controller
         return Validator::make($data, [
             'class_name'     => 'required|between:1,30',
             'class_template' => 'integer|exists:classes,id'
+        ]);
+    }
+
+    protected function validateClass(array $data)
+    {
+        return Validator::make($data, [
+            'class_name'    => 'required|between:1,30',
+            'class_subject' => 'string|between:1,30',
+            'class_room'    => 'string|between:1,30'
         ]);
     }
 }

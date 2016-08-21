@@ -13,6 +13,7 @@
         <link href="{{ asset('assets/css/components.min.css') }}" rel="stylesheet" type="text/css">
         <link href="{{ asset('assets/css/colors.min.css') }}" rel="stylesheet" type="text/css">
         <link href="{{ asset('assets/css/seatingplanner.css') }}" rel="stylesheet" type="text/css">
+        <link href="{{ asset('assets/css/components.min.css') }}" rel="stylesheet" type="text/css">
         <!-- /global stylesheets -->
 
         <!-- Core JS files -->
@@ -23,19 +24,30 @@
         <!-- /core JS files -->
 
         <!-- Theme JS files -->
+        <script type="text/javascript" src="{{ asset('assets/js/plugins/forms/wizards/steps.min.js') }}"></script> {{-- Somethings messing up tags here... --}}
+        <script type="text/javascript" src="{{ asset('assets/js/plugins/forms/selects/select2.min.js') }}"></script>
+        <script type="text/javascript" src="{{ asset('assets/js/plugins/forms/styling/uniform.min.js') }}"></script>
+        <script type="text/javascript" src="{{ asset('assets/js/plugins/forms/validation/validate.min.js') }}"></script>
         <script type="text/javascript" src="{{ asset('assets/js/core/libraries/jquery_ui/interactions.min.js') }}"></script>
-        <script type="text/javascript" src="{{ asset('assets/js/pages/appearance_draggable_panels.js') }}"></script>
         <script type="text/javascript" src="{{ asset('assets/js/core/libraries/jquery_ui/touch.min.js') }}"></script>
         <script type="text/javascript" src="{{ asset('assets/js/core/libraries/jquery_ui/effects.min.js') }}"></script>
         <script type="text/javascript" src="{{ asset('assets/js/plugins/uploaders/fileinput.min.js') }}"></script>
         <script type="text/javascript" src="{{ asset('assets/js/plugins/buttons/spin.min.js') }}"></script>
         <script type="text/javascript" src="{{ asset('assets/js/plugins/buttons/ladda.min.js') }}"></script>
+        <script type="text/javascript" src="{{ asset('assets/js/plugins/notifications/noty.min.js') }}"></script>
+        <script type="text/javascript" src="{{ asset('assets/js/plugins/notifications/sweet_alert.min.js') }}"></script>
+
+
+        <script type="text/javascript" src="{{ asset('assets/js/plugins/forms/tags/tagsinput.min.js') }}"></script>
+        <script type="text/javascript" src="{{ asset('assets/js/plugins/forms/tags/tokenfield.min.js') }}"></script>
+        <script type="text/javascript" src="{{ asset('assets/js/plugins/forms/inputs/typeahead/typeahead.bundle.min.js') }}"></script>
+
         <script type="text/javascript" src="{{ asset('assets/js/core/app.js') }}"></script>
+        <script type="text/javascript" src="{{ asset('assets/js/pages/form_tags_input.js') }}"></script>
+        <script type="text/javascript" src="{{ asset('assets/js/pages/appearance_draggable_panels.js') }}"></script>
         <script type="text/javascript" src="{{ asset('assets/js/pages/components_buttons.js') }}"></script>
         <script type="text/javascript" src="{{ asset('assets/js/pages/components_modals.js') }}"></script>
         <script type="text/javascript" src="{{ asset('assets/js/pages/uploader_bootstrap.js') }}"></script>
-        <script type="text/javascript" src="{{ asset('assets/js/plugins/notifications/noty.min.js') }}"></script>
-        <script type="text/javascript" src="{{ asset('assets/js/plugins/notifications/sweet_alert.min.js') }}"></script>
     </head>
 
     <body>
@@ -57,7 +69,7 @@
                     <li class="dropdown dropdown-user">
                         <a class="dropdown-toggle" data-toggle="dropdown">
                         <img src="/assets/images/placeholder.jpg" alt="">
-                        <span>{{ current(explode("@", Auth::user()->email, 2)) }}</span>
+                        <span class="username">{{ current(explode("@", Auth::user()->email, 2)) }}</span>
                         <i class="caret"></i>
                         </a>
                         <ul class="dropdown-menu dropdown-menu-right">
@@ -82,7 +94,7 @@
                                 <div class="media">
                                     <a href="javascript:void(0);" class="media-left"><img src="{{ asset('assets/images/placeholder.jpg') }}" class="img-circle img-sm" alt=""></a>
                                     <div class="media-body">
-                                        <span class="media-heading text-semibold">{{ current(explode("@", Auth::user()->email, 2)) }}</span>
+                                        <span class="media-heading text-semibold username">{{ current(explode("@", Auth::user()->email, 2)) }}</span>
                                         <div class="text-size-mini text-muted">
                                             <i class="icon-pin text-size-small"></i> &nbsp;Santa Ana, CA
                                         </div>
@@ -107,13 +119,13 @@
                                         <span>Main</span>
                                         <i class="icon-menu" title="Main pages"></i>
                                     </li>
-                                    <li @if(app('url')->current() == url('dashboard')) class="active" @endif>
+                                    <li @if (app('url')->current() == url('dashboard')) class="active" @endif>
                                         <a id="planner-href" href="{{ url('dashboard') }}">
                                             <i class="icon-home4"></i>
                                             <span>Dashboard</span>
                                         </a>
                                     </li>
-                                    <li @if(strpos(app('url')->current(), url('dashboard/classes')) !== false) class="active" @endif>
+                                    <li @if (strpos(app('url')->current(), url('dashboard/classes')) !== false) class="active" @endif>
                                         <a id="classes-href" href="{{ url('dashboard/classes') }}">
                                             <i class="icon-design"></i>
                                             <span>Manage Classes</span>

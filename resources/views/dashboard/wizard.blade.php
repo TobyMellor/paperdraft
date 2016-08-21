@@ -2,18 +2,6 @@
 
 @section('title', 'Classes')
 @section('main')
-
-	<link href="{{ asset('assets/css/components.min.css') }}" rel="stylesheet" type="text/css">
-	
-	<script type="text/javascript" src="{{ asset('assets/js/plugins/forms/tags/tagsinput.min.js') }}"></script>
-	<script type="text/javascript" src="{{ asset('assets/js/plugins/forms/inputs/typeahead/typeahead.bundle.min.js') }}"></script>
-	<script type="text/javascript" src="{{ asset('assets/js/pages/form_tags_input.js') }}"></script>
-
-	<script type="text/javascript" src="{{ asset('assets/js/plugins/forms/wizards/steps.min.js') }}"></script>
-	<script type="text/javascript" src="{{ asset('assets/js/plugins/forms/selects/select2.min.js') }}"></script>
-	<script type="text/javascript" src="{{ asset('assets/js/plugins/forms/styling/uniform.min.js') }}"></script>
-	<script type="text/javascript" src="{{ asset('assets/js/plugins/forms/validation/validate.min.js') }}"></script>
-	<script type="text/javascript" src="{{ asset('assets/js/pages/wizard_steps.js') }}"></script>
 	<!-- Main content -->
 	<div class="content-wrapper">
 
@@ -51,7 +39,7 @@
 			<!-- Wizard with validation -->
 	            <div class="panel panel-white">
 					<div class="panel-heading">
-						<h6 class="panel-title">Wizard with validation</h6>
+						<h6 class="panel-title">Get started</h6>
 						<div class="heading-elements">
 							<ul class="icons-list">
 		                		<li><a data-action="collapse"></a></li>
@@ -67,166 +55,42 @@
 							<div class="row">
 								<div class="col-md-6">
 									<div class="form-group">
-										<label>Select location: <span class="text-danger">*</span></label>
-										<select name="location" data-placeholder="Select position" class="select required">
-											<option></option>
-											<optgroup label="North America">
-												<option value="1">United States</option>
-												<option value="2">Canada</option>
-											</optgroup>
-
-											<optgroup label="Latin America">
-												<option value="3">Chile</option>
-												<option value="4">Argentina</option>
-												<option value="5">Colombia</option>
-												<option value="6">Peru</option>
-											</optgroup>
-
-											<optgroup label="Europe">
-												<option value="8">Croatia</option>
-												<option value="9">Hungary</option>
-												<option value="10">Ukraine</option>
-												<option value="11">Greece</option>
-											</optgroup>
-
-											<optgroup label="Middle East &amp; Africa">
-												<option value="21">Egypt</option>
-												<option value="22">Israel</option>
-												<option value="23">Nigeria</option>
-												<option value="24">United Arab Emirates</option>
-											</optgroup>
-
-											<optgroup label="Asia Pacific">
-												<option value="26">Australia</option>
-												<option value="27">China</option>
-												<option value="28">India</option>
-												<option value="29">Singapore</option>
-											</optgroup>
-										</select>
-									</div>
-								</div>
-
-								<div class="col-md-6">
-									<div class="form-group">
-										<label>Select position: <span class="text-danger">*</span></label>
-										<select name="position" data-placeholder="Select position" class="select required">
-											<option></option>
-											<optgroup label="Developer Relations">
-												<option value="1">Sales Engineer</option>
-												<option value="2">Ads Solutions Consultant</option>
-												<option value="3">Technical Solutions Consultant</option>
-												<option value="4">Business Intern</option>
-											</optgroup>
-
-											<optgroup label="Engineering &amp; Design">
-												<option value="5">Interaction Designer</option>
-												<option value="6">Technical Program Manager</option>
-												<option value="7">Software Engineer</option>
-												<option value="8">Information Security Engineer</option>
-											</optgroup>
-
-											<optgroup label="Marketing &amp; Communications">
-												<option value="13">Media Outreach Manager</option>
-												<option value="14">Research Manager</option>
-												<option value="15">Marketing Intern</option>
-												<option value="16">Business Intern</option>
-											</optgroup>
-
-											<optgroup label="Sales Operations">
-												<option value="17">Sales Operations Analyst</option>
-												<option value="18">Technology Product Manager</option>
-												<option value="19">Product Expert</option>
-												<option value="20">Sales Insights Analyst</option>
-												<option value="21">Customer Operations Analyst</option>
-											</optgroup>
-										</select>
-									</div>
-								</div>
-							</div>
-
-							<div class="row">
-								<div class="col-md-6">
-									<div class="form-group">
-										<label>Applicant name: <span class="text-danger">*</span></label>
-										<input type="text" name="name" class="form-control required" placeholder="John Doe">
-									</div>
-								</div>
-
-								<div class="col-md-6">
-									<div class="form-group">
 										<label>Email address: <span class="text-danger">*</span></label>
-										<input type="email" name="email" class="form-control required" placeholder="your@email.com">
+										<input type="email" class="form-control" value="tobymulberry@hotmail.com" disabled>
 									</div>
+									<a class="btn btn-primary">Change Email</a>
 								</div>
-							</div>
-
-							<div class="row">
 								<div class="col-md-6">
 									<div class="form-group">
-										<label>Phone #:</label>
-										<input type="text" name="tel" class="form-control" placeholder="+99-99-9999-9999" data-mask="+99-99-9999-9999">
+										<label>Password: <span class="text-danger">*</span></label>
+										<input type="text" class="form-control" value="******" disabled>
+									</div>
+									<a class="btn btn-primary">Change Password</a>
+								</div>
+							</div>
+							<div class="row" style="margin-top: 20px;">
+								<div class="col-md-2">
+									<div class="form-group">
+										<label>Your title: <span class="text-danger">*</span></label>
+										<select name="title" data-placeholder="Select your title" class="select">
+											<option value="Mr">Mr</option>
+											<option value="Mrs">Mrs</option>
+											<option value="Miss">Miss</option>
+											<option value="Ms">Ms</option>
+											<option value="Dr">Dr</option>
+										</select>
 									</div>
 								</div>
-
-								<div class="col-md-6">
-									<div class="row">
-										<div class="col-md-4">
-											<div class="form-group">
-												<select name="birth-month" data-placeholder="Month" class="select">
-													<option></option>
-													<option value="1">January</option>
-													<option value="2">February</option>
-													<option value="3">March</option>
-													<option value="4">April</option>
-													<option value="5">May</option>
-													<option value="6">June</option>
-													<option value="7">July</option>
-													<option value="8">August</option>
-													<option value="9">September</option>
-													<option value="10">October</option>
-													<option value="11">November</option>
-													<option value="12">December</option>
-												</select>
-											</div>
-										</div>
-
-										<div class="col-md-4">
-											<div class="form-group">
-												<select name="birth-day" data-placeholder="Day" class="select">
-													<option></option>
-													<option value="1">1</option>
-													<option value="2">2</option>
-													<option value="3">3</option>
-													<option value="4">4</option>
-													<option value="5">5</option>
-													<option value="6">6</option>
-													<option value="7">7</option>
-													<option value="8">8</option>
-													<option value="9">9</option>
-													<option value="...">...</option>
-													<option value="31">31</option>
-												</select>
-											</div>
-										</div>
-
-										<div class="col-md-4">
-											<div class="form-group">
-												<select name="birth-year" data-placeholder="Year" class="select">
-													<option></option>
-													<option value="1">1980</option>
-													<option value="2">1981</option>
-													<option value="3">1982</option>
-													<option value="4">1983</option>
-													<option value="5">1984</option>
-													<option value="6">1985</option>
-													<option value="7">1986</option>
-													<option value="8">1987</option>
-													<option value="9">1988</option>
-													<option value="10">1989</option>
-													<option value="11">1990</option>
-												</select>
-											</div>
-										</div>
+								<div class="col-md-5">
+									<div class="form-group">
+										<label>Your first name: <span class="text-danger">*</span></label>
+										<input type="text" name="first_name" class="form-control" placeholder="Your first name">
+									</div>
+								</div>
+								<div class="col-md-5">
+									<div class="form-group">
+										<label>Your last name: <span class="text-danger">*</span></label>
+										<input type="text" name="last_name" class="form-control" placeholder="Your last name">
 									</div>
 								</div>
 							</div>
@@ -238,161 +102,40 @@
 								<div class="col-md-6">
 									<div class="form-group">
 										<label>Class Name: <span class="text-danger">*</span></label>
-		                                <input type="text" name="experience-company" placeholder="Class name" class="form-control required">
+		                                <input type="text" name="class_name" placeholder="Class name" class="form-control required">
 	                                </div>
 
 									<div class="form-group">
 										<label>Subject:</label>
-		                                <input type="text" name="experience-position" placeholder="Subject name" class="form-control required">
-	                                </div>
-
-									<div class="form-group">
-										<label>Typeahead support</label>
-										<input type="text" value="Washington,Alaska" data-role="tagsinput" class="tagsinput-typeahead">
+										<input type="text" name="class_subject" value="" data-role="tagsinput" class="subject-typeahead">
 									</div>
 
 									<div class="form-group">
-										<label>Room number:</label>
-		                                <input type="text" name="experience-position" placeholder="Room name" class="form-control required">
-	                                </div>
-
-									<div class="row">
-										<div class="col-md-6">
-											<label>From:</label>
-											<div class="row">
-												<div class="col-md-6">
-													<div class="form-group">
-					                                    <select name="education-from-month" data-placeholder="Month" class="select">
-					                                    	<option></option>
-					                                        <option value="January">January</option> 
-					                                        <option value="...">...</option> 
-					                                        <option value="December">December</option> 
-					                                    </select>
-				                                    </div>
-												</div>
-
-												<div class="col-md-6">
-													<div class="form-group">
-					                                    <select name="education-from-year" data-placeholder="Year" class="select">
-					                                        <option></option> 
-					                                        <option value="1995">1995</option> 
-					                                        <option value="...">...</option> 
-					                                        <option value="1980">1980</option> 
-					                                    </select>
-				                                    </div>
-												</div>
-											</div>
-										</div>
-
-										<div class="col-md-6">
-											<label>To:</label>
-											<div class="row">
-												<div class="col-md-6">
-													<div class="form-group">
-					                                    <select name="education-to-month" data-placeholder="Month" class="select">
-					                                    	<option></option>
-					                                        <option value="January">January</option> 
-					                                        <option value="...">...</option> 
-					                                        <option value="December">December</option> 
-					                                    </select>
-				                                    </div>
-												</div>
-
-												<div class="col-md-6">
-													<div class="form-group">
-					                                    <select name="education-to-year" data-placeholder="Year" class="select">
-					                                        <option></option> 
-					                                        <option value="1995">1995</option> 
-					                                        <option value="...">...</option> 
-					                                        <option value="1980">1980</option> 
-					                                    </select>
-				                                    </div>
-												</div>
-											</div>
-										</div>
+										<label>Room:</label>
+										<input type="text" name="class_room" value="" data-role="tagsinput" class="room-typeahead">
 									</div>
+
+									<a href="javascript:void(0);" class="btn btn-primary pull-right" id="create-class">Create Class <i class="icon-book" style="margin-left: 5px;"></i></a>
 								</div>
 
 								<div class="col-md-6">
-	                                <div class="form-group">
-										<label>Brief description:</label>
-	                                    <textarea name="experience-description" rows="4" cols="4" placeholder="Tasks and responsibilities" class="form-control"></textarea>
-	                                </div>
-
-									<div class="form-group">
-										<label>Recommendations:</label>
-	                                    <input name="recommendations" type="file" class="file-styled">
-	                                    <span class="help-block">Accepted formats: pdf, doc. Max file size 2Mb</span>
-	                                </div>
-								</div>
-							</div>
-						</fieldset>
-
-						<h6>Additional info</h6>
-						<fieldset>
-							<div class="row">
-								<div class="col-md-6">
-									<div class="form-group">
-										<label>Applicant resume:</label>
-	                                    <input type="file" name="resume" class="file-styled">
-	                                    <span class="help-block">Accepted formats: pdf, doc. Max file size 2Mb</span>
-                                    </div>
-								</div>
-
-								<div class="col-md-6">
-									<div class="form-group">
-										<label>Where did you find us? <span class="text-danger">*</span></label>
-	                                    <select name="source" data-placeholder="Choose an option..." class="select-simple required">
-	                                        <option></option> 
-	                                        <option value="monster">Monster.com</option> 
-	                                        <option value="linkedin">LinkedIn</option> 
-	                                        <option value="google">Google</option> 
-	                                        <option value="adwords">Google AdWords</option> 
-	                                        <option value="other">Other source</option>
-	                                    </select>
-                                    </div>
-								</div>
-							</div>
-
-							<div class="row">
-								<div class="col-md-6">
-									<div class="form-group">
-										<label>Availability: <span class="text-danger">*</span></label>
-										<div class="radio">
-											<label>
-												<input type="radio" name="availability" class="styled required">
-												Immediately
-											</label>
-										</div>
-
-										<div class="radio">
-											<label>
-												<input type="radio" name="availability" class="styled">
-												1 - 2 weeks
-											</label>
-										</div>
-
-										<div class="radio">
-											<label>
-												<input type="radio" name="availability" class="styled">
-												3 - 4 weeks
-											</label>
-										</div>
-
-										<div class="radio">
-											<label>
-												<input type="radio" name="availability" class="styled">
-												More than 1 month
-											</label>
-										</div>
+									<label>Your classes:</label>
+									<strong id="no-classes"><br />You have no classes yet. Create one using the form.</strong>
+	                                <div class="table-responsive" style="display: none;">
+										<table class="table table-bordered table-striped table-hover">
+											<thead>
+												<tr>
+													<th>Class Name</th>
+													<th>Subject</th>
+													<th>Room</th>
+													<th>Action</th>
+												</tr>
+											</thead>
+											<tbody></tbody>
+										</table>
 									</div>
-								</div>
 
-								<div class="col-md-6">
-									<div class="form-group">
-										<label>Additional information:</label>
-	                                    <textarea name="additional-info" rows="5" cols="5" placeholder="If you want to add any info, do it here." class="form-control"></textarea>
-                                    </div>
+									<br />
 								</div>
 							</div>
 						</fieldset>
@@ -410,4 +153,232 @@
 	<!-- /main content -->
 @stop
 @section('scripts')
+	<script>
+		//
+	    // Wizard with validation
+	    //
+
+	    // Show form
+	    var form = $(".steps-validation").show();
+	    var token = '{{ csrf_token() }}';
+
+	    // Initialize wizard
+	    $(".steps-validation").steps({
+	        headerTag: "h6",
+	        bodyTag: "fieldset",
+	        transitionEffect: "fade",
+	        titleTemplate: '<span class="number">#index#</span> #title#',
+	        autoFocus: true,
+	        onStepChanging: function (event, currentIndex, newIndex) {
+	            $('.validation-error-label').remove();
+
+	            var requiredErrorLabel = '<label id="position-error" class="validation-error-label" for="position">This field is required.</label>';
+
+	            if (currentIndex == 0) {
+	                var title = $('select[name=title]');
+	                var firstName = $('input[name=first_name]');
+	                var lastName = $('input[name=last_name]');
+
+	                if (title.val() == "" || title.val() == null) {
+	                    title.parent().append(requiredErrorLabel);
+	                } else if (['Mr', 'Mrs', 'Miss', 'Ms', 'Dr'].indexOf(title.val()) == -1) {
+	                    title.parent().append(requiredErrorLabel);
+	                }
+
+	                if (firstName.val() == "" || firstName.val() == null) {
+	                    firstName.parent().append(requiredErrorLabel);
+	                } else if (firstName.val().length == 0 || firstName.val().length >= 20) {
+	                    firstName.parent().append('<label id="position-error" class="validation-error-label" for="position">The first name must be less than 20 characters.</label>');
+	                }
+
+	                if (lastName.val() == "" || lastName.val() == null) {
+	                    lastName.parent().append(requiredErrorLabel);
+	                } else if (lastName.val().length == 0 || lastName.val().length >= 20) {
+	                    lastName.parent().append('<label id="position-error" class="validation-error-label" for="position">The last name must be less than 20 characters.</label>');
+	                }
+	            }
+
+	            if ($('.validation-error-label').length > 0) {
+	                return false;
+	            }
+
+	            // Allways allow previous action even if the current form is not valid!
+	            if (currentIndex > newIndex) {
+	                return true;
+	            }
+
+	            // Forbid next action on "Warning" step if the user is to young
+	            if (newIndex === 3 && Number($("#age-2").val()) < 18) {
+	                return false;
+	            }
+
+	            return form.valid();
+	        },
+
+	        onStepChanged: function (event, currentIndex, priorIndex) {
+	            // Used to skip the "Warning" step if the user is old enough.
+	            if (currentIndex === 2 && Number($("#age-2").val()) >= 18) {
+	                form.steps("next");
+	            }
+
+	            // Used to skip the "Warning" step if the user is old enough and wants to the previous step.
+	            if (currentIndex === 2 && priorIndex === 3) {
+	                form.steps("previous");
+	            }
+	        },
+
+	        onFinishing: function (event, currentIndex) {
+	            form.validate().settings.ignore = ":disabled";
+	            return form.valid();
+	        },
+
+	        onFinished: function (event, currentIndex) {
+	            alert("Submitted!");
+	        }
+	    });
+
+	    // Initialize plugins
+	    // ------------------------------
+
+	    // Select2 selects
+	    $('.select').select2();
+
+	    // Simple select without search
+	    $('.select-simple').select2({
+	        minimumResultsForSearch: '-1'
+	    });
+
+	    // Styled checkboxes and radios
+	    $('.styled').uniform({
+	        radioClass: 'choice'
+	    });
+
+	    // Styled file input
+	    $('.file-styled').uniform({
+	        wrapperClass: 'bg-warning',
+	        fileButtonHtml: '<i class="icon-googleplus5"></i>'
+	    });
+
+	    $('input[name=last_name]').on('keyup', function() {
+	    	triggerNameChange();
+	    });
+
+	    $('select[name=title]').on('change', function() {
+	    	triggerNameChange();
+	    });
+
+	    $('#create-class').on('click', function() {
+	    	createClass();
+	    });
+
+	    function createClass() {
+	        var formData = $('.steps-validation').serializeArray().reduce(function(obj, item) {
+			    obj[item.name] = item.value;
+			    return obj;
+			}, {});
+
+			$('#create-class').addClass('disabled');
+
+			$.APIAjax({
+	        	url: '{{ url('api/class') }}',
+	        	type: 'POST',
+	        	data: {
+	        		class_name: formData['class_name'],
+					class_subject: formData['class_subject'],
+					class_room: formData['class_room']
+	        	},
+	        	success: function(jsonResponse) {
+					handleNotification(jsonResponse.message, 'success');
+
+					$('tbody').append('<tr>' +
+						'<td>' + formData['class_name'] + '</td>' +
+						'<td>' + formData['class_subject'] + '</td>' +
+						'<td>' + formData['class_room'] + '</td>' +
+						'<td>' +
+							'<div class="btn-group">' +
+        						'<button type="button" class="btn btn-danger">Delete</span></button>' +
+        					'</div>' +
+        				'</td>' +
+					'</tr>');
+
+					$('.table-responsive').fadeIn();
+					$('#no-classes').fadeOut();
+
+					$('input[name=class_name]').val('');
+					$('input[name=class_subject]').tagsinput('removeAll');
+					$('input[name=class_room]').tagsinput('removeAll');
+	        	},
+	        	error: function(jsonResponse) {
+					handleNotification(jsonResponse.message, 'error');
+	        	}
+	        }).done(function() {
+				$('#create-class').removeClass('disabled');
+	        });
+	    }
+
+	    function triggerNameChange() {
+	        var title = $('select[name=title]');
+	        var lastName = $('input[name=last_name]');
+	        var originalName = '{{ current(explode("@", Auth::user()->email, 2)) }}';
+
+	        $('.username').text(originalName);
+
+	        if (title.val() != "" && title.val() != null && ['Mr', 'Mrs', 'Miss', 'Ms', 'Dr'].indexOf(title.val()) > -1) {
+	            if (lastName.val() != "" && lastName.val() != null && lastName.val().length > 0 && lastName.val().length < 20) {
+	                $('.username').text(title.val() + '. ' + lastName.val());
+	            }
+	        }
+	    }
+
+        // notificationContent is the message e.g. 'hello' (string)
+        // type is the display type e.g. 'error' or 'success' (string)
+        function handleNotification(notificationContent, type, timeout = 5000) {
+            var n = noty({
+                text: notificationContent,
+                layout: 'topCenter',
+                type: type
+            });
+
+            setTimeout(function() {
+                n.close();
+            }, timeout);
+        }
+
+        function isValidJson(jsonResponse) {
+            return $.isPlainObject(jsonResponse);
+        }
+
+        $.ajaxSetup({
+            headers: {
+                'X-CSRF-TOKEN': token
+            }
+        });
+
+        $.extend({
+            APIAjax: function(params){
+                params.error = function() {
+                    handleNotification('A server-side error occured. Try refreshing if the problem persists.', 'error');
+                };
+
+                if (params.success && typeof params.success == 'function') {
+                    var successCallback = params.success;
+                    var ourCallback = function(responseJson) {
+                        if (isValidJson(responseJson)) { // Validate the data
+                            if (responseJson.error == 0) {
+                                successCallback(responseJson); // Continue to function
+                            } else {
+                                handleNotification(responseJson.message, 'error');
+                            }
+                        } else {
+                            handleNotification('A server-side error occured. Try refreshing if the problem persists.', 'error');
+                        }
+                    }
+
+                    params.success = ourCallback;
+                }
+
+                return $.ajax(params);
+            }
+        });
+    </script>
 @stop

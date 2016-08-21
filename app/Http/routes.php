@@ -83,5 +83,13 @@ Route::group(['middleware' => ['web', 'auth']], function () {
             ]
         );
     });
+    
+    Route::resource('api/class', 'ClassController', 
+        [
+            'only' => [
+                'store',  // POST api/class
+            ], 
+        ]
+    );
 });
 

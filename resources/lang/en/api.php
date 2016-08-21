@@ -53,5 +53,10 @@ return [
             'update'  => 'The student was successfully updated.',
             'destroy' => 'The student was successfully deleted.'
         ]
+    ],
+    'class' => [
+        'success' => [
+            'store' => 'The class was successfully stored.'
+        ]
     ]
 ];
