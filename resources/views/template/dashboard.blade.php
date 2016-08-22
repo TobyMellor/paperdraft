@@ -61,7 +61,7 @@
                     <li class="dropdown dropdown-user">
                         <a class="dropdown-toggle" data-toggle="dropdown">
                         <img src="/assets/images/placeholder.jpg" alt="">
-                        <span class="username">{{ current(explode("@", Auth::user()->email, 2)) }}</span>
+                        <span class="username">@if (isset(Auth::user()->last_name)){{ Auth::user()->title }}. {{ Auth::user()->last_name }}@else{{ current(explode("@", Auth::user()->email, 2)) }}@endif</span>
                         <i class="caret"></i>
                         </a>
                         <ul class="dropdown-menu dropdown-menu-right">
@@ -86,7 +86,7 @@
                                 <div class="media">
                                     <a href="javascript:void(0);" class="media-left"><img src="{{ asset('assets/images/placeholder.jpg') }}" class="img-circle img-sm" alt=""></a>
                                     <div class="media-body">
-                                        <span class="media-heading text-semibold username">{{ current(explode("@", Auth::user()->email, 2)) }}</span>
+                                        <span class="media-heading text-semibold username">@if (isset(Auth::user()->last_name)){{ Auth::user()->title }}. {{ Auth::user()->last_name }}@else{{ current(explode("@", Auth::user()->email, 2)) }}@endif</span>
                                         <div class="text-size-mini text-muted">
                                             <i class="icon-pin text-size-small"></i> &nbsp;Santa Ana, CA
                                         </div>
