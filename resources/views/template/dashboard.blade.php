@@ -24,10 +24,6 @@
         <!-- /core JS files -->
 
         <!-- Theme JS files -->
-        <script type="text/javascript" src="{{ asset('assets/js/plugins/forms/wizards/steps.min.js') }}"></script>
-        <script type="text/javascript" src="{{ asset('assets/js/plugins/forms/selects/select2.min.js') }}"></script>
-        <script type="text/javascript" src="{{ asset('assets/js/plugins/forms/styling/uniform.min.js') }}"></script>
-        <script type="text/javascript" src="{{ asset('assets/js/plugins/forms/validation/validate.min.js') }}"></script>
         <script type="text/javascript" src="{{ asset('assets/js/core/libraries/jquery_ui/interactions.min.js') }}"></script>
         <script type="text/javascript" src="{{ asset('assets/js/core/libraries/jquery_ui/touch.min.js') }}"></script>
         <script type="text/javascript" src="{{ asset('assets/js/core/libraries/jquery_ui/effects.min.js') }}"></script>
@@ -38,12 +34,8 @@
         <script type="text/javascript" src="{{ asset('assets/js/plugins/notifications/sweet_alert.min.js') }}"></script>
 
 
-        <script type="text/javascript" src="{{ asset('assets/js/plugins/forms/tags/tagsinput.min.js') }}"></script>
-        <script type="text/javascript" src="{{ asset('assets/js/plugins/forms/tags/tokenfield.min.js') }}"></script>
-        <script type="text/javascript" src="{{ asset('assets/js/plugins/forms/inputs/typeahead/typeahead.bundle.min.js') }}"></script>
 
         <script type="text/javascript" src="{{ asset('assets/js/core/app.js') }}"></script>
-        <script type="text/javascript" src="{{ asset('assets/js/pages/form_tags_input.js') }}"></script>
         <script type="text/javascript" src="{{ asset('assets/js/pages/appearance_draggable_panels.js') }}"></script>
         <script type="text/javascript" src="{{ asset('assets/js/pages/components_buttons.js') }}"></script>
         <script type="text/javascript" src="{{ asset('assets/js/pages/components_modals.js') }}"></script>

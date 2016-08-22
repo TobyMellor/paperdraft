@@ -133,7 +133,7 @@
 													<div id="icon-only-tab1" class="tab-pane has-padding active">
 														<div class="row">
 															<div class="col-md-6">
-																<label class="display-block text-bold">Basic Information *</label>
+																<label class="display-block text-bold">Basic Information <span class="text-danger">*</span></label>
 																<input data-original-title="Enter the students name" class="form-control" data-popup="tooltip" title="" placeholder="Students Name" type="text" name="student_name" autocomplete="off" required>
 																<br />
 																<label class="display-block text-bold">Additional Information</label>
@@ -146,19 +146,19 @@
 																<label class="display-block text-bold">Student Ability Tier</label>
 																<div class="radio">
 																	<label>
-																		<input type="radio" checked="checked" name="ability_cap" value="H">
+																		<input type="radio" class="styled" name="ability_cap" value="H">
 																		High
 																	</label>
 																</div>
 																<div class="radio">
 																	<label>
-																		<input type="radio" name="ability_cap" value="M">
+																		<input type="radio" class="styled" checked="checked" name="ability_cap" value="M">
 																		Medium
 																	</label>
 																</div>
 																<div class="radio">
 																	<label>
-																		<input type="radio" name="ability_cap" value="L">
+																		<input type="radio" class="styled" name="ability_cap" value="L">
 																		Low
 																	</label>
 																</div>
@@ -171,9 +171,9 @@
 															<div class="col-md-6">
 																<label class="display-block text-bold">Current Attainment Level</label>
 																<div class="form-group">
-																	<select class="form-control" name="current_attainment_level">
+																	<select name="current_attainment_level">
 																		<optgroup label="Current Attainment Level">
-																			<option value="" disabled selected>Select a current attainment level</option>
+																			<option value="" selected>Select a current attainment level</option>
 																			<option value="A*">A*</option>
 																			<option value="A">A</option>
 																			<option value="B">B</option>
@@ -190,9 +190,9 @@
 															<div class="col-md-6">
 																<label class="display-block text-bold">Target Level</label>
 																<div class="form-group">
-																	<select class="form-control" name="target_attainment_level">
+																	<select name="target_attainment_level">
 																		<optgroup label="Target Level">
-																			<option value="" disabled selected>Select a target level</option>
+																			<option value="" selected>Select a target level</option>
 																			<option value="A*">A*</option>
 																			<option value="A">A</option>
 																			<option value="B">B</option>
@@ -278,7 +278,7 @@
 	<!-- /main content -->
 	<div id="modal_create_class" class="modal fade">
 		<div class="modal-dialog">
-			<div class="modal-content text-center">
+			<div class="modal-content">
 				<div class="modal-header bg-primary">
 					<h5 class="modal-title">Enter information for the new class</h5>
 				</div>
@@ -286,28 +286,48 @@
 				<form action="{{ url('/class') }}" method="POST" class="form-inline">
 					<input name="_token" value="{{ csrf_token() }}" hidden>
 					<div class="modal-body">
-						<label class="display-block text-bold">What's the classes name?*</label>
-						<div class="form-group has-feedback">
-							<input type="text" placeholder="Class name" class="form-control" name="class_name">
-							<div class="form-control-feedback">
-								<i class="icon-book text-muted"></i>
+						<div class="row">
+							<div class="col-md-6">
+								<label class="display-block text-bold">What's the classes name? <span class="text-danger">*</span></label>
+								<div class="form-group has-feedback" style="width: 100%;">
+									<input type="text" placeholder="Class name" style="width: 100%;" class="form-control" name="class_name">
+									<div class="form-control-feedback">
+										<i class="icon-book text-muted"></i>
+									</div>
+								</div>
+							</div>
+							<div class="col-md-6">
+								<label class="display-block text-bold">What's the subject you're teaching?</label>
+								<div class="form-group has-feedback" style="width: 100%;">
+									<input type="text" placeholder="Subject name" style="width: 100%;" class="form-control" name="class_subject">
+									<div class="form-control-feedback">
+										<i class="icon-graduation text-muted"></i>
+									</div>
+								</div>
+								<br />
+								<br />
+								<label class="display-block text-bold">What's the room name?</label>
+								<div class="form-group has-feedback" style="width: 100%;">
+									<input type="text" placeholder="Room name" style="width: 100%;" class="form-control" name="class_room">
+									<div class="form-control-feedback">
+										<i class="icon-home text-muted"></i>
+									</div>
+								</div>
+								@if (isset($classes))
+									<br />
+									<br />
+									<label class="display-block text-bold">Should we use a seating template?</label>
+									<select name="class_template" id="template-picker">
+										<optgroup label="Available class templates">
+											<option value="" selected>Select a class template to copy</option>
+											@foreach ($classes as $class)
+												<option value="{{ $class->id }}">{{ $class->class_name }}</option>
+											@endforeach
+										</optgroup>
+									</select>
+								@endif
 							</div>
 						</div>
-						@if (isset($classes))
-							<br />
-							<br />
-							<div class="form-group">
-								<label class="display-block text-bold">Should we use a seating template?</label>
-								<select class="form-control" name="class_template" id="template-picker">
-									<optgroup label="Available class templates">
-										<option value="" selected>Select a class template to copy</option>
-										@foreach ($classes as $class)
-											<option value="{{ $class->id }}">{{ $class->class_name }}</option>
-										@endforeach
-									</optgroup>
-								</select>
-							</div>
-						@endif
 					</div>
 
 					<div class="modal-footer text-center">
@@ -446,6 +466,8 @@
 	</div>
 @stop
 @section('scripts')
+    <script type="text/javascript" src="{{ asset('assets/js/plugins/forms/selects/select2.min.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('assets/js/plugins/forms/styling/uniform.min.js') }}"></script>
 	<script>
 	    @if (session('errorMessage') != null)
 	    	var errorValidationResponses = {!! session('errorValidationResponse') !!};
@@ -612,6 +634,12 @@
 
                 $('#modal_update_student').modal('show');
 	        });
+
+	    	$('select').select2();
+
+		    $('.styled').uniform({
+		        radioClass: 'choice'
+		    });
         });
 
         var classId = {{ $classId }};

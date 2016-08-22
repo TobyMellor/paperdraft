@@ -100,12 +100,12 @@
 
 									<div class="form-group">
 										<label>Subject:</label>
-										<input type="text" name="class_subject" value="" data-role="tagsinput" class="subject-typeahead">
+										<input type="text" name="class_subject" placeholder="Subject name" value="" data-role="tagsinput" class="form-control subject-typeahead">
 									</div>
 
 									<div class="form-group">
 										<label>Room:</label>
-										<input type="text" name="class_room" value="" data-role="tagsinput" class="room-typeahead">
+										<input type="text" name="class_room" placeholder="Room name" value="" data-role="tagsinput" class="room-typeahead form-control">
 									</div>
 
 									<a href="javascript:void(0);" class="btn btn-primary pull-right" id="create-class">Create Class <i class="icon-book" style="margin-left: 5px;"></i></a>
@@ -151,6 +151,17 @@
 	<!-- /main content -->
 @stop
 @section('scripts')
+    <script type="text/javascript" src="{{ asset('assets/js/plugins/forms/wizards/steps.min.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('assets/js/plugins/forms/selects/select2.min.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('assets/js/plugins/forms/styling/uniform.min.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('assets/js/plugins/forms/validation/validate.min.js') }}"></script>
+
+    <script type="text/javascript" src="{{ asset('assets/js/plugins/forms/tags/tagsinput.min.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('assets/js/plugins/forms/tags/tokenfield.min.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('assets/js/plugins/forms/inputs/typeahead/typeahead.bundle.min.js') }}"></script>
+
+    <script type="text/javascript" src="{{ asset('assets/js/pages/form_tags_input.js') }}"></script>
+
 	<script>
 		//
 	    // Wizard with validation
@@ -350,6 +361,7 @@
 			}, {});
 
 			$('#create-class').addClass('disabled');
+			$('#create-class').html('Creating Class <i class="icon-spinner2 spinner" style="margin-left: 5px;"></i>')
 
 			$.APIAjax({
 	        	url: '{{ url('api/class') }}',
@@ -394,6 +406,7 @@
 	        	}
 	        }).always(function() {
 	        	$('#create-class').removeClass('disabled');
+	        	$('#create-class').html('Create Class <i class="icon-book" style="margin-left: 5px;"></i>');
 	        });
 	    }
 
@@ -406,7 +419,7 @@
 
 					$('button[class-id=' + classId + ']').closest('tr').fadeOut(300, function() {
 						$(this).remove();
-						
+
 			        	if ($('tr').length == 1) {
 							$('.table-responsive').fadeOut(300, function() {
 								$('#no-classes').fadeIn();
@@ -486,16 +499,5 @@
                 return $.ajax(params);
             }
         });
-
-		function _goToStep(wizard, options, state, index) {
-		    return paginationClick(wizard, options, state, index);
-		}
-
-        $.fn.steps.setStep = function (step) {
-		    var options = getOptions(this),
-		        state = getState(this);
-
-		    return _goToStep(this, options, state, step);
-		};
     </script>
 @stop

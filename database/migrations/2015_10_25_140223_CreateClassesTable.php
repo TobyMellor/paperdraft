@@ -32,6 +32,9 @@ class CreateClassesTable extends Migration
                 ->unsigned()
                 ->default(1);
 
+            $table->string('class_subject', 30)->nullable();
+            $table->string('class_room', 30)->nullable();
+
             $table->timestamps();
         });
 
