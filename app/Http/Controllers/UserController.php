@@ -32,11 +32,6 @@ class UserController extends Controller
         $this->request = $request;
     }
 
-    private function getRequest()
-    {
-        return $this->request;
-    }
-
     /**
      * Unauthenticates the user then redirects to login page.
      *
@@ -55,9 +50,8 @@ class UserController extends Controller
      *
      * @return \Illuminate\Http\View
      */
-    public function getLogin()
+    public function getLogin(Request $request)
     {
-        $request = $this->getRequest();
         $request->session()->put('changeSection', 'sign-in');
 
         return view('auth.login');
@@ -68,9 +62,8 @@ class UserController extends Controller
      *
      * @return \Illuminate\Http\View
      */
-    public function getRegister()
+    public function getRegister(Request $request)
     {
-        $request = $this->getRequest();
         $request->session()->put('changeSection', 'sign-up');
 
         return view('auth.login');
@@ -101,6 +94,7 @@ class UserController extends Controller
     public function getUser($userId)
     {
         $user = User::find($userId);
+
         return $user;
     }
 
@@ -109,12 +103,10 @@ class UserController extends Controller
      *
      * @return \Illuminate\Http\Redirect
      */
-    public function authenticateUser()
+    public function authenticateUser(Request $request)
     {
-        $request = $this->getRequest();
-
         if (Auth::attempt([
-            'email' => $request->input('email'),
+            'email'    => $request->input('email'),
             'password' => $request->input('password')
         ], $request->input('checkbox'))) {
             return redirect()->intended($this->redirectTo);
@@ -129,13 +121,11 @@ class UserController extends Controller
      *
      * @return \Illuminate\Http\Redirect
      */
-    public function storeUser()
+    public function storeUser(Request $request)
     {
-        $request = $this->getRequest();
-
         $data = [
-            'email' => $request->input('email'),
-            'password' => $request->input('password'),
+            'email'                 => $request->input('email'),
+            'password'              => $request->input('password'),
             'password_confirmation' => $request->input('password_confirmation'),
         ];
 
@@ -153,8 +143,8 @@ class UserController extends Controller
             $confirmationCode = str_random(30);
 
             User::create([
-                'email' => $email,
-                'password' => $password,
+                'email'             => $email,
+                'password'          => $password,
                 'confirmation_code' => $confirmationCode
             ]);
             
@@ -195,9 +185,8 @@ class UserController extends Controller
         }
     }
 
-    public function confirmEmail()
+    public function confirmEmail(Request $request)
     {
-        $request = $this->request;
         $confirmationCode = $request->get('token');
         $email = $request->get('email');
 
@@ -234,6 +223,53 @@ class UserController extends Controller
     }
 
     /**
+     * Update the specified resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function update(Request $request)
+    {
+        $title = $request->input('title');
+        $firstName = $request->input('first_name');
+        $lastName = $request->input('last_name');
+
+        $data = [
+            'title'      => $title,
+            'first_name' => $firstName,
+            'last_name'  => $lastName
+        ];
+
+        $validation = $this->validateUpdatedUser($data);
+
+        if (!$validation->fails()) {
+            User::where('id', Auth::user()->id)
+                ->update([
+                    'title'      => $title,
+                    'first_name' => $firstName,
+                    'last_name'  => $lastName
+                ]);
+
+            return response()->json([
+                'error'   => 0,
+                'message' => trans('api.user.success.update')
+            ]);
+        }
+
+        $errorMessages = $validation->errors()->all();
+        $responseMessage = '';
+
+        foreach ($errorMessages as $errorMessage) {
+            $responseMessage .= $errorMessage;
+        }
+        
+        return response()->json([
+            'error'   => 1,
+            'message' => $responseMessage
+        ]);
+    }
+
+    /**
      * Validates an array of information.
      *
      * @return Validator
@@ -241,14 +277,28 @@ class UserController extends Controller
     protected function validator(array $data)
     {
         return Validator::make($data, [
-            'email' => 'required|email|max:255|min:1|unique:users',
+            'email'    => 'required|email|max:255|min:1|unique:users',
             'password' => 'required|confirmed|min:6'
+        ]);
+    }
+
+    /**
+     * Validates an array of information.
+     *
+     * @return Validator
+     */
+    protected function validateUpdatedUser(array $data)
+    {
+        return Validator::make($data, [
+            'title'      => 'required|string|in:Mr,Mrs,Miss,Ms,Dr',
+            'first_name' => 'required|between:1,20|regex:/^[a-zA-Z0-9\s-]+$/',
+            'last_name' => 'required|between:1,20|regex:/^[a-zA-Z0-9\s-]+$/',
         ]);
     }
 
     public function __destruct()
     {
-        $request = $this->getRequest();
+        $request = $this->request;
         $request->flash();
     }
 }

@@ -259,15 +259,8 @@ $(function() {
 
     // Allow dublicates
     $('.tags-input-dublicates').tagsinput({
-        allowDuplicates: true
+        allowDuplicates: false
     });
-
-
-    // Set maximum allowed tags
-    $('.tagsinput-max-tags').tagsinput({
-        maxTags: 5
-    });
-
 
     // Custom tag class
     $('.tagsinput-custom-tag-class').tagsinput({
@@ -286,23 +279,25 @@ $(function() {
         return function findMatches(q, cb) {
             var matches, substringRegex;
 
-            // an array that will be populated with substring matches
-            matches = [];
+            if (q.length <= 30) {
+                // an array that will be populated with substring matches
+                matches = [];
 
-            // regex used to determine if a string contains the substring `q`
-            substrRegex = new RegExp(q, 'i');
+                // regex used to determine if a string contains the substring `q`
+                substrRegex = new RegExp(q, 'i');
 
-            // iterate through the pool of strings and for any string that
-            // contains the substring `q`, add it to the `matches` array
-            $.each(strs, function(i, str) {
-                if (substrRegex.test(str)) {
+                // iterate through the pool of strings and for any string that
+                // contains the substring `q`, add it to the `matches` array
+                $.each(strs, function(i, str) {
+                    if (substrRegex.test(str)) {
 
-                    // the typeahead jQuery plugin expects suggestions to a
-                    // JavaScript object, refer to typeahead docs for more info
-                    matches.push({ value: str });
-                }
-            });
-            cb(matches);
+                        // the typeahead jQuery plugin expects suggestions to a
+                        // JavaScript object, refer to typeahead docs for more info
+                        matches.push({ value: str });
+                    }
+                });
+                cb(matches);
+            }
         };
     };
 
@@ -340,7 +335,8 @@ $(function() {
         {
             hint: true,
             highlight: true,
-            minLength: 1
+            minLength: 1,
+            maxTags: 1
         },
         {
             name: 'states',
@@ -393,5 +389,4 @@ $(function() {
         $('.tagsinput-destroy').tagsinput('destroy');
         $(this).addClass('disabled');
     });
-
 });

@@ -40,13 +40,6 @@
 	            <div class="panel panel-white">
 					<div class="panel-heading">
 						<h6 class="panel-title">Get started</h6>
-						<div class="heading-elements">
-							<ul class="icons-list">
-		                		<li><a data-action="collapse"></a></li>
-		                		<li><a data-action="reload"></a></li>
-		                		<li><a data-action="close"></a></li>
-		                	</ul>
-	                	</div>
 					</div>
 
                 	<form class="steps-validation" action="#">
@@ -56,14 +49,14 @@
 								<div class="col-md-6">
 									<div class="form-group">
 										<label>Email address: <span class="text-danger">*</span></label>
-										<input type="email" class="form-control" value="tobymulberry@hotmail.com" disabled>
+										<input type="email" class="form-control" value="{{ Auth::user()->email }}" disabled>
 									</div>
 									<a class="btn btn-primary">Change Email</a>
 								</div>
 								<div class="col-md-6">
 									<div class="form-group">
 										<label>Password: <span class="text-danger">*</span></label>
-										<input type="text" class="form-control" value="******" disabled>
+										<input type="text" class="form-control" value="****" disabled>
 									</div>
 									<a class="btn btn-primary">Change Password</a>
 								</div>
@@ -84,13 +77,13 @@
 								<div class="col-md-5">
 									<div class="form-group">
 										<label>Your first name: <span class="text-danger">*</span></label>
-										<input type="text" name="first_name" class="form-control" placeholder="Your first name">
+										<input type="text" name="first_name" value="{{ Auth::user()->first_name }}" class="form-control" placeholder="Your first name">
 									</div>
 								</div>
 								<div class="col-md-5">
 									<div class="form-group">
 										<label>Your last name: <span class="text-danger">*</span></label>
-										<input type="text" name="last_name" class="form-control" placeholder="Your last name">
+										<input type="text" name="last_name" value="{{ Auth::user()->last_name }}" class="form-control" placeholder="Your last name">
 									</div>
 								</div>
 							</div>
@@ -139,6 +132,11 @@
 								</div>
 							</div>
 						</fieldset>
+
+						<h6>Your students</h6>
+						<fieldset>
+							<h2>We'll redirect you to the students page.</h2>
+						</fieldset>
 					</form>
 	            </div>
 	            <!-- /wizard with validation -->
@@ -161,6 +159,7 @@
 	    // Show form
 	    var form = $(".steps-validation").show();
 	    var token = '{{ csrf_token() }}';
+	    var hasErrorOccured = false;
 
 	    // Initialize wizard
 	    $(".steps-validation").steps({
@@ -169,6 +168,9 @@
 	        transitionEffect: "fade",
 	        titleTemplate: '<span class="number">#index#</span> #title#',
 	        autoFocus: true,
+	        @if (Auth::user()->last_name != null)
+        		startIndex: 1,
+	        @endif
 	        onStepChanging: function (event, currentIndex, newIndex) {
 	            $('.validation-error-label').remove();
 
@@ -196,6 +198,22 @@
 	                } else if (lastName.val().length == 0 || lastName.val().length >= 20) {
 	                    lastName.parent().append('<label id="position-error" class="validation-error-label" for="position">The last name must be less than 20 characters.</label>');
 	                }
+
+	                updateUser();
+	            }
+
+	            if (currentIndex == 1 && newIndex == 2) {
+		        	if ($('tr').length > 1) {
+		        		window.location.href = '{{ url('dashboard/classes') }}';
+
+		        		$(".steps-validation").fadeOut();
+
+		        		return true;
+		        	}
+
+		        	handleNotification('You need to create at least one class before continuing.', 'error');
+
+		        	return false;
 	            }
 
 	            if ($('.validation-error-label').length > 0) {
@@ -215,26 +233,11 @@
 	            return form.valid();
 	        },
 
-	        onStepChanged: function (event, currentIndex, priorIndex) {
-	            // Used to skip the "Warning" step if the user is old enough.
-	            if (currentIndex === 2 && Number($("#age-2").val()) >= 18) {
-	                form.steps("next");
-	            }
+	        onStepChanged: function (event, currentIndex, priorIndex) {},
 
-	            // Used to skip the "Warning" step if the user is old enough and wants to the previous step.
-	            if (currentIndex === 2 && priorIndex === 3) {
-	                form.steps("previous");
-	            }
-	        },
+	        onFinishing: function (event, currentIndex) {},
 
-	        onFinishing: function (event, currentIndex) {
-	            form.validate().settings.ignore = ":disabled";
-	            return form.valid();
-	        },
-
-	        onFinished: function (event, currentIndex) {
-	            alert("Submitted!");
-	        }
+	        onFinished: function (event, currentIndex) {}
 	    });
 
 	    // Initialize plugins
@@ -267,9 +270,78 @@
 	    	triggerNameChange();
 	    });
 
+	    $('input').on('beforeItemAdd', function(event) {
+			$(this).tagsinput('removeAll');
+		});
+
 	    $('#create-class').on('click', function() {
-	    	createClass();
+            var className = $('input[name=class_name]');
+            var classSubject = $('input[name=class_subject]');
+            var classRoom = $('input[name=class_room]');
+
+            $('.validation-error-label').remove();
+
+            if (className.val() == "" || className.val() == null) {
+                className.parent().append('<label id="position-error" class="validation-error-label" for="position">This field is required.</label>');
+            } else if (className.val().length == 0 || className.val().length > 30) {
+                className.parent().append('<label id="position-error" class="validation-error-label" for="position">The class name must be less than 30 characters.</label>');
+            }
+
+            if (classSubject.val().length > 30) {
+                classSubject.parent().append('<label id="position-error" class="validation-error-label" for="position">The subject name must be less than 30 characters.</label>');
+            } else {
+            	$('.subject-typeahead').tagsinput('add', $('.tt-input:first').val());
+            }
+
+            if (classRoom.val().length > 30) {
+                classRoom.parent().append('<label id="position-error" class="validation-error-label" for="position">The room name must be less than 30 characters.</label>');
+            } else {
+            	$('.room-typeahead').tagsinput('add', $('.tt-input:last').val());
+            }
+
+            if ($('.validation-error-label').length == 0) {
+	    		createClass();
+            }
 	    });
+
+	    $(document).delegate('.delete-class', 'click', function() {
+	    	var classId = $(this).attr('class-id');
+
+	    	$(this).replaceWith('<button class="btn btn-danger" type="button" class-id="' + classId + '" disabled>Deleting <i class="icon-spinner2 spinner" style="margin-left: 5px;"></i></button>');
+
+	    	removeClass(classId);
+	    });
+
+	    $('select[name=title]').select2('val', '{{ Auth::user()->title }}');
+
+	    function updateUser() {
+	        var formData = $('.steps-validation').serializeArray().reduce(function(obj, item) {
+			    obj[item.name] = item.value;
+			    return obj;
+			}, {});
+
+			$.APIAjax({
+	        	url: '{{ url('api/user') }}/{{ Auth::user()->id }}',
+	        	type: 'PUT',
+	        	data: {
+	        		title: formData['title'],
+	        		first_name: formData['first_name'],
+	        		last_name: formData['last_name']
+	        	},
+	        	success: function(jsonResponse) {
+					handleNotification(jsonResponse.message, 'success');
+	        	},
+	        	error: function(jsonResponse) {
+					$(".steps-validation").steps("previous");
+	        	}
+	        }).always(function() {
+				if (hasErrorOccured) {
+					hasErrorOccured = false;
+
+					$('.steps-validation').steps('previous');
+				}
+	        });
+	    }
 
 	    function createClass() {
 	        var formData = $('.steps-validation').serializeArray().reduce(function(obj, item) {
@@ -290,29 +362,61 @@
 	        	success: function(jsonResponse) {
 					handleNotification(jsonResponse.message, 'success');
 
+					if (formData['class_subject'] == "") {
+						formData['class_subject'] = 'N/A';
+					}
+
+					if (formData['class_room'] == "") {
+						formData['class_room'] = 'N/A';
+					}
+
 					$('tbody').append('<tr>' +
 						'<td>' + formData['class_name'] + '</td>' +
 						'<td>' + formData['class_subject'] + '</td>' +
 						'<td>' + formData['class_room'] + '</td>' +
 						'<td>' +
 							'<div class="btn-group">' +
-        						'<button type="button" class="btn btn-danger">Delete</span></button>' +
+        						'<button type="button" class="btn btn-danger delete-class" class-id="' + jsonResponse.class.id + '">Delete</span></button>' +
         					'</div>' +
         				'</td>' +
 					'</tr>');
 
-					$('.table-responsive').fadeIn();
-					$('#no-classes').fadeOut();
+					$('#no-classes').fadeOut(300, function() {
+						$('.table-responsive').fadeIn();
+					});
 
 					$('input[name=class_name]').val('');
 					$('input[name=class_subject]').tagsinput('removeAll');
 					$('input[name=class_room]').tagsinput('removeAll');
 	        	},
 	        	error: function(jsonResponse) {
-					handleNotification(jsonResponse.message, 'error');
+					$('.steps-validation').steps('previous');
 	        	}
-	        }).done(function() {
-				$('#create-class').removeClass('disabled');
+	        }).always(function() {
+	        	$('#create-class').removeClass('disabled');
+	        });
+	    }
+
+	    function removeClass(classId) {
+			$.APIAjax({
+	        	url: '{{ url('api/class') }}/' + classId,
+	        	type: 'DELETE',
+	        	success: function(jsonResponse) {
+					handleNotification(jsonResponse.message, 'success');
+
+					$('button[class-id=' + classId + ']').closest('tr').fadeOut(300, function() {
+						$(this).remove();
+						
+			        	if ($('tr').length == 1) {
+							$('.table-responsive').fadeOut(300, function() {
+								$('#no-classes').fadeIn();
+							});
+			        	}
+					});
+	        	},
+	        	error: function(jsonResponse) {}
+	        }).always(function() {
+				$('button[class-id=' + classId + ']').replaceWith('<button type="button" class="btn btn-danger delete-class" class-id="' + classId + '">Delete</span></button>');
 	        });
 	    }
 
@@ -357,6 +461,7 @@
         $.extend({
             APIAjax: function(params){
                 params.error = function() {
+                    hasErrorOccured = true;
                     handleNotification('A server-side error occured. Try refreshing if the problem persists.', 'error');
                 };
 
@@ -370,6 +475,7 @@
                                 handleNotification(responseJson.message, 'error');
                             }
                         } else {
+                        	hasErrorOccured = true;
                             handleNotification('A server-side error occured. Try refreshing if the problem persists.', 'error');
                         }
                     }
@@ -380,5 +486,16 @@
                 return $.ajax(params);
             }
         });
+
+		function _goToStep(wizard, options, state, index) {
+		    return paginationClick(wizard, options, state, index);
+		}
+
+        $.fn.steps.setStep = function (step) {
+		    var options = getOptions(this),
+		        state = getState(this);
+
+		    return _goToStep(this, options, state, step);
+		};
     </script>
 @stop

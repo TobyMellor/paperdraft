@@ -87,7 +87,16 @@ Route::group(['middleware' => ['web', 'auth']], function () {
     Route::resource('api/class', 'ClassController', 
         [
             'only' => [
-                'store',  // POST api/class
+                'store',  // POST   api/class
+                'destroy' // DELETE api/class
+            ], 
+        ]
+    );
+
+    Route::resource('api/user', 'UserController', 
+        [
+            'only' => [
+                'update', // PUT api/user
             ], 
         ]
     );

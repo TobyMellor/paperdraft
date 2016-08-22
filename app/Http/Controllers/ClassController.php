@@ -169,6 +169,43 @@ class ClassController extends Controller
             ->delete(); 
     }
 
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  int  $id
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function destroy(Request $request, $id)
+    {
+        $data = [
+            'class_id' => $id
+        ];
+
+        $validation = $this->validateClassId($data);
+
+        if (!$validation->fails()) {
+            SchoolClass::where('id', $id)->delete();
+
+            return response()->json([
+                'error'   => 0,
+                'message' => trans('api.class.success.destroy')
+            ]);
+        }
+
+        $errorMessages = $validation->errors()->all();
+        $responseMessage = '';
+
+        foreach ($errorMessages as $errorMessage) {
+            $responseMessage .= $errorMessage;
+        }
+        
+        return response()->json([
+            'error'   => 1,
+            'message' => $responseMessage
+        ]);
+    }
+
 
     /**
      * Duplicate class items from one class to another
@@ -214,6 +251,13 @@ class ClassController extends Controller
             'class_name'    => 'required|between:1,30',
             'class_subject' => 'string|between:1,30',
             'class_room'    => 'string|between:1,30'
+        ]);
+    }
+
+    protected function validateClassId(array $data)
+    {
+        return Validator::make($data, [
+            'class_id' => 'required|integer|exists:classes,id,user_id,' . Auth::user()->id
         ]);
     }
 }

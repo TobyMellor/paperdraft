@@ -56,7 +56,13 @@ return [
     ],
     'class' => [
         'success' => [
-            'store' => 'The class was successfully stored.'
+            'store'   => 'The class was successfully stored.',
+            'destroy' => 'The class was successfully deleted.'
+        ]
+    ],
+    'user' => [
+        'success' => [
+            'update' => 'Your user data has been successfully updated.'
         ]
     ]
 ];
