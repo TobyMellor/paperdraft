@@ -382,7 +382,7 @@
 
 	    	$(this).replaceWith('<button class="btn btn-danger" type="button" class-id="' + classId + '" disabled>Deleting <i class="icon-spinner2 spinner" style="margin-left: 5px;"></i></button>');
 
-	    	removeClass(classId);
+	    	deleteClass(classId);
 	    });
 
 	    $('select[name=title]').select2('val', '{{ Auth::user()->title }}');
@@ -476,7 +476,7 @@
 	        });
 	    }
 
-	    function removeClass(classId) {
+	    function deleteClass(classId) {
 			$.APIAjax({
 	        	url: '{{ url('api/class') }}/' + classId,
 	        	type: 'DELETE',

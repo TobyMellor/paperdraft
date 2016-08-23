@@ -77,7 +77,7 @@
                                                 <li><a href="{{ url('dashboard/classes/' . $class->id . '/duplicate') }}" data-toggle="modal" data-target="#modal_form_inline">Duplicate class template</a></li>
                                                 <li class="divider"></li>
                                                 <li><a href="javascript:void(0);" class="clear-seatingplan" data-toggle="modal" data-target="#modal_delete_seatingplan">Clear seating plan</a></li>
-                                                <li><a href="javascript:void(0);" class="delete-class" data-toggle="modal" data-target="#modal_delete_class">Delete class</a></li>
+                                                <li><a href="javascript:void(0);" class="delete-class">Delete class</a></li>
                                             </ul>
                                         </div> 
                                     </li>

@@ -248,7 +248,7 @@
                                                 <li><a href="javascript:void(0);" class="duplicate-class" data-toggle="modal" data-target="#modal_create_class">Duplicate class template</a></li>
                                                 <li class="divider"></li>
                                                 <li><a href="javascript:void(0);" class="delete-seatingplan" data-toggle="modal" data-target="#modal_delete_seatingplan">Clear seating plan</a></li>
-                                                <li><a href="javascript:void(0);" class="delete-class" data-toggle="modal" data-target="#modal_delete_class">Delete class</a></li>
+                                                <li><a href="javascript:void(0);" class="delete-class">Delete class</a></li>
                                             </ul>
                                         </div> 
                                     </li>
@@ -472,12 +472,9 @@
 	        });
 
 	        $('.delete-class').on('click', function() {
-	        	classId = $(this)
-	            	.parent()
-	            	.parent()
-	            	.parent()
-	            	.children(0)
-	            	.attr('class-id');
+	        	var classId = $(this).closest('.btn-group').children(0).attr('class-id');
+
+	        	deleteClass(classId);
 	        });
 
 	        $('.delete-seatingplan').on('click', function() {
@@ -702,15 +699,20 @@
             });
         }
 
-        function submitDeleteForm(URL, successMessage) {
+        function deleteClass(classId) {
         	$.APIAjax({
-                url: URL,
+                url: '{{ url('api/class') }}/' + classId,
                 type: 'DELETE',
-                data: {
-                    class_id: classId
-                },
                 success: function(jsonResponse) {
                     handleNotification(jsonResponse.message, 'success');
+
+                    if ($('.class-button[class-id=' + classId + ']').hasClass('class-button-active')) {
+                    	window.location.href = '{{ url('dashboard/classes') }}';
+                    } else {
+                    	$('.class-button[class-id=' + classId + ']').parent().fadeOut(300, function() {
+                    		$(this).remove();
+                    	});
+                    }
                 },
                 error: function(jsonResponse) {}
             });
