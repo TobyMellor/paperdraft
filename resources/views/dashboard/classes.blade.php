@@ -474,7 +474,7 @@
 	        $('.delete-class').on('click', function() {
 	        	var classId = $(this).closest('.btn-group').children(0).attr('class-id');
 
-	        	deleteClass(classId);
+				deleteClass(classId);
 	        });
 
 	        $('.delete-seatingplan').on('click', function() {

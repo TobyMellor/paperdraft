@@ -52,16 +52,22 @@
 						<fieldset>
 							<div class="row">
 								<div class="col-md-6">
-									<div class="form-group">
+									<div class="form-group has-feedback">
 										<label>Email address: <span class="text-danger">*</span></label>
 										<input type="email" class="form-control" value="{{ Auth::user()->email }}" disabled>
+		                                <div class="form-control-feedback">
+											<i class="icon-vcard text-muted"></i>
+										</div>
 									</div>
 									<a class="btn btn-primary">Change Email</a>
 								</div>
 								<div class="col-md-6">
-									<div class="form-group">
+									<div class="form-group has-feedback">
 										<label>Password: <span class="text-danger">*</span></label>
 										<input type="text" class="form-control" value="****" disabled>
+		                                <div class="form-control-feedback">
+											<i class="icon-user-lock text-muted"></i>
+										</div>
 									</div>
 									<a class="btn btn-primary">Change Password</a>
 								</div>
@@ -98,9 +104,12 @@
 						<fieldset>
 							<div class="row">
 								<div class="col-md-6">
-									<div class="form-group">
+									<div class="form-group has-feedback">
 										<label>Class Name: <span class="text-danger">*</span></label>
 		                                <input type="text" name="class_name" placeholder="Class name" class="form-control required">
+		                                <div class="form-control-feedback">
+											<i class="icon-book text-muted"></i>
+										</div>
 	                                </div>
 
 									<div class="form-group">
@@ -111,6 +120,7 @@
 									<div class="form-group">
 										<label>Room:</label>
 										<input type="text" name="class_room" placeholder="Room name" value="" data-role="tagsinput" class="room-typeahead form-control">
+										<span class="help-block">Recommended, gives option later to use seating layout across classes.</span>
 									</div>
 
 									<a href="javascript:void(0);" class="btn btn-primary pull-right" id="create-class">Create Class <i class="icon-book" style="margin-left: 5px;"></i></a>
@@ -155,6 +165,7 @@
     <script type="text/javascript" src="{{ asset('assets/js/plugins/forms/wizards/steps.min.js') }}"></script>
     <script type="text/javascript" src="{{ asset('assets/js/plugins/forms/selects/select2.min.js') }}"></script>
     <script type="text/javascript" src="{{ asset('assets/js/plugins/forms/styling/uniform.min.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('assets/js/plugins/forms/validation/validate.min.js') }}"></script>
 
     <script type="text/javascript" src="{{ asset('assets/js/plugins/forms/tags/tagsinput.min.js') }}"></script>
     <script type="text/javascript" src="{{ asset('assets/js/plugins/forms/inputs/typeahead/typeahead.bundle.min.js') }}"></script>
