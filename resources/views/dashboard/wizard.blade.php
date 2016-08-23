@@ -2,6 +2,11 @@
 
 @section('title', 'Classes')
 @section('main')
+	<style>
+		.content {
+			overflow: visible !important;
+		}
+	</style>
 	<!-- Main content -->
 	<div class="content-wrapper">
 
@@ -37,11 +42,11 @@
 		<!-- Content area -->
 		<div class="content">
 			<!-- Wizard with validation -->
-	            <div class="panel panel-white">
-					<div class="panel-heading">
-						<h6 class="panel-title">Get started</h6>
-					</div>
-
+            <div class="panel panel-white">
+				<div class="panel-heading">
+					<h6 class="panel-title">Get started</h6>
+				</div>
+				<div class="panel-body">
                 	<form class="steps-validation" action="#">
 						<h6>Personal data</h6>
 						<fieldset>
@@ -138,13 +143,9 @@
 							<h2>We'll redirect you to the students page.</h2>
 						</fieldset>
 					</form>
-	            </div>
-	            <!-- /wizard with validation -->
-			<!-- Footer -->
-			<div class="footer text-muted">
-				&copy; 2016 SeatingPlanner by Toby Mellor
-			</div>
-			<!-- /footer -->
+				</div>
+            </div>
+            <!-- /wizard with validation -->
 		</div>
 		<!-- /content area -->
 	</div>
@@ -154,25 +155,33 @@
     <script type="text/javascript" src="{{ asset('assets/js/plugins/forms/wizards/steps.min.js') }}"></script>
     <script type="text/javascript" src="{{ asset('assets/js/plugins/forms/selects/select2.min.js') }}"></script>
     <script type="text/javascript" src="{{ asset('assets/js/plugins/forms/styling/uniform.min.js') }}"></script>
-    <script type="text/javascript" src="{{ asset('assets/js/plugins/forms/validation/validate.min.js') }}"></script>
 
     <script type="text/javascript" src="{{ asset('assets/js/plugins/forms/tags/tagsinput.min.js') }}"></script>
-    <script type="text/javascript" src="{{ asset('assets/js/plugins/forms/tags/tokenfield.min.js') }}"></script>
     <script type="text/javascript" src="{{ asset('assets/js/plugins/forms/inputs/typeahead/typeahead.bundle.min.js') }}"></script>
 
-    <script type="text/javascript" src="{{ asset('assets/js/pages/form_tags_input.js') }}"></script>
-
 	<script>
-		//
-	    // Wizard with validation
-	    //
-
 	    // Show form
 	    var form = $(".steps-validation").show();
 	    var token = '{{ csrf_token() }}';
 	    var hasErrorOccured = false;
 
-	    // Initialize wizard
+        var roomsAvailable = [
+        	// roomsAvailable and subjectsAvailable will always return nothing until we setup something else later
+        	@if (isset($roomsAvailable))
+            	@foreach ($roomsAvailable as $roomAvailable)
+            		'{{ $roomAvailable }}',
+            	@endforeach
+            @endif
+        ];
+
+        var subjectsAvailable = [
+        	@if (isset($subjectsAvailable))
+            	@foreach ($subjectsAvailable as $subjectAvailable)
+            		'{{ $subjectAvailable }}',
+            	@endforeach
+            @endif
+        ];
+
 	    $(".steps-validation").steps({
 	        headerTag: "h6",
 	        bodyTag: "fieldset",
@@ -243,24 +252,77 @@
 
 	            return form.valid();
 	        },
+	        onInit: function(event, currentIndex) {	
+            	$(function() {
+			        var substringMatcher = function(strs) {
+			            return function findMatches(q, cb) {
+			                var matches, substringRegex;
 
-	        onStepChanged: function (event, currentIndex, priorIndex) {},
+			                if (q.length <= 30) {
+			                    // an array that will be populated with substring matches
+			                    matches = [];
 
-	        onFinishing: function (event, currentIndex) {},
+			                    // regex used to determine if a string contains the substring `q`
+			                    substrRegex = new RegExp(q, 'i');
 
-	        onFinished: function (event, currentIndex) {}
+			                    // iterate through the pool of strings and for any string that
+			                    // contains the substring `q`, add it to the `matches` array
+			                    $.each(strs, function(i, str) {
+			                        if (substrRegex.test(str)) {
+
+			                            // the typeahead jQuery plugin expects suggestions to a
+			                            // JavaScript object, refer to typeahead docs for more info
+			                            matches.push({ value: str });
+
+			                            if (matches.length >= 3) {
+			                            	return false;
+			                            }
+			                        }
+			                    });
+			                    cb(matches);
+			                }
+			            };
+			        };
+
+			        // Attach typeahead
+			        $('.subject-typeahead').tagsinput('input').typeahead(
+			            {
+			                hint: true,
+			                highlight: true,
+			                minLength: 1,
+			            },
+			            {
+			                name: 'states',
+			                displayKey: 'value',
+			                source: substringMatcher(subjectsAvailable)
+			            }
+			        ).bind('typeahead:selected', $.proxy(function (obj, datum) {  
+			            this.tagsinput('add', datum.value);
+			            this.tagsinput('input').typeahead('val', '');
+			        }, $('.subject-typeahead')));
+
+			        $('.room-typeahead').tagsinput('input').typeahead(
+			            {
+			                hint: true,
+			                highlight: true,
+			                minLength: 1,
+			                maxTags: 1
+			            },
+			            {
+			                name: 'states',
+			                displayKey: 'value',
+			                source: substringMatcher(roomsAvailable)
+			            }
+			        ).bind('typeahead:selected', $.proxy(function (obj, datum) {  
+			            this.tagsinput('add', datum.value);
+			            this.tagsinput('input').typeahead('val', '');
+			        }, $('.room-typeahead')));
+			    });
+	        }
 	    });
-
-	    // Initialize plugins
-	    // ------------------------------
 
 	    // Select2 selects
 	    $('.select').select2();
-
-	    // Simple select without search
-	    $('.select-simple').select2({
-	        minimumResultsForSearch: '-1'
-	    });
 
 	    // Styled checkboxes and radios
 	    $('.styled').uniform({
@@ -376,10 +438,14 @@
 
 					if (formData['class_subject'] == "") {
 						formData['class_subject'] = 'N/A';
+					} else if (subjectsAvailable.indexOf(formData['class_subject']) == -1) {
+						subjectsAvailable.push(formData['class_subject']);
 					}
 
 					if (formData['class_room'] == "") {
 						formData['class_room'] = 'N/A';
+					} else if (roomsAvailable.indexOf(formData['class_room']) == -1) {
+						roomsAvailable.push(formData['class_room']);
 					}
 
 					$('tbody').append('<tr>' +
