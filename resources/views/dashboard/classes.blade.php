@@ -436,34 +436,6 @@
 			</div>
 		</div>
 	</div>
-	<div id="modal_delete_class" class="modal fade">
-		<div class="modal-dialog">
-			<div class="modal-content text-center">
-				<div class="modal-header bg-danger">
-					<h5 class="modal-title">Are you sure you want to delete that class?</h5>
-				</div>
-				<input name="class_id" id="class-id-to-delete" value="" hidden>
-				<div class="modal-body">
-					<button type="button" class="btn">Cancel</button>
-					<button type="button" class="btn btn-danger" onclick="submitDeleteForm('/class', 'The class has been deleted!'); location.reload();">Delete <i class="icon-x"></i></button>
-				</div>
-			</div>
-		</div>
-	</div>
-	<div id="modal_delete_seatingplan" class="modal fade">
-		<div class="modal-dialog">
-			<div class="modal-content text-center">
-				<div class="modal-header bg-danger">
-					<h5 class="modal-title">Are you sure you want to delete the seating plan for that class?</h5>
-				</div>
-				<input name="class_id" id="class-object-id-to-delete" value="" hidden>
-				<div class="modal-body">
-					<button type="button" class="btn">Cancel</button>
-					<button type="button" class="btn btn-danger" onclick="submitDeleteForm('/class-object', 'The seating plan for that class has been cleared')">Delete <i class="icon-x"></i></button>
-				</div>
-			</div>
-		</div>
-	</div>
 @stop
 @section('scripts')
     <script type="text/javascript" src="{{ asset('assets/js/plugins/forms/selects/select2.min.js') }}"></script>
