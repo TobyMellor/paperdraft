@@ -203,6 +203,80 @@
                             @endif
                         </div>
                     </div>
+                    <div class="panel panel-white">
+                        <div class="panel-heading">
+                            <h6 class="panel-title">Students</h6>
+                            <div class="heading-elements">
+                                <form action="javascript:void(0);" class="heading-form" style="margin-left: 0px; margin-right: -12px;">
+                                    <div class="form-group has-feedback">
+                                        <input type="search" placeholder="Search..." class="form-control" style="width: 180px;">
+                                        <div class="form-control-feedback">
+                                            <i class="icon-search4 text-size-base text-muted"></i>
+                                        </div>
+                                    </div>
+                                </form>
+                                <ul class="icons-list">
+                                    <li><a title="" data-popup="tooltip" data-action="move" href="javascript:void(0);" data-original-title="Move" class="ui-sortable-handle"></a></li>
+                                    <li><a title="" data-popup="tooltip" data-action="collapse" data-original-title="Collapse" class=""></a></li>
+                                </ul>
+                            </div>
+                        <a class="heading-elements-toggle"><i class="icon-menu"></i></a></div>
+                        
+                        <div class="panel-body">
+                            <ul class="media-list media-list-linked">
+                                <li class="media">
+                                    <a class="media-link" href="#">
+                                        <div class="media-left"><img alt="" class="img-circle" src="http://demo.interface.club/limitless/layout_1/LTR/default/assets/images/demo/users/face1.jpg"></div>
+                                        <div class="media-body">
+                                            <div class="media-heading text-semibold">James Alexander</div>
+                                            <span class="text-muted">Development</span>
+                                        </div>
+                                        <div class="media-right media-middle text-nowrap">
+                                            <input class="styled" type="checkbox">
+                                        </div>
+                                    </a>
+                                </li>
+
+                                <li class="media">
+                                    <a class="media-link" href="#">
+                                        <div class="media-left"><img alt="" class="img-circle" src="http://demo.interface.club/limitless/layout_1/LTR/default/assets/images/demo/users/face2.jpg"></div>
+                                        <div class="media-body">
+                                            <div class="media-heading text-semibold">Jeremy Victorino</div>
+                                            <span class="text-muted">Finances</span>
+                                        </div>
+                                        <div class="media-right media-middle text-nowrap">
+                                            <input class="styled" type="checkbox">
+                                        </div>
+                                    </a>
+                                </li>
+
+                                <li class="media">
+                                    <a class="media-link" href="#">
+                                        <div class="media-left"><img alt="" class="img-circle" src="http://demo.interface.club/limitless/layout_1/LTR/default/assets/images/demo/users/face3.jpg"></div>
+                                        <div class="media-body">
+                                            <div class="media-heading text-semibold">Margo Baker</div>
+                                            <span class="text-muted">Marketing</span>
+                                        </div>
+                                        <div class="media-right media-middle text-nowrap">
+                                            <input class="styled" type="checkbox">
+                                        </div>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="panel-footer">
+                            <div class="heading-elements">
+                                <span class="heading-text text-semibold">Multiple buttons:</span>
+                                <div class="heading-btn pull-right">
+                                    <button class="btn btn-info" type="button">Save</button>
+                                    <button class="btn btn-default" type="button">Cancel</button>
+                                </div>
+                            </div>
+                            <a class="heading-elements-toggle">
+                                <i class="icon-more"></i>
+                            </a>
+                        </div>
+                    </div>
                 </div>
             </div>
             <!-- /dashboard content -->
@@ -221,6 +295,7 @@
 @section('scripts')
     <script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/raphael/2.1.0/raphael-min.js"></script>
     <script type="text/javascript" src="{{ asset('assets/js/plugins/drag_selection.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('assets/js/plugins/forms/styling/uniform.min.js') }}"></script>
 
     <script>
         $(document).ready(function() {
@@ -301,6 +376,10 @@
                         canvasController.confirmPageLeave(null, clickedLink);
                     }
                 }
+            });
+
+            $('.styled').uniform({
+                radioClass: 'choice'
             });
 
             bootstrapper(); // Start initializing

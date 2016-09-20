@@ -312,6 +312,7 @@
 									<div class="form-control-feedback">
 										<i class="icon-home text-muted"></i>
 									</div>
+									<span class="help-block">Recommended, gives option later to use seating layout across classes.</span>
 								</div>
 								@if (isset($classes))
 									<br />
