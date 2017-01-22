@@ -13,3 +13,4 @@ Homestead.yaml
 Homestead.json
 >>>>>>> 00ec27f4a978d3702ee7c4bf63b73b8dd2c762a2
 .env
+.DS_Store
