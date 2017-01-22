@@ -1,0 +1,80 @@
+
+.nav-pills-bordered > li > a {
+    background-color: #fff;
+}
+
+.nav-pills > li > .btn-group {
+    position: absolute;
+    right: 0;
+    top: 0;
+}
+
+.nav-pills > li > .btn-group > .btn {
+    padding: 10px 15px;
+    border-radius: 0 3px 3px 0;
+}
+
+.class-button {
+    background-color: #fcfcfc !important;
+    border-color: #ddd !important;
+    color: #333 !important;
+}
+
+.class-button-active {
+    background-color: #2196f3 !important;
+    border: 1px solid #2196f3 !important;
+    border-radius: 3px !important;
+    color: #fff !important;
+}
+
+.class-button-create {
+    background-color: #4caf50 !important;
+    border: 1px solid #4caf50 !important;
+    border-radius: 3px !important;
+    color: #fff !important;
+}
+
+.class-options {
+    background-color: #fcfcfc !important;
+    border-color: #ddd !important;
+    color: #333 !important;
+    padding: 9px 10px 9px 15px !important;
+}
+
+.class-options-active {
+    padding: 9px 10px 9px 15px !important;
+    background-color: #0e7ed5 !important;
+}
+
+.no-antialias { 
+    image-rendering: optimizeSpeed;
+    image-rendering: -moz-crisp-edges;
+    image-rendering: -o-crisp-edges;
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: pixelated;
+    image-rendering: optimize-contrast;
+    -ms-interpolation-mode: nearest-neighbor;
+
+}
+
+.drag-item, .outside-drag-item {
+    position: absolute;
+    cursor: move;
+}
+
+.drop-target {
+    left: 0px; top: 0px;
+    position: absolute;
+    width: 736px;
+    height: 736px;
+    border: dashed 1px orange;
+    background: whitesmoke url('/assets/images/objects/grid_64.png') repeat;
+    background-size: 32px 32px;
+    cursor: crosshair;
+    
+}
+
+.outline-highlight {
+    -webkit-filter: drop-shadow(1px 1px 0 #26a69a) drop-shadow(-1px -1px 0 #26a69a);
+    filter:drop-shadow(1px 1px 0 #26a69a) drop-shadow(-1px -1px 0 #26a69a);
+}
