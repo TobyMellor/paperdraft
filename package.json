@@ -1,5 +1,6 @@
 {
   "private": true,
+<<<<<<< HEAD
   "scripts": {
     "dev": "cross-env NODE_ENV=development webpack --progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js",
     "watch": "cross-env NODE_ENV=development webpack --watch --progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js",
@@ -13,5 +14,13 @@
     "laravel-mix": "^0.4.0",
     "lodash": "^4.16.2",
     "vue": "^2.0.1"
+=======
+  "devDependencies": {
+    "gulp": "^3.8.8"
+  },
+  "dependencies": {
+    "laravel-elixir": "^3.0.0",
+    "bootstrap-sass": "^3.0.0"
+>>>>>>> 00ec27f4a978d3702ee7c4bf63b73b8dd2c762a2
   }
 }

@@ -4,6 +4,7 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+<<<<<<< HEAD
     | Application Name
     |--------------------------------------------------------------------------
     |
@@ -16,6 +17,8 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+=======
+>>>>>>> 00ec27f4a978d3702ee7c4bf63b73b8dd2c762a2
     | Application Environment
     |--------------------------------------------------------------------------
     |
@@ -51,7 +54,11 @@ return [
     |
     */
 
+<<<<<<< HEAD
     'url' => env('APP_URL', 'http://localhost'),
+=======
+    'url' => env('APP_URL', 'http://seatingplanner.dev'),
+>>>>>>> 00ec27f4a978d3702ee7c4bf63b73b8dd2c762a2
 
     /*
     |--------------------------------------------------------------------------
@@ -136,7 +143,10 @@ return [
     */
 
     'providers' => [
+<<<<<<< HEAD
 
+=======
+>>>>>>> 00ec27f4a978d3702ee7c4bf63b73b8dd2c762a2
         /*
          * Laravel Framework Service Providers...
          */
@@ -152,7 +162,10 @@ return [
         Illuminate\Foundation\Providers\FoundationServiceProvider::class,
         Illuminate\Hashing\HashServiceProvider::class,
         Illuminate\Mail\MailServiceProvider::class,
+<<<<<<< HEAD
         Illuminate\Notifications\NotificationServiceProvider::class,
+=======
+>>>>>>> 00ec27f4a978d3702ee7c4bf63b73b8dd2c762a2
         Illuminate\Pagination\PaginationServiceProvider::class,
         Illuminate\Pipeline\PipelineServiceProvider::class,
         Illuminate\Queue\QueueServiceProvider::class,
@@ -164,16 +177,22 @@ return [
         Illuminate\View\ViewServiceProvider::class,
 
         /*
+<<<<<<< HEAD
          * Package Service Providers...
          */
         Laravel\Tinker\TinkerServiceProvider::class,
 
         /*
+=======
+>>>>>>> 00ec27f4a978d3702ee7c4bf63b73b8dd2c762a2
          * Application Service Providers...
          */
         App\Providers\AppServiceProvider::class,
         App\Providers\AuthServiceProvider::class,
+<<<<<<< HEAD
         // App\Providers\BroadcastServiceProvider::class,
+=======
+>>>>>>> 00ec27f4a978d3702ee7c4bf63b73b8dd2c762a2
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
 
@@ -191,13 +210,19 @@ return [
     */
 
     'aliases' => [
+<<<<<<< HEAD
 
+=======
+>>>>>>> 00ec27f4a978d3702ee7c4bf63b73b8dd2c762a2
         'App' => Illuminate\Support\Facades\App::class,
         'Artisan' => Illuminate\Support\Facades\Artisan::class,
         'Auth' => Illuminate\Support\Facades\Auth::class,
         'Blade' => Illuminate\Support\Facades\Blade::class,
+<<<<<<< HEAD
         'Broadcast' => Illuminate\Support\Facades\Broadcast::class,
         'Bus' => Illuminate\Support\Facades\Bus::class,
+=======
+>>>>>>> 00ec27f4a978d3702ee7c4bf63b73b8dd2c762a2
         'Cache' => Illuminate\Support\Facades\Cache::class,
         'Config' => Illuminate\Support\Facades\Config::class,
         'Cookie' => Illuminate\Support\Facades\Cookie::class,
@@ -211,7 +236,10 @@ return [
         'Lang' => Illuminate\Support\Facades\Lang::class,
         'Log' => Illuminate\Support\Facades\Log::class,
         'Mail' => Illuminate\Support\Facades\Mail::class,
+<<<<<<< HEAD
         'Notification' => Illuminate\Support\Facades\Notification::class,
+=======
+>>>>>>> 00ec27f4a978d3702ee7c4bf63b73b8dd2c762a2
         'Password' => Illuminate\Support\Facades\Password::class,
         'Queue' => Illuminate\Support\Facades\Queue::class,
         'Redirect' => Illuminate\Support\Facades\Redirect::class,
@@ -228,4 +256,8 @@ return [
 
     ],
 
+<<<<<<< HEAD
 ];
+=======
+];
+>>>>>>> 00ec27f4a978d3702ee7c4bf63b73b8dd2c762a2

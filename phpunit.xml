@@ -9,6 +9,7 @@
          processIsolation="false"
          stopOnFailure="false">
     <testsuites>
+<<<<<<< HEAD
         <testsuite name="Feature Tests">
             <directory suffix="Test.php">./tests/Feature</directory>
         </testsuite>
@@ -20,6 +21,15 @@
     <filter>
         <whitelist processUncoveredFilesFromWhitelist="true">
             <directory suffix=".php">./app</directory>
+=======
+        <testsuite name="Application Test Suite">
+            <directory>./tests/</directory>
+        </testsuite>
+    </testsuites>
+    <filter>
+        <whitelist>
+            <directory suffix=".php">app/</directory>
+>>>>>>> 00ec27f4a978d3702ee7c4bf63b73b8dd2c762a2
         </whitelist>
     </filter>
     <php>

@@ -1,3 +1,7 @@
 * text=auto
 *.css linguist-vendored
+<<<<<<< HEAD
 *.scss linguist-vendored
+=======
+*.less linguist-vendored
+>>>>>>> 00ec27f4a978d3702ee7c4bf63b73b8dd2c762a2

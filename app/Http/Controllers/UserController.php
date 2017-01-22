@@ -11,10 +11,18 @@ use Mail;
 use Illuminate\Http\Request;
 
 use Illuminate\Foundation\Auth\ThrottlesLogins;
+<<<<<<< HEAD
 
 class UserController extends Controller
 {
     use ThrottlesLogins;
+=======
+use Illuminate\Foundation\Auth\AuthenticatesAndRegistersUsers;
+
+class UserController extends Controller
+{
+    use AuthenticatesAndRegistersUsers, ThrottlesLogins;
+>>>>>>> 00ec27f4a978d3702ee7c4bf63b73b8dd2c762a2
 
     private $request;
 

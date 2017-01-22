@@ -2,7 +2,11 @@
 
 namespace App\Providers;
 
+<<<<<<< HEAD
 use Illuminate\Support\Facades\Event;
+=======
+use Illuminate\Contracts\Events\Dispatcher as DispatcherContract;
+>>>>>>> 00ec27f4a978d3702ee7c4bf63b73b8dd2c762a2
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
 
 class EventServiceProvider extends ServiceProvider
@@ -19,6 +23,7 @@ class EventServiceProvider extends ServiceProvider
     ];
 
     /**
+<<<<<<< HEAD
      * Register any events for your application.
      *
      * @return void
@@ -26,6 +31,16 @@ class EventServiceProvider extends ServiceProvider
     public function boot()
     {
         parent::boot();
+=======
+     * Register any other events for your application.
+     *
+     * @param  \Illuminate\Contracts\Events\Dispatcher  $events
+     * @return void
+     */
+    public function boot(DispatcherContract $events)
+    {
+        parent::boot($events);
+>>>>>>> 00ec27f4a978d3702ee7c4bf63b73b8dd2c762a2
 
         //
     }

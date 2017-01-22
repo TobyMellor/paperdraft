@@ -8,8 +8,15 @@ return [
     |--------------------------------------------------------------------------
     |
     | Here you may specify the default filesystem disk that should be used
+<<<<<<< HEAD
     | by the framework. The "local" disk, as well as a variety of cloud
     | based disks are available to your application. Just store away!
+=======
+    | by the framework. A "local" driver, as well as a variety of cloud
+    | based drivers are available for your choosing. Just store away!
+    |
+    | Supported: "local", "ftp", "s3", "rackspace"
+>>>>>>> 00ec27f4a978d3702ee7c4bf63b73b8dd2c762a2
     |
     */
 
@@ -37,14 +44,18 @@ return [
     | may even configure multiple disks of the same driver. Defaults have
     | been setup for each driver as an example of the required options.
     |
+<<<<<<< HEAD
     | Supported Drivers: "local", "ftp", "s3", "rackspace"
     |
+=======
+>>>>>>> 00ec27f4a978d3702ee7c4bf63b73b8dd2c762a2
     */
 
     'disks' => [
 
         'local' => [
             'driver' => 'local',
+<<<<<<< HEAD
             'root' => storage_path('app'),
         ],
 
@@ -53,14 +64,48 @@ return [
             'root' => storage_path('app/public'),
             'url' => env('APP_URL').'/storage',
             'visibility' => 'public',
+=======
+            'root'   => storage_path('app'),
+        ],
+
+        'ftp' => [
+            'driver'   => 'ftp',
+            'host'     => 'ftp.example.com',
+            'username' => 'your-username',
+            'password' => 'your-password',
+
+            // Optional FTP Settings...
+            // 'port'     => 21,
+            // 'root'     => '',
+            // 'passive'  => true,
+            // 'ssl'      => true,
+            // 'timeout'  => 30,
+>>>>>>> 00ec27f4a978d3702ee7c4bf63b73b8dd2c762a2
         ],
 
         's3' => [
             'driver' => 's3',
+<<<<<<< HEAD
             'key' => env('AWS_KEY'),
             'secret' => env('AWS_SECRET'),
             'region' => env('AWS_REGION'),
             'bucket' => env('AWS_BUCKET'),
+=======
+            'key'    => 'your-key',
+            'secret' => 'your-secret',
+            'region' => 'your-region',
+            'bucket' => 'your-bucket',
+        ],
+
+        'rackspace' => [
+            'driver'    => 'rackspace',
+            'username'  => 'your-username',
+            'key'       => 'your-key',
+            'container' => 'your-container',
+            'endpoint'  => 'https://identity.api.rackspacecloud.com/v2.0/',
+            'region'    => 'IAD',
+            'url_type'  => 'publicURL',
+>>>>>>> 00ec27f4a978d3702ee7c4bf63b73b8dd2c762a2
         ],
 
     ],

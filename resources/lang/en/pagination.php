@@ -14,6 +14,10 @@ return [
     */
 
     'previous' => '&laquo; Previous',
+<<<<<<< HEAD
     'next' => 'Next &raquo;',
+=======
+    'next'     => 'Next &raquo;',
+>>>>>>> 00ec27f4a978d3702ee7c4bf63b73b8dd2c762a2
 
 ];

@@ -11,8 +11,11 @@ return [
     | using this caching library. This connection is used when another is
     | not explicitly specified when executing a given caching function.
     |
+<<<<<<< HEAD
     | Supported: "apc", "array", "database", "file", "memcached", "redis"
     |
+=======
+>>>>>>> 00ec27f4a978d3702ee7c4bf63b73b8dd2c762a2
     */
 
     'default' => env('CACHE_DRIVER', 'file'),
@@ -40,12 +43,17 @@ return [
 
         'database' => [
             'driver' => 'database',
+<<<<<<< HEAD
             'table' => 'cache',
+=======
+            'table'  => 'cache',
+>>>>>>> 00ec27f4a978d3702ee7c4bf63b73b8dd2c762a2
             'connection' => null,
         ],
 
         'file' => [
             'driver' => 'file',
+<<<<<<< HEAD
             'path' => storage_path('framework/cache/data'),
         ],
 
@@ -64,6 +72,16 @@ return [
                     'host' => env('MEMCACHED_HOST', '127.0.0.1'),
                     'port' => env('MEMCACHED_PORT', 11211),
                     'weight' => 100,
+=======
+            'path'   => storage_path('framework/cache'),
+        ],
+
+        'memcached' => [
+            'driver'  => 'memcached',
+            'servers' => [
+                [
+                    'host' => '127.0.0.1', 'port' => 11211, 'weight' => 100,
+>>>>>>> 00ec27f4a978d3702ee7c4bf63b73b8dd2c762a2
                 ],
             ],
         ],

@@ -40,7 +40,11 @@ class VerifyParametersMiddleware
             $errorMessage = '';
             
             foreach ($validation->errors()->all() as $message) {
+<<<<<<< HEAD
                 $errorMessage .= $message . '<br />';
+=======
+                $errorMessage .= $message . ' ';
+>>>>>>> 00ec27f4a978d3702ee7c4bf63b73b8dd2c762a2
             }
 
             return response()->json([
@@ -62,6 +66,7 @@ class VerifyParametersMiddleware
         $canvasHistoryCount = $this->canvasHistoryController->getCanvasHistoryCount();
 
         return Validator::make($data, [
+<<<<<<< HEAD
             'class_id' => 'nullable|integer|exists:classes,id,user_id,' . Auth::id(),
             'canvas_item' => 'nullable|array',
             'canvas_history' => 'nullable|array|max:' . $canvasHistoryCount,
@@ -70,3 +75,12 @@ class VerifyParametersMiddleware
     }
 }
 
+=======
+            'class_id' => 'required|integer|exists:classes,id,user_id,' . Auth::user()->id,
+            'canvas_item' => 'array',
+            'canvas_history' => 'array|max:' . $canvasHistoryCount,
+            'canvas_action_undo_count' => 'integer|max:' . $canvasHistoryCount
+        ]);
+    }
+}
+>>>>>>> 00ec27f4a978d3702ee7c4bf63b73b8dd2c762a2

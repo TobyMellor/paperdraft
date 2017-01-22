@@ -16,13 +16,19 @@ return [
     'accepted'             => 'The :attribute must be accepted.',
     'active_url'           => 'The :attribute is not a valid URL.',
     'after'                => 'The :attribute must be a date after :date.',
+<<<<<<< HEAD
     'after_or_equal'       => 'The :attribute must be a date after or equal to :date.',
+=======
+>>>>>>> 00ec27f4a978d3702ee7c4bf63b73b8dd2c762a2
     'alpha'                => 'The :attribute may only contain letters.',
     'alpha_dash'           => 'The :attribute may only contain letters, numbers, and dashes.',
     'alpha_num'            => 'The :attribute may only contain letters and numbers.',
     'array'                => 'The :attribute must be an array.',
     'before'               => 'The :attribute must be a date before :date.',
+<<<<<<< HEAD
     'before_or_equal'      => 'The :attribute must be a date before or equal to :date.',
+=======
+>>>>>>> 00ec27f4a978d3702ee7c4bf63b73b8dd2c762a2
     'between'              => [
         'numeric' => 'The :attribute must be between :min and :max.',
         'file'    => 'The :attribute must be between :min and :max kilobytes.',
@@ -36,6 +42,7 @@ return [
     'different'            => 'The :attribute and :other must be different.',
     'digits'               => 'The :attribute must be :digits digits.',
     'digits_between'       => 'The :attribute must be between :min and :max digits.',
+<<<<<<< HEAD
     'dimensions'           => 'The :attribute has invalid image dimensions.',
     'distinct'             => 'The :attribute field has a duplicate value.',
     'email'                => 'The :attribute must be a valid email address.',
@@ -45,6 +52,13 @@ return [
     'image'                => 'The :attribute must be an image.',
     'in'                   => 'The selected :attribute is invalid.',
     'in_array'             => 'The :attribute field does not exist in :other.',
+=======
+    'email'                => 'The :attribute must be a valid email address.',
+    'exists'               => 'The selected :attribute is invalid.',
+    'filled'               => 'The :attribute field is required.',
+    'image'                => 'The :attribute must be an image.',
+    'in'                   => 'The selected :attribute is invalid.',
+>>>>>>> 00ec27f4a978d3702ee7c4bf63b73b8dd2c762a2
     'integer'              => 'The :attribute must be an integer.',
     'ip'                   => 'The :attribute must be a valid IP address.',
     'json'                 => 'The :attribute must be a valid JSON string.',
@@ -55,7 +69,10 @@ return [
         'array'   => 'The :attribute may not have more than :max items.',
     ],
     'mimes'                => 'The :attribute must be a file of type: :values.',
+<<<<<<< HEAD
     'mimetypes'            => 'The :attribute must be a file of type: :values.',
+=======
+>>>>>>> 00ec27f4a978d3702ee7c4bf63b73b8dd2c762a2
     'min'                  => [
         'numeric' => 'The :attribute must be at least :min.',
         'file'    => 'The :attribute must be at least :min kilobytes.',
@@ -64,11 +81,17 @@ return [
     ],
     'not_in'               => 'The selected :attribute is invalid.',
     'numeric'              => 'The :attribute must be a number.',
+<<<<<<< HEAD
     'present'              => 'The :attribute field must be present.',
     'regex'                => 'The :attribute format is invalid.',
     'required'             => 'The :attribute field is required.',
     'required_if'          => 'The :attribute field is required when :other is :value.',
     'required_unless'      => 'The :attribute field is required unless :other is in :values.',
+=======
+    'regex'                => 'The :attribute format is invalid.',
+    'required'             => 'The :attribute field is required.',
+    'required_if'          => 'The :attribute field is required when :other is :value.',
+>>>>>>> 00ec27f4a978d3702ee7c4bf63b73b8dd2c762a2
     'required_with'        => 'The :attribute field is required when :values is present.',
     'required_with_all'    => 'The :attribute field is required when :values is present.',
     'required_without'     => 'The :attribute field is required when :values is not present.',
@@ -83,7 +106,10 @@ return [
     'string'               => 'The :attribute must be a string.',
     'timezone'             => 'The :attribute must be a valid zone.',
     'unique'               => 'The :attribute has already been taken.',
+<<<<<<< HEAD
     'uploaded'             => 'The :attribute failed to upload.',
+=======
+>>>>>>> 00ec27f4a978d3702ee7c4bf63b73b8dd2c762a2
     'url'                  => 'The :attribute format is invalid.',
 
     /*

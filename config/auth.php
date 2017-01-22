@@ -81,6 +81,13 @@ return [
     | Resetting Passwords
     |--------------------------------------------------------------------------
     |
+<<<<<<< HEAD
+=======
+    | Here you may set the options for resetting passwords including the view
+    | that is your password reset e-mail. You may also set the name of the
+    | table that maintains all of the reset tokens for your application.
+    |
+>>>>>>> 00ec27f4a978d3702ee7c4bf63b73b8dd2c762a2
     | You may specify multiple password reset configurations if you have more
     | than one user table or model in the application and you want to have
     | separate password reset settings based on the specific user types.
@@ -94,9 +101,17 @@ return [
     'passwords' => [
         'users' => [
             'provider' => 'users',
+<<<<<<< HEAD
+=======
+            'email' => 'auth.emails.password',
+>>>>>>> 00ec27f4a978d3702ee7c4bf63b73b8dd2c762a2
             'table' => 'password_resets',
             'expire' => 60,
         ],
     ],
+<<<<<<< HEAD
 
 ];
+=======
+];
+>>>>>>> 00ec27f4a978d3702ee7c4bf63b73b8dd2c762a2

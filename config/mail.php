@@ -11,8 +11,12 @@ return [
     | sending of e-mail. You may specify which one you're using throughout
     | your application here. By default, Laravel is setup for SMTP mail.
     |
+<<<<<<< HEAD
     | Supported: "smtp", "sendmail", "mailgun", "mandrill", "ses",
     |            "sparkpost", "log", "array"
+=======
+    | Supported: "smtp", "mail", "sendmail", "mailgun", "mandrill", "ses", "log"
+>>>>>>> 00ec27f4a978d3702ee7c4bf63b73b8dd2c762a2
     |
     */
 
@@ -55,10 +59,14 @@ return [
     |
     */
 
+<<<<<<< HEAD
     'from' => [
         'address' => env('MAIL_FROM_ADDRESS', 'hello@example.com'),
         'name' => env('MAIL_FROM_NAME', 'Example'),
     ],
+=======
+    'from' => ['address' => null, 'name' => null],
+>>>>>>> 00ec27f4a978d3702ee7c4bf63b73b8dd2c762a2
 
     /*
     |--------------------------------------------------------------------------
@@ -86,10 +94,25 @@ return [
 
     'username' => env('MAIL_USERNAME'),
 
+<<<<<<< HEAD
+=======
+    /*
+    |--------------------------------------------------------------------------
+    | SMTP Server Password
+    |--------------------------------------------------------------------------
+    |
+    | Here you may set the password required by your SMTP server to send out
+    | messages from your application. This will be given to the server on
+    | connection so that the application will be able to send messages.
+    |
+    */
+
+>>>>>>> 00ec27f4a978d3702ee7c4bf63b73b8dd2c762a2
     'password' => env('MAIL_PASSWORD'),
 
     /*
     |--------------------------------------------------------------------------
+<<<<<<< HEAD
     | Markdown Mail Settings
     |--------------------------------------------------------------------------
     |
@@ -106,5 +129,30 @@ return [
             resource_path('views/vendor/mail'),
         ],
     ],
+=======
+    | Sendmail System Path
+    |--------------------------------------------------------------------------
+    |
+    | When using the "sendmail" driver to send e-mails, we will need to know
+    | the path to where Sendmail lives on this server. A default path has
+    | been provided here, which will work well on most of your systems.
+    |
+    */
+
+    'sendmail' => '/usr/sbin/sendmail -bs',
+
+    /*
+    |--------------------------------------------------------------------------
+    | Mail "Pretend"
+    |--------------------------------------------------------------------------
+    |
+    | When this option is enabled, e-mail will not actually be sent over the
+    | web and will instead be written to your application's logs files so
+    | you may inspect the message. This is great for local development.
+    |
+    */
+
+    'pretend' => false,
+>>>>>>> 00ec27f4a978d3702ee7c4bf63b73b8dd2c762a2
 
 ];
