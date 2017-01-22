@@ -611,13 +611,14 @@
 
         //Example:
         // [
-        //     {
-        //         "id": 1,
-        //         "item_id": 1,
-        //         "class_id": 1,
-        //         "position_x": 5,
-        //         "position_y": 10,
-        //     }
+        //    1: {
+        //       "id": 1,
+        //       "item_id": 1,
+        //       "position_x": 25,
+        //       "position_y": 5,
+        //       "pseudo_item": false, // True when item exists in session, but not in the database
+        //       "soft_deleted": false // True when user deletes item, but still stored in database for use via CanvasHistory
+        //    }
         // ]
         class CanvasItemModel {
             index(classId) {
@@ -685,6 +686,36 @@
                     },
                     success: function(jsonResponse) {},
                     error: function(jsonReponse) {}
+                });
+            }
+        }
+
+        // An 'Class student' is a 'students' seating position for the given class
+        // e.g. Student: Toby Mellor -- Class student: Student is stored at x: 25, y: 5
+        // This is specific to a particular classroom
+
+        // Example:
+        // [
+        //    1: {
+        //       "id": 1,
+        //       "student_id": 1,
+        //       "canvas_item_id": 1,
+        //    }
+        // ]
+        class ClassStudentModel {
+            index(classId) {
+                $.APIAjax({
+                    url: '{{ url('api/class-student') }}',
+                    type: 'GET',
+                    data: {
+                        class_id: classId
+                    },
+                    success: function(jsonResponse) {
+                        historyController.jsonCanvasHistory = jsonResponse;
+
+                        historyController.init();
+                    },
+                    error: function(jsonResponse) {}
                 });
             }
         }

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 
 use App\Http\Requests;
+use App\Http\Controllers\ClassStudentController;
 
 use App\Student;
 use App\ClassStudent;
@@ -40,7 +41,7 @@ class StudentController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function store(Request $request)
+    public function store(Request $request, ClassStudentController $classStudentController)
     {
         $studentName = $request->input('student_name');
         $pupilPremium = $request->input('pupil_premium');
