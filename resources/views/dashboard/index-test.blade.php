@@ -388,29 +388,29 @@
         var token = '{{ csrf_token() }}';
         var assetsBasePath = '{{ asset('assets/images/objects') }}/';
 
-        var canvasController,
-            historyController,
-            notificationController,
-            utils;
-
-        var hasUserMadeChanges = false;
-
         var selectedCanvasItems = {
             parent: {},
             children: {}
         };
 
+        var hasUserMadeChanges = false;
+
+        var canvasController,
+            historyController,
+            notificationController,
+            utils;
+
         var rect; // The drag rectangle used in drag_selection.js
 
         class View {
             addCanvasItem(item, canvasItem) {
-                var canvasItemId = canvasItem.id;
-                var canvasItemPositionX = canvasItem.position_x * 32;
-                var canvasItemPositionY = canvasItem.position_y * 32;
+                var canvasItemId        = canvasItem.id,
+                    canvasItemPositionX = canvasItem.position_x * 32,
+                    canvasItemPositionY = canvasItem.position_y * 32;
 
-                var itemLocation = item.location;
-                var itemWidth = item.width;
-                var itemHeight = item.height;
+                var itemLocation = item.location,
+                    itemWidth    = item.width,
+                    itemHeight   = item.height;
 
                 $('.drop-target').append(
                     '<div class="drag-item" canvas-item-id="' + canvasItemId + '" style="display: none; left: ' + canvasItemPositionX + 'px; top: ' + canvasItemPositionY + 'px; background-image: url(\'{{ asset('assets/images/objects') }}/' + itemLocation + '\'); background-size: ' + itemWidth + 'px; height: ' + itemHeight + 'px; width: ' + itemWidth + 'px;"></div>'
@@ -469,12 +469,10 @@
                 $('#selected-delete').html('Delete <i class="icon-diff-removed position-right"></i>');
 
                 for (var index in selectedBoardItems) {
-                    var selectedBoardItem = selectedBoardItems[index];
-
-                    var selectedBoardItemId = selectedBoardItem.id;
-
-                    var selectedBoardItemPositionX = selectedBoardItem.position_x;
-                    var selectedBoardItemPositionY = selectedBoardItem.position_y;
+                    var selectedBoardItem          = selectedBoardItems[index],
+                        selectedBoardItemId        = selectedBoardItem.id,
+                        selectedBoardItemPositionX = selectedBoardItem.position_x,
+                        selectedBoardItemPositionY = selectedBoardItem.position_y;
 
                     if (index == 1) {
                         $('#selected-delete').html('Delete All <i class="icon-diff-removed position-right"></i>');
@@ -726,10 +724,10 @@
                     @if (isset($items))
                         @foreach ($items as $item)
                             {
-                                'id': '{{ $item->id }}',
-                                'name': '{{ $item->name }}',
-                                'width': '{{ $item->width }}',
-                                'height': '{{ $item->height }}',
+                                'id':       '{{ $item->id }}',
+                                'name':     '{{ $item->name }}',
+                                'width':    '{{ $item->width }}',
+                                'height':   '{{ $item->height }}',
                                 'location': '{{ $item->location }}',
                             },
                         @endforeach
@@ -737,12 +735,12 @@
                 ],
                 this.jsonCanvasItems;
 
-                this.canvasItems = {}, // e.g. Table is stored at X: 5, Y: 8 in the grid
-                this.items = {}, // e.g. A Table desk.png, A Teachers Desk teachers_desk.png
-                this.canvasItemsGrid = [], // e.g. Grid of all possible locations to store items
+                this.canvasItems            = {}, // e.g. Table is stored at X: 5, Y: 8 in the grid
+                this.items                  = {}, // e.g. A Table desk.png, A Teachers Desk teachers_desk.png
+                this.canvasItemsGrid        = [], // e.g. Grid of all possible locations to store items
                 this.softDeletedCanvasItems = {};
 
-                this.classId = classId,
+                this.classId  = classId,
                 this.gridSize = gridSize;
 
                 this.canvasItemModel = new CanvasItemModel,
@@ -755,10 +753,10 @@
             }
 
             init() {
-                var jsonItems = this.jsonItems,
+                var jsonItems       = this.jsonItems,
                     jsonCanvasItems = this.jsonCanvasItems;
 
-                var items = this.items,
+                var items       = this.items,
                     canvasItems = this.canvasItems; 
 
                 this.generateGrid(this.gridSize);
@@ -793,9 +791,9 @@
                 var items = this.items;
 
                 var item = items[item.id] = {
-                    'name': item.name,
-                    'height': item.height,
-                    'width': item.width,
+                    'name':     item.name,
+                    'height':   item.height,
+                    'width':    item.width,
                     'location': item.location
                 };
             }
@@ -806,9 +804,9 @@
             }
 
             createCanvasItem(itemId, isPseudoCanvasItem = false) {
-                var canvasItems = this.canvasItems,
+                var canvasItems     = this.canvasItems,
                     canvasItemModel = this.canvasItemModel,
-                    classId = this.classId;
+                    classId         = this.classId;
 
                 var canvasItem = {
                     item_id: itemId
@@ -821,8 +819,8 @@
                 }
 
                 if (!$.isEmptyObject(selectedCanvasItems.parent)) {
-                    var parentCanvasItemPositionX = canvasItems[selectedCanvasItems.parent.id].position_x;
-                    var parentCanvasItemPositionY = canvasItems[selectedCanvasItems.parent.id].position_y;
+                    var parentCanvasItemPositionX = canvasItems[selectedCanvasItems.parent.id].position_x.
+                        parentCanvasItemPositionY = canvasItems[selectedCanvasItems.parent.id].position_y;
 
                     var nearestEmptySpace = this.getNearestEmpty(parentCanvasItemPositionX, parentCanvasItemPositionY, 5, 5);
 
@@ -842,16 +840,16 @@
 
             // Stores the canvasItem locally and adds it to the view (canvas)
             addCanvasItem(canvasItem, isPseudoCanvasItem = false) {
-                var items = this.items,
-                    canvasItems = this.canvasItems,
+                var items           = this.items,
+                    canvasItems     = this.canvasItems,
                     canvasItemsGrid = this.canvasItemsGrid;
 
                 var canvasItem = canvasItems[canvasItem.id] = {
-                    'id': canvasItem.id,
-                    'item_id': canvasItem.item_id,
-                    'position_x': canvasItem.position_x,
-                    'position_y': canvasItem.position_y,
-                    'pseudo_item': isPseudoCanvasItem,
+                    'id':           canvasItem.id,
+                    'item_id':      canvasItem.item_id,
+                    'position_x':   canvasItem.position_x,
+                    'position_y':   canvasItem.position_y,
+                    'pseudo_item':  isPseudoCanvasItem,
                     'soft_deleted': false
                 };
 
@@ -865,13 +863,13 @@
 
                 if (isPseudoCanvasItem) {
                     historyController.addCanvasHistory({
-                        canvas_item_id: canvasItem.id,
-                        item_id: canvasItem.item_id,
-                        type: 'addition',
+                        canvas_item_id:      canvasItem.id,
+                        item_id:             canvasItem.item_id,
+                        type:                'addition',
                         previous_position_x: canvasItem.position_x,
                         previous_position_y: canvasItem.position_y,
-                        position_x: null,
-                        position_y: null
+                        position_x:          null,
+                        position_y:          null
                     });
                 }
             }
@@ -881,19 +879,19 @@
                     softDeletedCanvasItems = this.softDeletedCanvasItems;
 
                 softDeletedCanvasItems[softDeletedCanvasItem.id] = {
-                    'id': softDeletedCanvasItem.id,
-                    'item_id': softDeletedCanvasItem.item_id,
-                    'position_x': softDeletedCanvasItem.position_x,
-                    'position_y': softDeletedCanvasItem.position_y,
-                    'pseudo_item': softDeletedCanvasItem.pseudo_item,
+                    'id':           softDeletedCanvasItem.id,
+                    'item_id':      softDeletedCanvasItem.item_id,
+                    'position_x':   softDeletedCanvasItem.position_x,
+                    'position_y':   softDeletedCanvasItem.position_y,
+                    'pseudo_item':  softDeletedCanvasItem.pseudo_item,
                     'soft_deleted': true
                 };
             }
 
             updatePseudoCanvasItemToReal(oldCanvasItemId, newCanvasItemId, isSoftDeleted = false) {
                 var canvasItemsGrid = this.canvasItemsGrid,
-                    canvasItems,
-                    canvasHistory = historyController.canvasHistory;
+                    canvasHistory   = historyController.canvasHistory,
+                    canvasItems;
 
                 if (isSoftDeleted) {
                     canvasItems = this.softDeletedCanvasItems;
@@ -926,10 +924,10 @@
             }
 
             removeCanvasItem(canvasItemId) {
-                var canvasItems = this.canvasItems,
-                    canvasItemsGrid = this.canvasItemsGrid,
+                var canvasItems            = this.canvasItems,
+                    canvasItemsGrid        = this.canvasItemsGrid,
                     softDeletedCanvasItems = this.softDeletedCanvasItems, 
-                    view = this.view;
+                    view                   = this.view;
 
                 var canvasItem = canvasItems[canvasItemId];
 
@@ -955,7 +953,6 @@
                 var canvasItems = this.canvasItems;
 
                 this.removeCanvasItem(canvasItemId);
-
                 this.updateSelected(Object.keys(canvasItems).length > 0 ? [Object.keys(canvasItems)[0]] : []);
             }
 
@@ -967,12 +964,12 @@
                     var canvasItemId = selectedIds[index];
 
                     historyController.addCanvasHistory({
-                        canvas_item_id: canvasItemId,
-                        type: 'deletion',
+                        canvas_item_id:      canvasItemId,
+                        type:                'deletion',
                         previous_position_x: canvasItems[canvasItemId].position_x,
                         previous_position_y: canvasItems[canvasItemId].position_y,
-                        position_x: null,
-                        position_y: null
+                        position_x:          null,
+                        position_y:          null
                     });
 
                     this.removeCanvasItem(canvasItemId);
@@ -982,9 +979,9 @@
             }
 
             deleteCanvasItems() {
-                var canvasItemModel = this.canvasItemModel,
+                var canvasItemModel        = this.canvasItemModel,
                     softDeletedCanvasItems = this.softDeletedCanvasItems,
-                    classId = this.classId;
+                    classId                = this.classId;
 
                 if (Object.keys(softDeletedCanvasItems).length > 0) {
                     canvasItemModel.batchDestroy(classId, softDeletedCanvasItems);
@@ -1062,11 +1059,10 @@
                         var parentCanvasItemId = view.getCanvasItemId($(this));
 
                         // We need the new location of the canvasItem as it may be outdated in the canvasItems array
-                        var newParentCanvasItemPositionX = Math.round($(this).position().left / 32);
-                        var newParentCanvasItemPositionY = Math.round($(this).position().top / 32);
-
-                        var oldParentCanvasItemPositionX = canvasItems[parentCanvasItemId].position_x;
-                        var oldParentCanvasItemPositionY = canvasItems[parentCanvasItemId].position_y;
+                        var newParentCanvasItemPositionX = Math.round($(this).position().left / 32),
+                            newParentCanvasItemPositionY = Math.round($(this).position().top / 32),
+                            oldParentCanvasItemPositionX = canvasItems[parentCanvasItemId].position_x,
+                            oldParentCanvasItemPositionY = canvasItems[parentCanvasItemId].position_y;
 
                         if (newParentCanvasItemPositionX != oldParentCanvasItemPositionX
                                 || newParentCanvasItemPositionY != oldParentCanvasItemPositionY) { // Continue if the item has moved
@@ -1075,8 +1071,8 @@
                                 newParentCanvasItemPositionX,
                                 newParentCanvasItemPositionY
                             )) {
-                                var lastDeltaX = newParentCanvasItemPositionX - oldParentCanvasItemPositionX;
-                                var lastDeltaY = newParentCanvasItemPositionY - oldParentCanvasItemPositionY;
+                                var lastDeltaX = newParentCanvasItemPositionX - oldParentCanvasItemPositionX,
+                                    lastDeltaY = newParentCanvasItemPositionY - oldParentCanvasItemPositionY;
 
                                 selectedCanvasItems.parent.last_delta_x = lastDeltaX;
                                 selectedCanvasItems.parent.last_delta_y = lastDeltaY;
@@ -1087,17 +1083,13 @@
 
                                 for (var childrenId in selectedCanvasItems.children) {
                                     if (Math.abs(lastDeltaX) >= Math.abs(lastDeltaY) && lastDeltaX > 0) {
-                                        // right
-                                        sortedChildren.push([childrenId, -selectedCanvasItems.children[childrenId].relative_position_x]);
+                                        sortedChildren.push([childrenId, -selectedCanvasItems.children[childrenId].relative_position_x]); // right
                                     } else if (Math.abs(lastDeltaX) >= Math.abs(lastDeltaY) && lastDeltaX < 0) {
-                                        // left
-                                        sortedChildren.push([childrenId, selectedCanvasItems.children[childrenId].relative_position_x]);
+                                        sortedChildren.push([childrenId, selectedCanvasItems.children[childrenId].relative_position_x]); // left
                                     } else if (Math.abs(lastDeltaX) <= Math.abs(lastDeltaY) && lastDeltaY > 0) {
-                                        // up
-                                        sortedChildren.push([childrenId, -selectedCanvasItems.children[childrenId].relative_position_y]);
+                                        sortedChildren.push([childrenId, -selectedCanvasItems.children[childrenId].relative_position_y]); // up
                                     } else if (Math.abs(lastDeltaX) <= Math.abs(lastDeltaY) && lastDeltaY < 0) {
-                                        // down
-                                        sortedChildren.push([childrenId, selectedCanvasItems.children[childrenId].relative_position_y]);
+                                        sortedChildren.push([childrenId, selectedCanvasItems.children[childrenId].relative_position_y]); // down
                                     }
                                 }
 
@@ -1108,14 +1100,14 @@
                                 );
 
                                 for (let i = 0; i < sortedChildren.length; i++) {
-                                    var childCanvasItemId = sortedChildren[i][0];
-                                    var childCanvasItem = canvasItems[childCanvasItemId];
+                                    var childCanvasItemId = sortedChildren[i][0],
+                                        childCanvasItem = canvasItems[childCanvasItemId];
 
-                                    var oldChildPositionX = childCanvasItem.position_x;
-                                    var oldChildPositionY = childCanvasItem.position_y;
+                                    var oldChildPositionX = childCanvasItem.position_x,
+                                        oldChildPositionY = childCanvasItem.position_y;
 
-                                    var childRelativePositionX = selectedCanvasItems.children[childCanvasItemId].relative_position_x;
-                                    var childRelativePositionY = selectedCanvasItems.children[childCanvasItemId].relative_position_y;
+                                    var childRelativePositionX = selectedCanvasItems.children[childCanvasItemId].relative_position_x,
+                                        childRelativePositionY = selectedCanvasItems.children[childCanvasItemId].relative_position_y;
                                     
                                     if (canvasController.updateCanvasItemPosition(
                                         childCanvasItem,
@@ -1159,8 +1151,8 @@
                             var canvasItemId = selectedIds[index];
 
                             pendingCanvasHistoryRecords.push({ // Store the canvasItem's history
-                                canvas_item_id: canvasItemId,
-                                type: 'movement',
+                                canvas_item_id:      canvasItemId,
+                                type:                'movement',
                                 previous_position_x: canvasItems[canvasItemId].position_x,
                                 previous_position_y: canvasItems[canvasItemId].position_y
                             });
@@ -1176,8 +1168,8 @@
                         if (pendingCanvasHistoryRecords[0].previous_position_x != canvasItems[pendingCanvasHistoryRecords[0].canvas_item_id].position_x
                                 || pendingCanvasHistoryRecords[0].previous_position_y != canvasItems[pendingCanvasHistoryRecords[0].canvas_item_id].position_y) {
                             for (var index in pendingCanvasHistoryRecords) {
-                                var pendingCanvasHistoryRecord = pendingCanvasHistoryRecords[index];
-                                var canvasItemId = pendingCanvasHistoryRecord.canvas_item_id;
+                                var pendingCanvasHistoryRecord = pendingCanvasHistoryRecords[index],
+                                    canvasItemId = pendingCanvasHistoryRecord.canvas_item_id;
 
                                 pendingCanvasHistoryRecord.position_x = canvasItems[canvasItemId].position_x;
                                 pendingCanvasHistoryRecord.position_y = canvasItems[canvasItemId].position_y;
@@ -1201,8 +1193,8 @@
             // Accepts array of canvasItemIds e.g. [2, 5, 7]
             updateSelected(canvasItemIds, shouldClearView = true) {
                 var canvasItems = this.canvasItems,
-                    items = this.items,
-                    view = this.view;
+                    items       = this.items,
+                    view        = this.view;
 
                 var selectedBoardItems = [];
 
@@ -1228,11 +1220,11 @@
                             selectedCanvasItems.parent.id = canvasItemId;
 
                             selectedBoardItems[index] = {
-                                id: canvasItemId,
+                                id:         canvasItemId,
                                 position_x: canvasItems[canvasItemId].position_x,
                                 position_y: canvasItems[canvasItemId].position_y,
-                                location: items[canvasItems[canvasItemId].item_id].location,
-                                name: items[canvasItems[canvasItemId].item_id].name
+                                location:   items[canvasItems[canvasItemId].item_id].location,
+                                name:       items[canvasItems[canvasItemId].item_id].name
                             };
                         } else {
                             if (childrenIndexOf == -1) {
@@ -1249,11 +1241,11 @@
 
                         if (canvasItemId in canvasItems) { // We might have just deleted the child
                             selectedBoardItems[index] = {
-                                id: canvasItemId,
+                                id:         canvasItemId,
                                 position_x: canvasItems[canvasItemId].position_x,
                                 position_y: canvasItems[canvasItemId].position_y,
-                                location: items[canvasItems[canvasItemId].item_id].location,
-                                name: items[canvasItems[canvasItemId].item_id].name
+                                location:   items[canvasItems[canvasItemId].item_id].location,
+                                name:       items[canvasItems[canvasItemId].item_id].name
                             };
                         }
                     }
@@ -1262,7 +1254,7 @@
                     view.updateSelectedBoard(selectedBoardItems);
                 } else {
                     selectedCanvasItems = {
-                        parent: {},
+                        parent:   {},
                         children: {}
                     };
 
@@ -1283,8 +1275,8 @@
             }
             
             getNearestEmpty(positionX, positionY, maxCheckHeight, maxCheckWidth) {
-                var x = 0,
-                    y = 0,
+                var x     = 0,
+                    y     = 0,
                     delta = [0, -1],
                     potentialEmptyX,
                     potentialEmptyY;
@@ -1314,9 +1306,9 @@
 
             updateConnectedCanvasItems(canvasItemPositionX, canvasItemPositionY, checkExemptions, checkExemptionsIndex = null) {
                 var canvasItemsGrid = this.canvasItemsGrid,
-                    canvasItems = this.canvasItems,
-                    items = this.items,
-                    view = this.view;
+                    canvasItems     = this.canvasItems,
+                    items           = this.items,
+                    view            = this.view;
 
                 var canvasItemId = canvasItemsGrid[canvasItemPositionX][canvasItemPositionY];
 
@@ -1355,14 +1347,13 @@
                                     continue;
                                 }
                                 
-                                var checkPositionX = canvasItemPositionX - 1 + x;
-                                var checkPositionY = canvasItemPositionY - 1 + i;
+                                var checkPositionX = canvasItemPositionX - 1 + x,
+                                    checkPositionY = canvasItemPositionY - 1 + i;
 
                                 if (this.isPositionInBounds(checkPositionX, checkPositionY)) {
-                                    var canvasItemIdInCheckPosition = canvasItemsGrid[checkPositionX][checkPositionY];
-                                    var hasAlreadyBeenChecked = utils.isArrayInArray(checkExemptions, [checkPositionX, checkPositionY]);
-
-                                    var shouldCheckFurther = true; // Only used to check previously checked items
+                                    var canvasItemIdInCheckPosition = canvasItemsGrid[checkPositionX][checkPositionY],
+                                        hasAlreadyBeenChecked = utils.isArrayInArray(checkExemptions, [checkPositionX, checkPositionY]),
+                                        shouldCheckFurther = true; // Only used to check previously checked items
 
                                     if (hasAlreadyBeenChecked) {
                                         if (canvasItemIdInCheckPosition != -1 && canvasItems[canvasItemIdInCheckPosition].item_id == 1) { // Connect alreadyChecked item, but put isDirectConnected to false to prevent further checking
@@ -1375,8 +1366,8 @@
                                         if (canvasItemIdInCheckPosition != -1 && canvasItems[canvasItemIdInCheckPosition].item_id == 1) { // There's a table item in the position we're checking
                                             if (adjacentDirections[i][x].length == 9) { // Check position is northwest, northeast, southeast or southwest (all 9 characters long)
                                                 // We need to check to see if adjacent items are present. i.e. northwest requires north (center x, same y) and west (same x, center y)  to be present
-                                                var canvasItemIdAdjacentCheckPositionX = canvasItemsGrid[canvasItemPositionX][checkPositionY];
-                                                var canvasItemIdAdjacentCheckPositionY = canvasItemsGrid[checkPositionX][canvasItemPositionY];
+                                                var canvasItemIdAdjacentCheckPositionX = canvasItemsGrid[canvasItemPositionX][checkPositionY],
+                                                    canvasItemIdAdjacentCheckPositionY = canvasItemsGrid[checkPositionX][canvasItemPositionY];
 
                                                 if (canvasItemIdAdjacentCheckPositionX != -1 
                                                         && canvasItems[canvasItemIdAdjacentCheckPositionX].item_id == 1
@@ -1436,15 +1427,15 @@
 
             confirmPageLeave(buttonElement = null, externalLink = null) {
                 swal({
-                    title: "Do you want to save changes made to '" + $('#class-name').text() + "'?",
-                    text: "Your changes will be lost if you don’t save them.",
-                    type: "warning",
-                    showCancelButton: true,
+                    title:              "Do you want to save changes made to '" + $('#class-name').text() + "'?",
+                    text:               "Your changes will be lost if you don’t save them.",
+                    type:               "warning",
+                    showCancelButton:   true,
                     confirmButtonColor: "#66BB6A",
-                    confirmButtonText: "Save seating plan",
-                    cancelButtonText: "Continue without saving",
-                    closeOnConfirm: false,
-                    closeOnCancel: true
+                    confirmButtonText:  "Save seating plan",
+                    cancelButtonText:   "Continue without saving",
+                    closeOnConfirm:     false,
+                    closeOnCancel:      true
                 }, function(isConfirm){
                     if (isConfirm) {
                         $('.confirm').html('Loading <i class="icon-spinner2 spinner" style="margin-left: 5px;"></i>');
@@ -1452,11 +1443,11 @@
                         canvasController.saveCanvasItems(buttonElement, externalLink);
 
                         swal({
-                            title: "Saved!",
-                            text: "Your changes to '" + $('#class-name').text() + "' have been saved.",
+                            title:              "Saved!",
+                            text:               "Your changes to '" + $('#class-name').text() + "' have been saved.",
                             confirmButtonColor: "#66BB6A",
-                            type: "success",
-                            timer: 2000
+                            type:               "success",
+                            timer:              2000
                         });
                     } else {
                         if (buttonElement != null) {
@@ -1469,10 +1460,10 @@
             }
 
             saveCanvasItems(buttonElement = null, externalLink = null) {   
-                var canvasItems = this.canvasItems,
+                var canvasItems            = this.canvasItems,
                     softDeletedCanvasItems = this.softDeletedCanvasItems,
-                    canvasItemModel = this.canvasItemModel,
-                    classId = this.classId;
+                    canvasItemModel        = this.canvasItemModel,
+                    classId                = this.classId;
 
                 var mergedCanvasItems = $.extend({}, canvasItems, softDeletedCanvasItems); // Merge canvasItems and softDeletedCanvasItems since we need to store softDeleted too so user use history to revert back later
 
@@ -1501,7 +1492,7 @@
                 this.canvasItemsGrid = [];
 
                 selectedCanvasItems = {
-                    parent: {},
+                    parent:   {},
                     children: {}
                 };
             }
@@ -1511,7 +1502,7 @@
             constructor() {
                 this.jsonCanvasHistory = [];
 
-                this.canvasHistory = []; // Stores array of objects containing actions performed by the user
+                this.canvasHistory  = []; // Stores array of objects containing actions performed by the user
                 this.canvasActionUndoCount = 1; // How many times to undo away from most recent action
                 this.pendingCanvasHistoryRecords = []; // Store positions when drag starts, store them in canvasHistory on stop
 
@@ -1549,21 +1540,21 @@
                 }
 
                 this.canvasHistory[this.canvasHistory.length] = {
-                    canvas_item_id: canvasHistoryRecord.canvas_item_id,
-                    type: canvasHistoryRecord.type,
+                    canvas_item_id:      canvasHistoryRecord.canvas_item_id,
+                    type:                canvasHistoryRecord.type,
                     previous_position_x: canvasHistoryRecord.previous_position_x,
                     previous_position_y: canvasHistoryRecord.previous_position_y,
-                    position_x: canvasHistoryRecord.position_x,
-                    position_y: canvasHistoryRecord.position_y
+                    position_x:          canvasHistoryRecord.position_x,
+                    position_y:          canvasHistoryRecord.position_y
                 }
             }
 
             storeCanvasHistory(buttonElement = null, externalLink = null) {
-                var canvasHistory = this.canvasHistory,
-                    canvasHistoryModel = this.canvasHistoryModel,
+                var canvasHistory         = this.canvasHistory,
+                    canvasHistoryModel    = this.canvasHistoryModel,
                     maxCanvasHistoryCount = this.maxCanvasHistoryCount,
                     canvasActionUndoCount = this.canvasActionUndoCount,
-                    classId = canvasController.classId;
+                    classId               = canvasController.classId;
 
                 var slicedHistory = canvasHistory.slice(Math.max(canvasHistory.length - maxCanvasHistoryCount, 0)); // Don't send > maxCanvasHistoryCount to DB
 
@@ -1573,10 +1564,10 @@
             }
 
             undoCanvasAction() {
-                var canvasHistory = this.canvasHistory,
-                    canvasActionUndoCount = this.canvasActionUndoCount,
-                    canvasItems = canvasController.canvasItems,
-                    view = this.view,
+                var canvasHistory          = this.canvasHistory,
+                    canvasActionUndoCount  = this.canvasActionUndoCount,
+                    canvasItems            = canvasController.canvasItems,
+                    view                   = this.view,
                     softDeletedCanvasItems = canvasController.softDeletedCanvasItems;
 
                 if (Object.keys(canvasHistory).length - canvasActionUndoCount >= 0) {
@@ -1594,11 +1585,11 @@
                         default:
                             var canvasItem = canvasItems[canvasItemId];
 
-                            var currentItemPositionX = canvasItem.position_x;
-                            var currentItemPositionY = canvasItem.position_y;
+                            var currentItemPositionX = canvasItem.position_x,
+                                currentItemPositionY = canvasItem.position_y;
 
-                            var canvasItemPositionX = action.previous_position_x;
-                            var canvasItemPositionY = action.previous_position_y;
+                            var canvasItemPositionX = action.previous_position_x,
+                                canvasItemPositionY = action.previous_position_y;
 
                             canvasController.updateCanvasItemPosition(canvasItem, canvasItemPositionX, canvasItemPositionY)
                             view.updateCanvasItemPosition(canvasItemId, canvasItemPositionX, canvasItemPositionY);
@@ -1637,11 +1628,11 @@
                         default:
                             var canvasItem = canvasItems[canvasItemId];
 
-                            var currentItemPositionX = canvasItem.position_x;
-                            var currentItemPositionY = canvasItem.position_y;
+                            var currentItemPositionX = canvasItem.position_x,
+                                currentItemPositionY = canvasItem.position_y;
 
-                            var canvasItemPositionX = action.position_x;
-                            var canvasItemPositionY = action.position_y;
+                            var canvasItemPositionX = action.position_x,
+                                canvasItemPositionY = action.position_y;
 
                             canvasController.updateCanvasItemPosition(canvasItem, canvasItemPositionX, canvasItemPositionY);
                             view.updateCanvasItemPosition(canvasItemId, canvasItemPositionX, canvasItemPositionY);
@@ -1665,9 +1656,9 @@
             // type is the display type e.g. 'error' or 'success' (string)
             handleNotification(notificationContent, type, timeout = 7500) {
                 var n = noty({
-                    text: notificationContent,
+                    text:   notificationContent,
                     layout: 'topCenter',
-                    type: type
+                    type:   type
                 });
 
                 setTimeout(function() {
@@ -1691,31 +1682,31 @@
             }
 
             getQueryParams() {
-                var query_string = {};
-                var query = window.location.search.substring(1);
-                var vars = query.split("&");
-                for (var i=0;i<vars.length;i++) {
+                var queryString = {},
+                    query       = window.location.search.substring(1),
+                    vars        = query.split("&");
+
+                for (var i = 0; i < vars.length; i++) {
                     var pair = vars[i].split("=");
+
                     // If first entry with this name
-                    if (typeof query_string[pair[0]] === "undefined") {
-                        query_string[pair[0]] = decodeURIComponent(pair[1]);
-                        // If second entry with this name
-                    } else if (typeof query_string[pair[0]] === "string") {
-                        var arr = [ query_string[pair[0]],decodeURIComponent(pair[1]) ];
-                        query_string[pair[0]] = arr;
-                    // If third or later entry with this name
+                    if (typeof queryString[pair[0]] === "undefined") {
+                        queryString[pair[0]] = decodeURIComponent(pair[1]);
+                    } else if (typeof queryString[pair[0]] === "string") {
+                        var arr = [queryString[pair[0]], decodeURIComponent(pair[1])];
+                        queryString[pair[0]] = arr;
                     } else {
-                        query_string[pair[0]].push(decodeURIComponent(pair[1]));
+                        queryString[pair[0]].push(decodeURIComponent(pair[1]));
                     }
                 } 
 
-                return query_string;
+                return queryString;
             }
 
             isInt(value) {
-              return !isNaN(value) && 
-                     parseInt(Number(value)) == value && 
-                     !isNaN(parseInt(value, 10));
+                return !isNaN(value) && 
+                    parseInt(Number(value)) == value && 
+                    !isNaN(parseInt(value, 10));
             }
         }
 
@@ -1723,8 +1714,8 @@
             utils = new Utils;
             notificationController = new NotificationController;
 
-            var queryParameters = utils.getQueryParams();
-            var classId = @if ($recentClassId != null) {{ $recentClassId }} @else parseInt($(".class-button:first").attr("class-id")); @endif
+            var queryParameters = utils.getQueryParams(),
+                classId = @if ($recentClassId != null) {{ $recentClassId }} @else parseInt($(".class-button:first").attr("class-id")); @endif
 
             if (queryParameters.hasOwnProperty('class')) {
                 if (utils.isInt(queryParameters.class) && $('.class-button[class-id=' + queryParameters.class + ']').length > 0) {
@@ -1748,18 +1739,18 @@
                     };
 
                     if (params.success && typeof params.success == 'function') {
-                        var successCallback = params.success;
-                        var ourCallback = function(responseJson) {
-                            if (utils.isValidJson(responseJson)) { // Validate the data
-                                if (responseJson.error == 0) {
-                                    successCallback(responseJson); // Continue to function
+                        var successCallback = params.success,
+                            ourCallback = function(responseJson) {
+                                if (utils.isValidJson(responseJson)) { // Validate the data
+                                    if (responseJson.error == 0) {
+                                        successCallback(responseJson); // Continue to function
+                                    } else {
+                                        notificationController.handleNotification(responseJson.message, 'error');
+                                    }
                                 } else {
-                                    notificationController.handleNotification(responseJson.message, 'error');
+                                    notificationController.handleNotification('A server-side error occured. Try refreshing if the problem persists.', 'error');
                                 }
-                            } else {
-                                notificationController.handleNotification('A server-side error occured. Try refreshing if the problem persists.', 'error');
                             }
-                        }
 
                         params.success = ourCallback;
                     }
