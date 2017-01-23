@@ -1062,8 +1062,8 @@
                         var parentCanvasItemId = view.getCanvasItemId($(this));
 
                         // We need the new location of the canvasItem as it may be outdated in the canvasItems array
-                        var newParentCanvasItemPositionX = $(this).position().left / 32;
-                        var newParentCanvasItemPositionY = $(this).position().top / 32;
+                        var newParentCanvasItemPositionX = Math.round($(this).position().left / 32);
+                        var newParentCanvasItemPositionY = Math.round($(this).position().top / 32);
 
                         var oldParentCanvasItemPositionX = canvasItems[parentCanvasItemId].position_x;
                         var oldParentCanvasItemPositionY = canvasItems[parentCanvasItemId].position_y;
@@ -1799,7 +1799,6 @@
 
             // If we are not dragging yet, we won't check for options
             if (constrainPosition) {
-
                 if (this.containment) {
                     if (this.relativeContainer) {
                         co = this.relativeContainer.offset();
@@ -1828,7 +1827,6 @@
                 }
 
                 if (o.grid) {
-
                     //Check for grid elements set to 0 to prevent divide by 0 error causing invalid argument errors in IE (see ticket #6950)
                     top = o.grid[1] ? this.originalPageY + Math.round((pageY - this.originalPageY) / o.grid[1]) * o.grid[1] : this.originalPageY;
                     pageY = containment ? ((top - this.offset.click.top >= containment[1] || top - this.offset.click.top > containment[3]) ? top : ((top - this.offset.click.top >= containment[1]) ? top - o.grid[1] : top + o.grid[1])) : top;
