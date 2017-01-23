@@ -823,7 +823,7 @@
                 }
 
                 if (!$.isEmptyObject(selectedCanvasItems.parent)) {
-                    var parentCanvasItemPositionX = canvasItems[selectedCanvasItems.parent.id].position_x.
+                    var parentCanvasItemPositionX = canvasItems[selectedCanvasItems.parent.id].position_x,
                         parentCanvasItemPositionY = canvasItems[selectedCanvasItems.parent.id].position_y;
 
                     var nearestEmptySpace = this.getNearestEmpty(parentCanvasItemPositionX, parentCanvasItemPositionY, 5, 5);
