@@ -203,7 +203,8 @@
                             @endif
                         </div>
                     </div>
-                    <div class="panel panel-white">
+
+                    <div class="panel panel-flat">
                         <div class="panel-heading">
                             <h6 class="panel-title">Students</h6>
                             <div class="heading-elements">
@@ -220,56 +221,124 @@
                                     <li><a title="" data-popup="tooltip" data-action="collapse" data-original-title="Collapse" class=""></a></li>
                                 </ul>
                             </div>
-                        <a class="heading-elements-toggle"><i class="icon-menu"></i></a></div>
-                        
-                        <div class="panel-body">
-                            <ul class="media-list media-list-linked">
-                                <li class="media">
-                                    <a class="media-link" href="#">
-                                        <div class="media-left"><img alt="" class="img-circle" src="http://demo.interface.club/limitless/layout_1/LTR/default/assets/images/demo/users/face1.jpg"></div>
-                                        <div class="media-body">
-                                            <div class="media-heading text-semibold">James Alexander</div>
-                                            <span class="text-muted">Development</span>
-                                        </div>
-                                        <div class="media-right media-middle text-nowrap">
-                                            <input class="styled" type="checkbox">
-                                        </div>
-                                    </a>
-                                </li>
-
-                                <li class="media">
-                                    <a class="media-link" href="#">
-                                        <div class="media-left"><img alt="" class="img-circle" src="http://demo.interface.club/limitless/layout_1/LTR/default/assets/images/demo/users/face2.jpg"></div>
-                                        <div class="media-body">
-                                            <div class="media-heading text-semibold">Jeremy Victorino</div>
-                                            <span class="text-muted">Finances</span>
-                                        </div>
-                                        <div class="media-right media-middle text-nowrap">
-                                            <input class="styled" type="checkbox">
-                                        </div>
-                                    </a>
-                                </li>
-
-                                <li class="media">
-                                    <a class="media-link" href="#">
-                                        <div class="media-left"><img alt="" class="img-circle" src="http://demo.interface.club/limitless/layout_1/LTR/default/assets/images/demo/users/face3.jpg"></div>
-                                        <div class="media-body">
-                                            <div class="media-heading text-semibold">Margo Baker</div>
-                                            <span class="text-muted">Marketing</span>
-                                        </div>
-                                        <div class="media-right media-middle text-nowrap">
-                                            <input class="styled" type="checkbox">
-                                        </div>
-                                    </a>
-                                </li>
-                            </ul>
+                            <a class="heading-elements-toggle">
+                                <i class="icon-menu"></i>
+                            </a>
                         </div>
+
+                        <div class="table-responsive" style="max-height: 275px;">
+                            <table class="table text-nowrap">
+                                <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Gender</th>
+                                        <th>Selected</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>
+                                            <div class="media-left media-middle">
+                                                <img alt="" class="img-circle" src="http://demo.interface.club/limitless/layout_1/LTR/default/assets/images/demo/users/face1.jpg">
+                                            </div>
+
+                                            <div class="media-body">
+                                                <div class="media-heading">
+                                                    <a href="javascript:void(0);" class="letter-icon-title">Toby Mellor</a>
+                                                </div>
+
+                                                <div class="text-muted text-size-small">
+                                                    CAL: A | Trgt: A* | Tier: H | PP: <i class="icon-checkmark3"></i>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <span class="text-muted text-size-small">Female</span>
+                                        </td>
+                                        <td>
+                                            <input type="checkbox" class="styled" checked="checked">
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="media-left media-middle">
+                                                <img alt="" class="img-circle" src="http://demo.interface.club/limitless/layout_1/LTR/default/assets/images/demo/users/face1.jpg">
+                                            </div>
+
+                                            <div class="media-body">
+                                                <div class="media-heading">
+                                                    <a href="javascript:void(0);" class="letter-icon-title">James Burriss</a>
+                                                </div>
+
+                                                <div class="text-muted text-size-small">
+                                                    CAL: B | Trgt: A | Tier: M | PP: <i class="icon-cross2"></i>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <span class="text-muted text-size-small">Male</span>
+                                        </td>
+                                        <td>
+                                            <input type="checkbox" class="styled" checked="checked">
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="media-left media-middle">
+                                                <img alt="" class="img-circle" src="http://demo.interface.club/limitless/layout_1/LTR/default/assets/images/demo/users/face1.jpg">
+                                            </div>
+
+                                            <div class="media-body">
+                                                <div class="media-heading">
+                                                    <a href="javascript:void(0);" class="letter-icon-title">Harry Ablewhite-Butler</a>
+                                                </div>
+
+                                                <div class="text-muted text-size-small">
+                                                    CAL: B | Trgt: B | Tier: L | PP: <i class="icon-checkmark3"></i>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <span class="text-muted text-size-small">Male</span>
+                                        </td>
+                                        <td>
+                                            <input type="checkbox" class="styled" checked="checked">
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <div class="media-left media-middle">
+                                                <img alt="" class="img-circle" src="http://demo.interface.club/limitless/layout_1/LTR/default/assets/images/demo/users/face1.jpg">
+                                            </div>
+
+                                            <div class="media-body">
+                                                <div class="media-heading">
+                                                    <a href="javascript:void(0);" class="letter-icon-title">John Smith</a>
+                                                </div>
+
+                                                <div class="text-muted text-size-small">
+                                                    CAL: F | Trgt: C | Tier: L | PP: <i class="icon-checkmark3"></i>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <span class="text-muted text-size-small">Female</span>
+                                        </td>
+                                        <td>
+                                            <input type="checkbox" class="styled" checked="checked">
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
                         <div class="panel-footer">
                             <div class="heading-elements">
-                                <span class="heading-text text-semibold">Multiple buttons:</span>
+                                <div class="heading-btn pull-left">
+                                    <button class="btn btn-danger" type="button">Assign Seats to Selected (5)</button>
+                                </div>
                                 <div class="heading-btn pull-right">
-                                    <button class="btn btn-info" type="button">Save</button>
-                                    <button class="btn btn-default" type="button">Cancel</button>
+                                    <button class="btn btn-default" type="button">Select All</button>
                                 </div>
                             </div>
                             <a class="heading-elements-toggle">
