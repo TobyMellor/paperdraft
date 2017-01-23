@@ -16,6 +16,7 @@ class CreateStudentsTable extends Migration
             $table->increments('id');
 
             $table->string('name');
+            $table->string('gender');
             $table->boolean('pupil_premium');
 
             $table->integer('user_id')->unsigned();
@@ -30,6 +31,7 @@ class CreateStudentsTable extends Migration
             [
                 'name' => 'Toby Mellor',
                 'pupil_premium' => true,
+                'gender' => 'male',
                 'user_id' => 1
             ]
         ]);

@@ -43,17 +43,19 @@ class StudentController extends Controller
      */
     public function store(Request $request, ClassStudentController $classStudentController)
     {
-        $studentName = $request->input('student_name');
-        $pupilPremium = $request->input('pupil_premium');
-        $abilityCap = $request->input('ability_cap');
+        $studentName            = $request->input('student_name');
+        $gender                 = $request->input('gender');
+        $pupilPremium           = $request->input('pupil_premium');
+        $abilityCap             = $request->input('ability_cap');
         $currentAttainmentLevel = $request->input('current_attainment_level');
-        $targetAttainmentLevel = $request->input('target_attainment_level');
-        $studentImage = $request->input('student_image');
+        $targetAttainmentLevel  = $request->input('target_attainment_level');
+        $studentImage           = $request->input('student_image');
 
         $classId = $request->input('class_id');
 
         $data = [
             'student_name'             => $studentName,
+            'gender'                   => $gender,
             'pupil_premium'            => $pupilPremium,
             'ability_cap'              => $abilityCap,
             'current_attainment_level' => $currentAttainmentLevel,
@@ -65,6 +67,7 @@ class StudentController extends Controller
         if (!$validation->fails()) {
             $storedStudent = Student::create([
                 'name'          => $studentName,
+                'gender'        => $gender,
                 'pupil_premium' => $pupilPremium == 'true' ? true : false,
                 'user_id'       => Auth::user()->id
             ]);
@@ -107,17 +110,19 @@ class StudentController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $studentName = $request->input('student_name');
-        $pupilPremium = $request->input('pupil_premium');
-        $abilityCap = $request->input('ability_cap');
+        $studentName            = $request->input('student_name');
+        $gender                 = $request->input('gender');
+        $pupilPremium           = $request->input('pupil_premium');
+        $abilityCap             = $request->input('ability_cap');
         $currentAttainmentLevel = $request->input('current_attainment_level');
-        $targetAttainmentLevel = $request->input('target_attainment_level');
-        $studentImage = $request->input('student_image');
+        $targetAttainmentLevel  = $request->input('target_attainment_level');
+        $studentImage           = $request->input('student_image');
 
         $classId = $request->input('class_id');
 
         $data = [
             'student_name'             => $studentName,
+            'gender'                   => $gender,
             'pupil_premium'            => $pupilPremium,
             'ability_cap'              => $abilityCap,
             'current_attainment_level' => $currentAttainmentLevel,
@@ -131,6 +136,7 @@ class StudentController extends Controller
                 ->where('id', $id)
                 ->update([
                     'name'          => $studentName,
+                    'gender'        => $gender,
                     'pupil_premium' => $pupilPremium == 'true' ? true : false
                 ]);
 
@@ -188,14 +194,45 @@ class StudentController extends Controller
         ]);
     }
 
+    public function guessGender(Request $request)
+    {
+        $studentName = $request->input('student_name');
+        $ch = curl_init();
+
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_URL, 'https://api.genderize.io?name=' . $studentName);
+
+        $result = json_decode(curl_exec($ch));
+
+        curl_close($ch);
+
+        if (isset($result->gender) && ($result->gender === 'male' || $result->gender === 'female')) {
+            return response()->json([
+                'error' => 0,
+                'gender' => $result->gender,
+                'probability' => $result->probability * 100,
+                'message' => trans('api.student.success.guess-gender')
+            ]);
+        }
+
+        return response()->json([
+            'error' => 0,
+            'gender' => 'N/A',
+            'message' => trans('api.student.failure.guess-gender')
+        ]);
+        
+    }
+
     protected function validator(array $data)
     {
         return Validator::make($data, [
             'student_name'             => 'required|between:2,30|regex:/^[a-zA-Z0-9\s-]+$/',
-            'pupil_premium'            => 'in:true,false',
-            'ability_cap'              => 'in:H,M,L',
-            'current_attainment_level' => 'in:A*,A,B,C,D,E,F,G,U',
-            'target_attainment_level'  => 'in:A*,A,B,C,D,E,F,G,U'
+            'gender'                   => 'required|in:male,female',
+            'pupil_premium'            => 'nullable|in:true,false',
+            'ability_cap'              => 'nullable|in:H,M,L',
+            'current_attainment_level' => 'nullable|in:A*,A,B,C,D,E,F,G,U',
+            'target_attainment_level'  => 'nullable|in:A*,A,B,C,D,E,F,G,U'
         ]);
     }
 }

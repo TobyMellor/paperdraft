@@ -48,10 +48,14 @@ return [
     ],
     'student' => [
         'success' => [
-            'index'   => 'All of the students were successfully returned.',
-            'store'   => 'The student was successfully stored.',
-            'update'  => 'The student was successfully updated.',
-            'destroy' => 'The student was successfully deleted.'
+            'index'        => 'All of the students were successfully returned.',
+            'store'        => 'The student was successfully stored.',
+            'update'       => 'The student was successfully updated.',
+            'destroy'      => 'The student was successfully deleted.',
+            'guess-gender' => 'The students gender was successfully guessed.'
+        ],
+        'failure' => [
+            'guess-gender' => 'The students gender could not be guessed.'
         ]
     ],
     'class-student' => [

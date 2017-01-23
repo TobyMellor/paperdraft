@@ -55,6 +55,8 @@ Route::group(['middleware' => ['auth']], function () {
             ],
         ]
     );
+
+    Route::get('student/gender', 'StudentController@guessGender');
     
     Route::resource('class', 'ClassController', 
         [

@@ -20,13 +20,26 @@ class ClassStudentController extends Controller
     {
         $classId = $request->input('class_id');
 
-        $classStudents = ClassStudent::where('class_id', $classId)
+        $classStudents = [];
+        $students = ClassStudent::where('class_id', $classId)
             ->get();
+
+        foreach ($students as $student) {
+            $classStudents[$student->id] = [
+                'student_id'               => $student->student_id,
+                'name'                     => $student->student->name,
+                'pupil_premium'            => $student->student->pupil_premium,
+                'gender'                   => $student->student->gender,
+                'current_attainment_level' => $student->current_attainment_level,
+                'target_attainment_level'  => $student->target_attainment_level,
+                'ability_cap'              => $student->ability_cap
+            ];
+        }
 
         return response()->json([
             'class_students' => $classStudents,
-            'error' => 0,
-            'message' => trans('api.class-student.success.index')
+            'error'          => 0,
+            'message'        => trans('api.class-student.success.index')
         ]);
     }
 

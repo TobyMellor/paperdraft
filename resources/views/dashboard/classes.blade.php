@@ -91,6 +91,7 @@
 												<h6 class="no-margin ability-cap">{{ $classStudent->ability_cap }}</h6>
 											</td>
 										    <td>
+										    	<div class="gender" style="display: none;">{{ $classStudent->student->gender }}</div>
 							                    <div class="btn-group">
 							                        <button type="button" class="btn btn-danger dropdown-toggle" data-toggle="dropdown">Options <span class="caret"></span></button>
 							                        <ul class="dropdown-menu dropdown-menu-right">
@@ -134,13 +135,37 @@
 														<div class="row">
 															<div class="col-md-6">
 																<label class="display-block text-bold">Basic Information <span class="text-danger">*</span></label>
-																<input data-original-title="Enter the students name" class="form-control" data-popup="tooltip" title="" placeholder="Students Name" type="text" name="student_name" autocomplete="off" required>
+																<input data-original-title="Enter the students name" class="form-control" data-popup="tooltip" title="" placeholder="Students Name" type="text" name="student_name" autocomplete="off" required id="student-name">
 																<br />
-																<label class="display-block text-bold">Additional Information</label>
-																<label class="checkbox-inline">
-																    <input type="checkbox" class="styled" name="pupil_premium">
-																    Pupil Premium
-																</label>
+																<div class="col-md-6" style="padding-left: 0;">
+																	<label class="display-block text-bold">
+																		Gender <span class="text-danger">*</span>
+																		<span class="text-muted" style="padding-left: 6px;">
+										                                    <small class="selected-name" id="guessing-text" style="display: none;">
+										                                    	Guessing gender...
+										                                    </small>
+										                                </span>
+																	</label>
+																	<div class="radio">
+																		<label>
+																			<input type="radio" checked="checked" class="styled" name="gender" value="male">
+																			Male
+																		</label>
+																	</div>
+																	<div class="radio">
+																		<label>
+																			<input type="radio" class="styled" name="gender" value="female">
+																			Female
+																		</label>
+																	</div>
+																</div>
+																<div class="col-md-6">
+																	<label class="display-block text-bold">Additional Information</label>
+																	<label class="checkbox-inline">
+																	    <input type="checkbox" class="styled" name="pupil_premium">
+																	    Pupil Premium
+																	</label>
+																</div>
 															</div>
 															<div class="col-md-6">
 																<label class="display-block text-bold">Student Ability Tier</label>
@@ -351,7 +376,7 @@
 						<div class="form-group">
 							<div class="row">
 								<div class="col-sm-12">
-									<label class="display-block text-bold">Student Name *</label>
+									<label class="display-block text-bold">Students Name <span class="text-danger">*</span></label>
 									<input type="text" placeholder="Students Name" class="form-control" name="student_name">
 								</div>
 							</div>
@@ -360,30 +385,49 @@
 						<div class="form-group">
 							<div class="row">
 								<div class="col-sm-6">
+									<label class="display-block text-bold">
+										Gender <span class="text-danger">*</span>
+									</label>
+									<div class="radio">
+										<label>
+											<input type="radio" checked="checked" class="styled" name="gender" value="male">
+											Male
+										</label>
+									</div>
+									<div class="radio">
+										<label>
+											<input type="radio" class="styled" name="gender" value="female">
+											Female
+										</label>
+									</div>
+									<br />
+									<label class="display-block text-bold">Pupil Premium</label>
+									<label class="checkbox-inline">
+									    <input type="checkbox" class="styled" name="pupil_premium">
+									    Pupil Premium
+									</label>
+								</div>
+
+								<div class="col-sm-6">
 									<label class="display-block text-bold">Student Ability Tier</label>
 									<div class="radio">
 										<label>
-											<input type="radio" checked="checked" name="ability_cap" value="H">
+											<input type="radio" class="styled" checked="checked" name="ability_cap" value="H">
 											High
 										</label>
 									</div>
 									<div class="radio">
 										<label>
-											<input type="radio" name="ability_cap" value="M">
+											<input type="radio" class="styled" name="ability_cap" value="M">
 											Medium
 										</label>
 									</div>
 									<div class="radio">
 										<label>
-											<input type="radio" name="ability_cap" value="L">
+											<input type="radio" class="styled" name="ability_cap" value="L">
 											Low
 										</label>
 									</div>
-								</div>
-
-								<div class="col-sm-6">
-									<label class="display-block text-bold">Pupil Premium</label>
-									<input type="checkbox" class="styled" name="pupil_premium"> Pupil Premium
 								</div>
 							</div>
 						</div>
@@ -443,8 +487,8 @@
     <script type="text/javascript" src="{{ asset('assets/js/plugins/forms/styling/uniform.min.js') }}"></script>
 	<script>
 	    @if (session('errorMessage') != null)
-	    	var errorValidationResponses = {!! session('errorValidationResponse') !!};
-	    	var errorValidationResponse = '<br />';
+	    	var errorValidationResponses = {!! session('errorValidationResponse') !!},
+	    		errorValidationResponse = '<br />';
 
 	    	for (var key in errorValidationResponses) {
 	    		errorValidationResponse += errorValidationResponses[key] + '<br />';
@@ -488,6 +532,8 @@
 	        });
 
 	        $('#create-student').submit(function(event) {
+	        	$('#guessing-text').fadeOut();
+
 		        event.preventDefault();
 
 		        var formData = $('#create-student').serializeArray().reduce(function(obj, item) {
@@ -505,12 +551,13 @@
 		        	url: '{{ url('api/student') }}',
 		        	type: 'POST',
 		        	data: {
-						student_name: formData['student_name'],
-						pupil_premium: formData['pupil_premium'],
-						class_id: formData['class_id'],
-						ability_cap: formData['ability_cap'],
+						student_name: 			  formData['student_name'],
+						gender: 				  formData['gender'],
+						pupil_premium: 			  formData['pupil_premium'],
+						class_id: 				  formData['class_id'],
+						ability_cap: 			  formData['ability_cap'],
 						current_attainment_level: formData['current_attainment_level'],
-						target_attainment_level: formData['target_attainment_level']
+						target_attainment_level:  formData['target_attainment_level']
 		        	},
 		        	success: function(jsonResponse) {
 						handleNotification(formData['student_name'] + ' has been added to the class!', 'success');
@@ -527,10 +574,10 @@
 						        '</div>' +
 						    '</td>' +
 						    '<td>' +
-						        '<h6 class="no-margin current-attainment-level">' + ((formData['current_attainment_level'] === undefined) ? 'N/A' : formData['current_attainment_level']) + '</h6>' +
+						        '<h6 class="no-margin current-attainment-level">' + ((formData['current_attainment_level'] === "") ? 'N/A' : formData['current_attainment_level']) + '</h6>' +
 						    '</td>' +
 						    '<td>' +
-						        '<h6 class="no-margin target-attainment-level">' + ((formData['target_attainment_level'] === undefined) ? 'N/A' : formData['target_attainment_level']) + '</h6>' +
+						        '<h6 class="no-margin target-attainment-level">' + ((formData['target_attainment_level'] === "") ? 'N/A' : formData['target_attainment_level']) + '</h6>' +
 						    '</td>' +
 						    '<td>' +
 						        '<span class="pupil-premium"><i class="' + (formData['pupil_premium'] ? "icon-checkmark3 text-success" : "icon-cross2 text-danger-400") + '"></i></span>' +
@@ -539,6 +586,7 @@
 						        '<h6 class="no-margin ability-cap">' + formData['ability_cap'] + '</h6>' +
 						    '</td>' +
 						    '<td>' +
+						    	'<div class="gender" style="display: none;">' + formData['gender'] + '</div>' +
 			                    '<div class="btn-group">' + 
 			                        '<button type="button" class="btn btn-danger dropdown-toggle" data-toggle="dropdown">Options <span class="caret"></span></button>' +
 			                        '<ul class="dropdown-menu dropdown-menu-right">' +
@@ -569,19 +617,61 @@
 	        	updateClassStudent($(this));
 	        });
 
+	        var timer,
+	        	genderAJAXRequest;
+
+	        $('#student-name').on('keyup', function() {
+	        	if (genderAJAXRequest) { genderAJAXRequest.abort() }
+	        	clearTimeout(timer); // Clear the timer so we don't end up with dupes.
+
+    			timer = setTimeout(function() {
+		        	var studentName = $('#student-name').val(),
+		        		guessingText = $('#guessing-text');
+
+		        	if (studentName.length >= 2) {
+		        		guessingText.fadeIn();
+		        		guessingText.text('Guessing gender...');
+
+		        		genderAJAXRequest = $.APIAjax({
+			                url: '{{ url('api/student/gender') }}',
+			                type: 'GET',
+			                data: {
+			                	student_name: studentName.split(" ", 2)[0]
+			                },
+			                success: function(jsonResponse) {
+			                	if (jsonResponse.gender === 'male' || jsonResponse.gender === 'female') {
+			                		var gender = jsonResponse.gender;
+
+				            		guessingText.text('Guessing ' + gender + ' (' + (jsonResponse.probability) + '% sure)');
+
+				            			$('input[value=' + gender + ']').prop('checked', true);
+				            			$.uniform.update();
+			                	} else {
+			                		guessingText.text('Could not guess gender.');
+			                	}
+			                },
+			                error: function(jsonResponse) {}
+			            });
+		        	} else {
+		        		guessingText.fadeOut();
+		        	}
+		        }, 250);
+	        });
+
 	        $(document).delegate('.delete-student', 'click', function() {
 	        	deleteClassStudent($(this).closest('tr').attr('student-id'));
 	        });
 
 	        $(document).delegate('.edit-student', 'click', function() {
-                var classStudent = $(this).closest('tr');
-                var studentId = classStudent.attr('student-id');
+                var classStudent = $(this).closest('tr'),
+                	studentId = classStudent.attr('student-id');
 
-	            var studentName = classStudent.find('.student-name').text();
-	            var pupilPremium = classStudent.find('.pupil-premium').html();
-	            var abilityCap = classStudent.find('.ability-cap').text();
-	            var currentAttainmentLevel = classStudent.find('.current-attainment-level').text();
-	            var targetAttainmentLevel = classStudent.find('.target-attainment-level').text();
+	            var studentName 		   = classStudent.find('.student-name').text(),
+	            	gender 				   = classStudent.find('.gender').text(),
+	            	pupilPremium 		   = classStudent.find('.pupil-premium').html(),
+	            	abilityCap 			   = classStudent.find('.ability-cap').text(),
+	            	currentAttainmentLevel = classStudent.find('.current-attainment-level').text(),
+	            	targetAttainmentLevel  = classStudent.find('.target-attainment-level').text();
 
 	            if (pupilPremium.indexOf('icon-cross2') > -1) {
 	            	pupilPremium = false;
@@ -592,33 +682,29 @@
 	            $('#update-student input[name=student_id]').val(studentId);
 	            $('#update-student input[name=student_name]').val(studentName);
 	            $('#update-student input[name=pupil_premium]').prop('checked', pupilPremium);
+	            $('#update-student input[value=' + gender + ']').prop('checked', true);
 	            $('#update-student input[value=' + abilityCap + ']').prop('checked', true);
+	            $('#update-student select[name=current_attainment_level]').val(currentAttainmentLevel === 'N/A' ? '' : currentAttainmentLevel);
+	            $('#update-student select[name=target_attainment_level]').val(targetAttainmentLevel === 'N/A' ? '' : targetAttainmentLevel);
 
-	            if (currentAttainmentLevel != 'N/A') {
-	            	$('#update-student select[name=current_attainment_level]').val(currentAttainmentLevel);
-	            }
-
-	            if (targetAttainmentLevel != 'N/A') {
-	            	$('#update-student select[name=target_attainment_level]').val(targetAttainmentLevel);
-	            }
-
+	            $.uniform.update();
+	    		$('select').select2().trigger('change');
                 $('#modal_update_student').modal('show');
 	        });
 
 	    	$('select').select2();
-
 		    $('.styled').uniform({
 		        radioClass: 'choice'
 		    });
         });
 
-        var classId = {{ $classId }};
-        var token = '{{ csrf_token() }}';
+        var classId = {{ $classId }},
+        	token = '{{ csrf_token() }}';
 
         $('tbody').prepend('<tr id="no-students" @if (isset($classStudents) && sizeOf($classStudents) > 0) style="display: none;" @endif></tr>');
         $('#no-students').html(
         	'<div class="media-body media-middle">' +
-				'<h6 class="display-inline-block text-default text-semibold letter-icon-title" style="margin-top: 30px; margin-left: 20px;">' +
+				'<h6 class="display-inline-block text-default text-semibold letter-icon-title" style="margin-top: 30px; margin-left: 20px; margin-bottom: 30px;">' +
 					'This class has no students. Create one using the form below.' +
 				'</h6>' +
 			'</div>'
@@ -633,6 +719,7 @@
         function updateClassStudent(form) {
 	        var formData = form.serializeArray().reduce(function(obj, item) {
 			    obj[item.name] = item.value;
+
 			    return obj;
 			}, {});
 
@@ -646,12 +733,13 @@
                 url: '{{ url('api/student') }}/' + formData['student_id'],
                 type: 'PUT',
                 data: {
-                    student_name: formData['student_name'],
-                    pupil_premium: formData['pupil_premium'],
-                    class_id: classId,
-                    ability_cap: formData['ability_cap'],
+                    student_name: 			  formData['student_name'],
+                    gender: 			      formData['gender'],
+                    pupil_premium: 			  formData['pupil_premium'],
+                    class_id: 				  classId,
+                    ability_cap: 			  formData['ability_cap'],
                     current_attainment_level: formData['current_attainment_level'],
-                    target_attainment_level: formData['target_attainment_level']
+                    target_attainment_level:  formData['target_attainment_level']
                 },
                 success: function(jsonResponse) {
 	            	var classStudent = $('tr[student-id=' + formData['student_id'] + ']').closest('tr');
@@ -662,14 +750,14 @@
 	            		formData['pupil_premium'] = '<i class="icon-cross2 text-danger-400"></i>';
 	            	}
 
-		            var studentName = classStudent.find('.student-name').html(formData['student_name']);
-		            var pupilPremium = classStudent.find('.pupil-premium').html(formData['pupil_premium']);
-		            var abilityCap = classStudent.find('.ability-cap').html(formData['ability_cap']);
-		            var currentAttainmentLevel = classStudent.find('.current-attainment-level').html(formData['current_attainment_level']);
-		            var targetAttainmentLevel = classStudent.find('.target-attainment-level').html(formData['target_attainment_level']);
+		            var studentName 		   = classStudent.find('.student-name').html(formData['student_name']),
+		            	gender 		           = classStudent.find('.gender').html(formData['gender']),
+		            	pupilPremium 		   = classStudent.find('.pupil-premium').html(formData['pupil_premium']),
+		            	abilityCap 			   = classStudent.find('.ability-cap').html(formData['ability_cap']),
+		            	currentAttainmentLevel = classStudent.find('.current-attainment-level').html(formData['current_attainment_level']),
+		            	targetAttainmentLevel  = classStudent.find('.target-attainment-level').html(formData['target_attainment_level']);
 
 		       		handleNotification(jsonResponse.message, 'success');
-
 
                 	$('#modal_update_student').modal('hide');
                 	$('#update-student').trigger('reset');
@@ -689,7 +777,7 @@
                 	$('tr[student-id=' + studentId + ']').fadeOut(300, function() {
                 		$(this).remove();
 
-	            		if ($('tbody').length == 1) {
+	            		if ($('tbody').children().length == 1) {
 	            			$('tr').fadeIn();
 	            		}
                 	});
@@ -727,9 +815,9 @@
         // type is the display type e.g. 'error' or 'success' (string)
         function handleNotification(notificationContent, type, timeout = 5000) {
             var n = noty({
-                text: notificationContent,
+                text: 	notificationContent,
                 layout: 'topCenter',
-                type: type
+                type:   type
             });
 
             setTimeout(function() {
@@ -749,23 +837,25 @@
 
         $.extend({
             APIAjax: function(params){
-                params.error = function() {
-                    handleNotification('A server-side error occured. Try refreshing if the problem persists.', 'error');
+                params.error = function(event) {
+                	if (event.statusText != 'abort') {
+                    	handleNotification('A server-side error occured. Try refreshing if the problem persists.', 'error');
+                	}
                 };
 
                 if (params.success && typeof params.success == 'function') {
-                    var successCallback = params.success;
-                    var ourCallback = function(responseJson) {
-                        if (isValidJson(responseJson)) { // Validate the data
-                            if (responseJson.error == 0) {
-                                successCallback(responseJson); // Continue to function
-                            } else {
-                                handleNotification(responseJson.message, 'error');
-                            }
-                        } else {
-                            handleNotification('A server-side error occured. Try refreshing if the problem persists.', 'error');
-                        }
-                    }
+                    var successCallback = params.success,
+                    	ourCallback = function(responseJson) {
+	                        if (isValidJson(responseJson)) { // Validate the data
+	                            if (responseJson.error == 0) {
+	                                successCallback(responseJson); // Continue to function
+	                            } else {
+	                                handleNotification(responseJson.message, 'error');
+	                            }
+	                        } else {
+	                            handleNotification('A server-side error occured. Try refreshing if the problem persists.', 'error');
+	                        }
+	                    }
 
                     params.success = ourCallback;
                 }
