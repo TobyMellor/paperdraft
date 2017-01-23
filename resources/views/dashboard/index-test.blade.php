@@ -427,11 +427,15 @@
             }
 
             removeCanvasItem(canvasItemId) {
-                this.getCanvasItem(canvasItemId).remove();
+                var canvasItem = this.getCanvasItem(canvasItemId);
+
+                canvasItem.draggable('destroy');
+                canvasItem.remove();
             }
 
             removeCanvasItems() {
                 $('.drag-item').fadeOut(1000, function() {
+                    $(this).draggable('destroy');
                     $(this).remove();
                 });
             }
@@ -1318,18 +1322,18 @@
                     ['southwest', 'south', 'southeast']
                 ]; // All of the possible directions about an item (null), named to what the images are e.g. (north) desk-connected-north.png
                 
-                //  checkExemptions will keep track of what we've checked so we don't have to check them more than once or infinitely loop
-                //  e.g. prevent: 'connected south' -> check south -> 'connected north' -> check north -> (loop)
+                // checkExemptions will keep track of what we've checked so we don't have to check them more than once or infinitely loop
+                // e.g. prevent: 'connected south' -> check south -> 'connected north' -> check north -> (loop)
                 // 
-                //  Example:
-                //  [
-                //      5,
-                //      7,
-                //      [
-                //          [5, 6, 'north', false], // 'isDirectConnection', false means don't check this any further
-                //          [5, 8, 'south', false]
-                //      ]
-                //  ]
+                // Example:
+                // [
+                //     5,
+                //     7,
+                //     [
+                //         [5, 6, 'north', false], // 'isDirectConnection', false means don't check this any further
+                //         [5, 8, 'south', false]
+                //     ]
+                // ]
 
                 if (checkExemptionsIndex === null) {
                     checkExemptionsIndex = checkExemptions.push([
@@ -1818,7 +1822,7 @@
                 }
 
                 if (o.grid) {
-                    //Check for grid elements set to 0 to prevent divide by 0 error causing invalid argument errors in IE (see ticket #6950)
+                    // Check for grid elements set to 0 to prevent divide by 0 error causing invalid argument errors in IE (see ticket #6950)
                     top = o.grid[1] ? this.originalPageY + Math.round((pageY - this.originalPageY) / o.grid[1]) * o.grid[1] : this.originalPageY;
                     pageY = containment ? ((top - this.offset.click.top >= containment[1] || top - this.offset.click.top > containment[3]) ? top : ((top - this.offset.click.top >= containment[1]) ? top - o.grid[1] : top + o.grid[1])) : top;
 
@@ -1842,8 +1846,8 @@
             // If there's an object in position, you prevent dragging.
 
             if (canvasController.isCanvasItemInPosition(
-                    (pageX - this.offset.click.left - this.offset.parent.left) / 32,
-                    (pageY - this.offset.click.top - this.offset.parent.top) / 32)) {
+                    Math.round((pageX - this.offset.click.left - this.offset.parent.left) / 32),
+                    Math.round((pageY - this.offset.click.top - this.offset.parent.top) / 32))) {
                 return false;
             }
 
