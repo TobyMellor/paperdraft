@@ -293,7 +293,7 @@
 
 @stop
 @section('scripts')
-    <script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/raphael/2.1.0/raphael-min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/raphael/2.2.7/raphael.min.js"></script>
     <script type="text/javascript" src="{{ asset('assets/js/plugins/drag_selection.js') }}"></script>
     <script type="text/javascript" src="{{ asset('assets/js/plugins/forms/styling/uniform.min.js') }}"></script>
 
@@ -609,7 +609,7 @@
         // e.g. item: Table -- Canvas item: Table is stored at x: 25, y: 5
         // This is specific to a particular classroom, and the items can be any 'item' (a Table)
 
-        //Example:
+        // Example:
         // [
         //    1: {
         //       "id": 1,
