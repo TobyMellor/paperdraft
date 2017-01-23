@@ -34,6 +34,17 @@ Route::group(['middleware' => ['auth']], function () {
         'store'  // POST canvas-history
     ]]);
 
+    Route::resource('class-student', 'ClassStudentController',
+        [
+            'only' => [
+                'index',  // GET    class-student
+                'store',  // POST   class-student
+                'update', // PUT    class-student/{class-student-id}
+                'destroy' // DELETE class-student/{class-student-id}
+            ],
+        ]
+    );
+
     Route::resource('student', 'StudentController',
         [
             'only' => [

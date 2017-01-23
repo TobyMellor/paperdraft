@@ -62,9 +62,9 @@ class VerifyParametersMiddleware
         $canvasHistoryCount = $this->canvasHistoryController->getCanvasHistoryCount();
 
         return Validator::make($data, [
-            'class_id' => 'nullable|integer|exists:classes,id,user_id,' . Auth::id(),
-            'canvas_item' => 'nullable|array',
-            'canvas_history' => 'nullable|array|max:' . $canvasHistoryCount,
+            'class_id'                 => 'nullable|integer|exists:classes,id,user_id,' . Auth::id(),
+            'canvas_item'              => 'nullable|array',
+            'canvas_history'           => 'nullable|array|max:' . $canvasHistoryCount,
             'canvas_action_undo_count' => 'nullable|integer|max:' . $canvasHistoryCount
         ]);
     }

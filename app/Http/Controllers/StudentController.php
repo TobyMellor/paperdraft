@@ -18,7 +18,7 @@ class StudentController extends Controller
     /**
      * Display a listing of the resource.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  \Illuminate\Http\Request $request
      * @return \Illuminate\Http\JsonResponse
      */
     public function index(Request $request)
@@ -30,15 +30,15 @@ class StudentController extends Controller
 
         return response()->json([
             'students' => $students,
-            'error' => 0,
-            'message' => trans('api.student.success.index')
+            'error'    => 0,
+            'message'  => trans('api.student.success.index')
         ]);
     }
 
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  \Illuminate\Http\Request $request
      * @return \Illuminate\Http\JsonResponse
      */
     public function store(Request $request, ClassStudentController $classStudentController)
@@ -101,8 +101,8 @@ class StudentController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
+     * @param  \Illuminate\Http\Request $request
+     * @param  int $id
      * @return \Illuminate\Http\JsonResponse
      */
     public function update(Request $request, $id)
@@ -164,8 +164,8 @@ class StudentController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
+     * @param  \Illuminate\Http\Request $request
+     * @param  int $id
      * @return \Illuminate\Http\JsonResponse
      */
     public function destroy(Request $request, $id)

@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 
+use App\ClassStudent;
+
 use App\Http\Requests;
 
 class ClassStudentController extends Controller
@@ -11,11 +13,21 @@ class ClassStudentController extends Controller
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * @param  \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\JsonResponse
      */
-    public function index()
+    public function index(Request $request)
     {
-        //
+        $classId = $request->input('class_id');
+
+        $classStudents = ClassStudent::where('class_id', $classId)
+            ->get();
+
+        return response()->json([
+            'class_students' => $classStudents,
+            'error' => 0,
+            'message' => trans('api.class-student.success.index')
+        ]);
     }
 
     /**

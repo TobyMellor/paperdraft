@@ -715,7 +715,7 @@
                     async: false, // TODO: Needs better solution
                     data: {
                         canvas_item: canvasItem,
-                        class_id: classId
+                        class_id:    classId
                     },
                     success: function(jsonResponse) {
                         var returnedCanvasItem = jsonResponse.canvas_item;
@@ -740,7 +740,7 @@
                     type: 'DELETE',
                     data: {
                         canvas_items: softDeletedCanvasItems,
-                        class_id: classId
+                        class_id:     classId
                     },
                     success: function(jsonResponse) {},
                     error: function(jsonReponse) {}
@@ -753,7 +753,7 @@
                     type: 'PUT',
                     data: {
                         canvas_items: canvasItems,
-                        class_id: classId
+                        class_id:     classId
                     },
                     success: function(jsonResponse) {},
                     error: function(jsonReponse) {}
@@ -782,9 +782,9 @@
                         class_id: classId
                     },
                     success: function(jsonResponse) {
-                        historyController.jsonCanvasHistory = jsonResponse;
+                        studentController.jsonClassStudents = jsonResponse;
 
-                        historyController.init();
+                        studentController.init();
                     },
                     error: function(jsonResponse) {}
                 });
@@ -805,7 +805,7 @@
                             },
                         @endforeach
                     @endif
-                ],
+                ], // items never changed so we're not loading them dynamically
                 this.jsonCanvasItems;
 
                 this.canvasItems            = {}, // e.g. Table is stored at X: 5, Y: 8 in the grid
@@ -1571,6 +1571,40 @@
             }
         }
 
+        class StudentController {
+            constructor() {
+                this.jsonClassStudents = [];
+                this.classStudents  = {}; // Stores students in an object
+                this.classStudentsModel = new ClassStudentModel;
+            }
+
+            loadClassStudents() {
+                var classStudentsModel = this.classStudentsModel;
+
+                classStudentsModel.index(canvasController.classId);
+            }
+
+            init() {
+                var jsonClassStudentsRecords = this.jsonClassStudents;
+
+                // Take JSON array of all items and store them locally
+                for (var index in jsonClassStudentsRecords.class_students) {
+                    var classStudentRecord = jsonClassStudentsRecords.class_students[index];
+
+                    this.addClassStudent(classStudentRecord);
+                }
+            }
+
+            addClassStudent(classStudentRecord) {
+                this.classStudents[classStudentRecord.id] = {
+                    student_id:               classStudentRecord.student_id,
+                    ability_cap:              classStudentRecord.student_id,
+                    current_attainment_level: classStudentRecord.student_id,
+                    target_attainment_level:  classStudentRecord.student_id
+                }
+            }
+        }
+
         class HistoryController {
             constructor() {
                 this.jsonCanvasHistory = [];
@@ -1834,6 +1868,9 @@
 
             canvasController = new CanvasController(classId);
             canvasController.loadCanvasItems();
+
+            studentController = new StudentController(classId);
+            studentController.loadClassStudents();
 
             historyController = new HistoryController();
             historyController.loadCanvasHistory();
