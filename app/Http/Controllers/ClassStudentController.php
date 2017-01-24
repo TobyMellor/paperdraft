@@ -26,9 +26,10 @@ class ClassStudentController extends Controller
 
         foreach ($students as $student) {
             $classStudents[$student->id] = [
+                'id'                       => $student->id,
                 'student_id'               => $student->student_id,
                 'name'                     => $student->student->name,
-                'pupil_premium'            => $student->student->pupil_premium,
+                'pupil_premium'            => ($student->student->pupil_premium ? 'true' : 'false'),
                 'gender'                   => $student->student->gender,
                 'current_attainment_level' => $student->current_attainment_level,
                 'target_attainment_level'  => $student->target_attainment_level,

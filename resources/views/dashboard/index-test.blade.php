@@ -235,110 +235,17 @@
                                         <th>Selected</th>
                                     </tr>
                                 </thead>
-                                <tbody>
-                                    <tr>
-                                        <td>
-                                            <div class="media-left media-middle">
-                                                <img alt="" class="img-circle" src="http://demo.interface.club/limitless/layout_1/LTR/default/assets/images/demo/users/face1.jpg">
-                                            </div>
-
-                                            <div class="media-body">
-                                                <div class="media-heading">
-                                                    <a href="javascript:void(0);" class="letter-icon-title">Toby Mellor</a>
-                                                </div>
-
-                                                <div class="text-muted text-size-small">
-                                                    CAL: A | Trgt: A* | Tier: H | PP: <i class="icon-checkmark3"></i>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td>
-                                            <span class="text-muted text-size-small">Female</span>
-                                        </td>
-                                        <td>
-                                            <input type="checkbox" class="styled" checked="checked">
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            <div class="media-left media-middle">
-                                                <img alt="" class="img-circle" src="http://demo.interface.club/limitless/layout_1/LTR/default/assets/images/demo/users/face1.jpg">
-                                            </div>
-
-                                            <div class="media-body">
-                                                <div class="media-heading">
-                                                    <a href="javascript:void(0);" class="letter-icon-title">James Burriss</a>
-                                                </div>
-
-                                                <div class="text-muted text-size-small">
-                                                    CAL: B | Trgt: A | Tier: M | PP: <i class="icon-cross2"></i>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td>
-                                            <span class="text-muted text-size-small">Male</span>
-                                        </td>
-                                        <td>
-                                            <input type="checkbox" class="styled" checked="checked">
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            <div class="media-left media-middle">
-                                                <img alt="" class="img-circle" src="http://demo.interface.club/limitless/layout_1/LTR/default/assets/images/demo/users/face1.jpg">
-                                            </div>
-
-                                            <div class="media-body">
-                                                <div class="media-heading">
-                                                    <a href="javascript:void(0);" class="letter-icon-title">Harry Ablewhite-Butler</a>
-                                                </div>
-
-                                                <div class="text-muted text-size-small">
-                                                    CAL: B | Trgt: B | Tier: L | PP: <i class="icon-checkmark3"></i>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td>
-                                            <span class="text-muted text-size-small">Male</span>
-                                        </td>
-                                        <td>
-                                            <input type="checkbox" class="styled" checked="checked">
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            <div class="media-left media-middle">
-                                                <img alt="" class="img-circle" src="http://demo.interface.club/limitless/layout_1/LTR/default/assets/images/demo/users/face1.jpg">
-                                            </div>
-
-                                            <div class="media-body">
-                                                <div class="media-heading">
-                                                    <a href="javascript:void(0);" class="letter-icon-title">John Smith</a>
-                                                </div>
-
-                                                <div class="text-muted text-size-small">
-                                                    CAL: F | Trgt: C | Tier: L | PP: <i class="icon-checkmark3"></i>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td>
-                                            <span class="text-muted text-size-small">Female</span>
-                                        </td>
-                                        <td>
-                                            <input type="checkbox" class="styled" checked="checked">
-                                        </td>
-                                    </tr>
-                                </tbody>
+                                <tbody id="class-students"></tbody>
                             </table>
                         </div>
 
                         <div class="panel-footer">
                             <div class="heading-elements">
                                 <div class="heading-btn pull-left">
-                                    <button class="btn btn-danger" type="button">Assign Seats to Selected (5)</button>
+                                    <button class="btn btn-danger" type="button" id="generate-seating-positions">Loading...</button>
                                 </div>
                                 <div class="heading-btn pull-right">
-                                    <button class="btn btn-default" type="button">Select All</button>
+                                    <button class="btn btn-default" type="button" id="select-all">Select All</button>
                                 </div>
                             </div>
                             <a class="heading-elements-toggle">
@@ -421,9 +328,9 @@
                     e.preventDefault();
                     canvasController.softDeleteCanvasItems();
                 } else if (e.ctrlKey || e.metaKey) { // The 'ctrl' (windows) or 'cmd' (mac) key
-                    if (e.which == 90) { // The 'z' key (combined with ctrl or cmd)
+                    if (e.which === 90) { // The 'z' key (combined with ctrl or cmd)
                         historyController.undoCanvasAction();
-                    } else if (e.which == 89) { // The 'y' key (combined with ctrl or cmd)
+                    } else if (e.which === 89) { // The 'y' key (combined with ctrl or cmd)
                         historyController.redoCanvasAction();
                     }
                 }/* else if ((e.ctrlKey && e.keyCode == 0x56) || (e.metaKey && e.keyCode == 0x56)) {
@@ -446,6 +353,12 @@
                     }
                 }
             });
+
+            $(document).on('change', '.selected-student', function() {
+                studentController.updateSelectedStudents();
+            });
+
+            $(document).on('click', '#select-all', function() {});
 
             $('.styled').uniform({
                 radioClass: 'choice'
@@ -486,6 +399,46 @@
                 );
 
                 $('.drop-target').children().show();
+            }
+
+            addClassStudent(classStudent) {
+                var classStudentId          = classStudent.id,
+                    name                    = classStudent.name,
+                    gender                  = classStudent.gender,
+                    pupilPremium            = classStudent.pupil_premium,
+                    abilityCap              = classStudent.ability_cap,
+                    currentAttainmentLevel  = classStudent.current_attainment_level,
+                    targetAttainmentLevel   = classStudent.target_attainment_level;
+
+                $('#class-students').append(
+                    '<tr>' +
+                        '<td>' +
+                            '<div class="media-middle">' +
+                                '<img alt="" class="img-circle" src="">' +
+                            '</div>' +
+                            '<div class="media-left media-middle">' +
+                                '<a class="btn bg-teal-400 btn-rounded btn-icon btn-xs" href="javascript:void(0);">' +
+                                    '<div class="letter-icon">' + name.charAt(0).toUpperCase() + '</div>' +
+                                '</a>' +
+                            '</div>' +
+                            '<div class="media-body">' +
+                                '<div class="media-heading">' +
+                                    '<a href="javascript:void(0);" class="letter-icon-title">' + name + '</a>' +
+                                '</div>' +
+                                '<div class="text-muted text-size-small">' +
+                                    'CAL: ' + currentAttainmentLevel + ' | Trgt: ' + targetAttainmentLevel + ' | Tier: ' + abilityCap + ' | PP: ' + (pupilPremium ? '<i class="icon-checkmark3"></i>' : '<i class="icon-cross2"></i>') +
+                                '</div>' +
+                            '</div>' +
+                        '</td>' +
+                        '<td>' +
+                            '<span class="text-muted text-size-small">' + (gender[0].toUpperCase() + gender.slice(1)) + '</span>' +
+                        '</td>' +
+                        '<td>' +
+                            '<input type="checkbox" class="styled selected-student" checked="checked" class-student-id="' + classStudentId + '">' +
+                        '</td>' +
+                    '</tr>');
+
+                $('.styled').uniform();
             }
 
             updateCanvasItemPosition(canvasItemId, canvasItemPositionX, canvasItemPositionY) {
@@ -619,6 +572,25 @@
                 canvasController.loadCanvasItems();
 
                 historyController.loadCanvasHistory();
+            }
+
+            updateStudentButtons() {
+                var selectedStudents = this.getSelectedStudents(),
+                    generateButton   = $('#generate-seating-positions');
+
+                if (selectedStudents.length > 0) {
+                    generateButton.text('Assign Seats to Selected (' + selectedStudents.length + ')');
+
+                    generateButton.show();
+                } else {
+                    generateButton.hide(1000);
+                }
+            }
+
+            getSelectedStudents() {
+                return $('.selected-student:checked').map(function() {
+                    return $(this).attr('class-student-id');
+                }).get();
             }
         }
 
@@ -1575,7 +1547,10 @@
             constructor() {
                 this.jsonClassStudents = [];
                 this.classStudents  = {}; // Stores students in an object
+                this.selectedStudents = {}
+
                 this.classStudentsModel = new ClassStudentModel;
+                this.view = new View;
             }
 
             loadClassStudents() {
@@ -1593,15 +1568,43 @@
 
                     this.addClassStudent(classStudentRecord);
                 }
+
+                this.view.updateStudentButtons();
             }
 
             addClassStudent(classStudentRecord) {
                 this.classStudents[classStudentRecord.id] = {
                     student_id:               classStudentRecord.student_id,
-                    ability_cap:              classStudentRecord.student_id,
-                    current_attainment_level: classStudentRecord.student_id,
-                    target_attainment_level:  classStudentRecord.student_id
+                    gender:                   classStudentRecord.gender,
+                    pupil_premium:            classStudentRecord.pupil_premium,
+                    ability_cap:              classStudentRecord.ability_cap,
+                    current_attainment_level: classStudentRecord.current_attainment_level,
+                    target_attainment_level:  classStudentRecord.target_attainment_level
                 }
+
+                this.view.addClassStudent(classStudentRecord);
+            }
+
+            getSelectedStudents() {
+                var selectedStudents = this.selectedStudents;
+
+                return selectedStudents.male.concat(selectedStudents.female);
+            }
+
+            updateSelectedStudents() {
+                var selectedStudents = this.view.getSelectedStudents();
+                this.selectedStudents = {
+                    'male':   [],
+                    'female': []
+                };
+
+                for (var i = 0; i < selectedStudents.length; i++) {
+                    var selectedStudentId = selectedStudents[i];
+
+                    this.selectedStudents[this.classStudents[selectedStudentId].gender][selectedStudentId] = this.classStudents[selectedStudentId];
+                }
+
+                this.view.updateStudentButtons();
             }
         }
 
@@ -1609,7 +1612,7 @@
             constructor() {
                 this.jsonCanvasHistory = [];
 
-                this.canvasHistory  = []; // Stores array of objects containing actions performed by the user
+                this.canvasHistory = []; // Stores array of objects containing actions performed by the user
                 this.canvasActionUndoCount = 1; // How many times to undo away from most recent action
                 this.pendingCanvasHistoryRecords = []; // Store positions when drag starts, store them in canvasHistory on stop
 
