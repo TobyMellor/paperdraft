@@ -245,7 +245,7 @@
                                     <button class="btn btn-danger" type="button" id="generate-seating-positions">Loading...</button>
                                 </div>
                                 <div class="heading-btn pull-right">
-                                    <button class="btn btn-default" type="button" id="select-all">Select All</button>
+                                    <button class="btn btn-default" type="button" id="select-all">Deselect All</button>
                                 </div>
                             </div>
                             <a class="heading-elements-toggle">
@@ -358,7 +358,23 @@
                 studentController.updateSelectedStudents();
             });
 
-            $(document).on('click', '#select-all', function() {});
+            $(document).on('click', '#select-all', function() {
+                var selectAll = $(this);
+
+                $('.selected-student').each(function() {
+                    if ($(this).prop('checked') && selectAll.text() === 'Deselect All') {
+                        $(this).click();
+                    } else if (!$(this).prop('checked') && selectAll.text() === 'Select All') {
+                        $(this).click();
+                    }
+                });
+
+                if (selectAll.text() === 'Deselect All') {
+                    selectAll.text('Select All');
+                } else {
+                    selectAll.text('Deselect All');
+                }
+            });
 
             $('.styled').uniform({
                 radioClass: 'choice'
@@ -583,7 +599,7 @@
 
                     generateButton.show();
                 } else {
-                    generateButton.hide(1000);
+                    generateButton.hide();
                 }
             }
 
