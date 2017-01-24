@@ -40,6 +40,9 @@
         <script type="text/javascript" src="{{ asset('assets/js/pages/components_buttons.js') }}"></script>
         <script type="text/javascript" src="{{ asset('assets/js/pages/components_modals.js') }}"></script>
         <script type="text/javascript" src="{{ asset('assets/js/pages/uploader_bootstrap.js') }}"></script>
+
+        <script type="text/javascript" src="{{ asset('assets/js/plugins/forms/selects/select2.min.js') }}"></script>
+        <script type="text/javascript" src="{{ asset('assets/js/plugins/forms/styling/uniform.min.js') }}"></script>
     </head>
 
     <body>

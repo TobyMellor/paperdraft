@@ -266,13 +266,96 @@
         <!-- /content area -->
     </div>
     <!-- /main content -->
+    <div id="modal_assign_seating_positions" class="modal fade in">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-center">
+                    <h5 class="modal-title">Auto-Assign Seating Positions</h5>
+                </div>
+                
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <label class="display-block text-bold">Assignment Algorithm</label>
+                            <select class="select" name="assignment-algorithm">
+                                <option value="" disabled selected>Select an algorithm</option>
+                                <option value="boy-girl">Boy/Girl</option>
+                            </select>
+                        </div>
+                    </div>
 
+                    <div class="row text-center">
+                        <p class="text-muted" style="margin-bottom: 5px; margin-top: 10px;">Choose which seats you want the algorithm to apply to</p>
+
+                        <div class="btn-group" data-toggle="buttons">
+                            <label class="btn btn-primary active">
+                                <input name="options" id="option1" type="radio"> All Seats
+                            </label>
+
+                            <label class="btn btn-primary">
+                                <input name="options" id="option2" type="radio"> Only Selected Seats
+                            </label>
+                        </div>
+                    </div>
+
+                    <br />
+
+                    <div class="alert alert-warning alert-styled-left">
+                        <button type="button" class="close" data-dismiss="alert"><span>×</span><span class="sr-only">Close</span></button>
+                        <span class="text-semibold">Warning!</span> You've selected less chairs than students! You've got an uneven number of boys/girls.
+                    </div>
+
+                    <h5>Exemptions (optional)</h5>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label class="display-block text-bold">Select 1st student</label>
+                            <select class="select" name="assignment-algorithm">
+                                <option value="" disabled selected>Select 1st troublesum student</option>
+                                <option value="boy-girl">John Smith</option>
+                            </select>
+
+                            <label class="display-block text-bold" style="margin-top: 10px;">Select 2nd student to separate from 'John Smith'</label>
+                            <select class="select" name="assignment-algorithm">
+                                <option value="" disabled selected>Select 2nd troublesum student</option>
+                                <option value="boy-girl">John Smith</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="display-block text-bold">Students exempt from sitting with 'John Smith'</label>
+                            <table class="table table-bordered table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>First Name</th>
+                                        <th>Last Name</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Eugene</td>
+                                        <td>Kopyov</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Victoria</td>
+                                        <td>Baker</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button data-dismiss="modal" class="btn btn-link" type="button">Close</button>
+                    <button class="btn btn-primary" type="submit" disabled>Auto-Assign Seating Positions</button>
+                </div>
+            </div>
+        </div>
+    </div>
 @stop
 @section('scripts')
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/raphael/2.2.7/raphael.min.js"></script>
     <script type="text/javascript" src="{{ asset('assets/js/plugins/drag_selection.js') }}"></script>
-    <script type="text/javascript" src="{{ asset('assets/js/plugins/forms/styling/uniform.min.js') }}"></script>
-
     <script>
         $(document).ready(function() {
             $('.drop-target').on('mousedown', '.drag-item', function() {
@@ -376,6 +459,11 @@
                 }
             });
 
+            $(document).on('change', 'select[name="assignment-algorithm"]', function() {
+
+            });
+
+            $('select').select2();
             $('.styled').uniform({
                 radioClass: 'choice'
             });
@@ -1621,6 +1709,12 @@
                 }
 
                 this.view.updateStudentButtons();
+            }
+
+            showModal() {
+                $('select[name="assignment-algorithm"]').val('').trigger('change');
+
+                $('#modal_assign_seating_positions').modal('show')
             }
         }
 

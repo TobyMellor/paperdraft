@@ -367,7 +367,7 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header bg-primary text-center">
-                    <h5 class="modal-title">Update information for the student</h5>
+                    <h5 class="modal-title">Update Student Information</h5>
                 </div>
 
                 <form action="javascript:void(0);" method="PUT" id="update-student">
@@ -483,8 +483,6 @@
     </div>
 @stop
 @section('scripts')
-    <script type="text/javascript" src="{{ asset('assets/js/plugins/forms/selects/select2.min.js') }}"></script>
-    <script type="text/javascript" src="{{ asset('assets/js/plugins/forms/styling/uniform.min.js') }}"></script>
     <script>
         @if (session('errorMessage') != null)
             var errorValidationResponses = {!! session('errorValidationResponse') !!},
