@@ -37,7 +37,7 @@
         <div class="content">
             <div class="row row-sortable">
                 <div class="col-md-8">
-                    <div class="panel panel-white">
+                    <div class="panel panel-white main-canvas">
                         <div class="panel-heading">
                             <h6 class="panel-title"><span class="text-semibold">Seating Planner</span> <span class="text-muted"><small id="class-name">Year 11<small></span></h6>
                             <div class="heading-elements">
@@ -55,7 +55,7 @@
                                 </ul>
                             </div>
                             <a class="heading-elements-toggle"><i class="icon-menu"></i></a></div>
-                        <div class="panel-body canvas" style="height: 736px; overflow-x: auto; overflow-y: hidden;">
+                        <div class="panel-body main-panel-body" style="height: 736px; overflow-x: auto; overflow-y: hidden;">
                             <div class="drop-target" id="paper"></div>
                         </div>
                     </div>
@@ -511,6 +511,9 @@
             $('.drop-target').css('width', squareWidth * 23);
             $('.drop-target').css('height', squareWidth * 23);
             $('.drop-target').css('background-size', squareWidth);
+            $('#paper').css('margin-top', ($('.main-canvas').width() - (squareWidth * 23)) / 2);
+            $('#paper').css('margin-left', ($('.main-canvas').width() - (squareWidth * 23)) / 2);
+            $('.main-panel-body').css('height', $('.main-canvas').width());
 
             bootstrapper(); // Start initializing
         });
@@ -532,7 +535,7 @@
 
         var rect; // The drag rectangle used in drag_selection.js
 
-        var squareWidth = Math.floor($('.canvas').width() / 23);
+        var squareWidth = Math.floor($('.main-canvas').width() / 23);
 
         class View {
             addCanvasItem(item, canvasItem) {
