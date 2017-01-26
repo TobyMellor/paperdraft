@@ -34,7 +34,7 @@
         </div>
         <!-- /page header -->
         <!-- Content area -->
-        <div class="content">
+        <div class="content" style="padding-top: 20px;">
             <div class="row row-sortable">
                 <div class="col-md-8">
                     <div class="panel panel-white main-canvas">
@@ -392,7 +392,7 @@
             $('#save-button').click(function() {
                 canvasController.saveCanvasItems();
 
-                notificationController.handleNotification('The seating planner was saved successfully!', 'success');
+                notificationController.handleNotification('The seating plan was saved successfully!', 'success');
             });
 
             $('.class-button').click(function() {
@@ -767,6 +767,26 @@
                 return $('.selected-student:checked').map(function() {
                     return $(this).attr('class-student-id');
                 }).get();
+            }
+
+            setCanvasItemTooltip(canvasItemId, studentName, studentGender) {
+                var canvasItem = this.getCanvasItem(canvasItemId);
+
+                canvasItem.attr('title', studentName);
+
+                if (studentGender === 'male') {
+                    canvasItem.tooltip({
+                        template: '<div class="tooltip"><div class="bg-teal" style="background-color: #2196f3; border-color: #2196f3;"><div class="tooltip-arrow"></div><div class="tooltip-inner"></div></div></div>',
+                        trigger: 'manual',
+                        animation: false
+                    }).tooltip('show');
+                } else {
+                    canvasItem.tooltip({
+                        template: '<div class="tooltip"><div class="bg-teal" style="background-color: #d2527f; border-color: #d2527f;"><div class="tooltip-arrow"></div><div class="tooltip-inner"></div></div></div>',
+                        trigger: 'manual',
+                        animation: false
+                    }).tooltip('show');
+                }
             }
         }
 
@@ -1294,6 +1314,12 @@
                                 newParentCanvasItemPositionX,
                                 newParentCanvasItemPositionY
                             )) {
+                                var classStudents = studentController.classStudents;
+
+                                if (canvasItems[parentCanvasItemId].student_id !== null) {
+                                    view.setCanvasItemTooltip(parentCanvasItemId, classStudents[canvasItems[parentCanvasItemId].student_id].name, classStudents[canvasItems[parentCanvasItemId].student_id].gender);
+                                }
+
                                 var lastDeltaX = newParentCanvasItemPositionX - oldParentCanvasItemPositionX,
                                     lastDeltaY = newParentCanvasItemPositionY - oldParentCanvasItemPositionY;
 
@@ -1342,6 +1368,10 @@
                                         selectedCanvasItemIds.push(childCanvasItemId);
 
                                         view.addCanvasItem(items[childCanvasItem.item_id], childCanvasItem);
+
+                                        if (canvasItems[childCanvasItemId].student_id !== null) {
+                                            view.setCanvasItemTooltip(childCanvasItemId, classStudents[canvasItems[childCanvasItemId].student_id].name, classStudents[canvasItems[childCanvasItemId].student_id].gender);
+                                        }
 
                                         canvasController.updateConnectedCanvasItems(oldChildPositionX, oldChildPositionY, [], null);
                                         canvasController.updateConnectedCanvasItems(childCanvasItem.position_x, childCanvasItem.position_y, [
@@ -1860,7 +1890,7 @@
                     }
                 }
 
-                notificationController.handleNotification('Finished assigning ' + this.getSeatedStudents().length + ' students to seats.', 'success');
+                notificationController.handleNotification('Finished assigning ' + this.getSeatedStudents().length + ' student(s) to seat(s).', 'success');
             }
 
             attemptSeatPlacement(attemptedSeatsAvailable, incorrectSeatsAvailable, selectedStudent) {
@@ -1877,7 +1907,11 @@
                         return false;
                     }
                 } else {
-                    canvasController.canvasItems[canvasController.canvasItemsGrid[attemptedSeatsAvailable[0][0]][attemptedSeatsAvailable[0][1]]].student_id = selectedStudent.student_id;
+                    var canvasItemId = canvasController.canvasItemsGrid[attemptedSeatsAvailable[0][0]][attemptedSeatsAvailable[0][1]];
+
+                    canvasController.canvasItems[canvasItemId].student_id = selectedStudent.student_id;
+
+                    canvasController.view.setCanvasItemTooltip(canvasItemId, selectedStudent.name, selectedStudent.gender);
 
                     attemptedSeatsAvailable.shift();
                 }
