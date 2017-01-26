@@ -55,7 +55,7 @@
                                 </ul>
                             </div>
                             <a class="heading-elements-toggle"><i class="icon-menu"></i></a></div>
-                        <div class="panel-body" style="height: 736px; overflow-x: auto; overflow-y: hidden;">
+                        <div class="panel-body canvas" style="height: 736px; overflow-x: auto; overflow-y: hidden;">
                             <div class="drop-target" id="paper"></div>
                         </div>
                     </div>
@@ -508,6 +508,10 @@
                 radioClass: 'choice'
             });
 
+            $('.drop-target').css('width', squareWidth * 23);
+            $('.drop-target').css('height', squareWidth * 23);
+            $('.drop-target').css('background-size', squareWidth);
+
             bootstrapper(); // Start initializing
         });
 
@@ -528,18 +532,20 @@
 
         var rect; // The drag rectangle used in drag_selection.js
 
+        var squareWidth = Math.floor($('.canvas').width() / 23);
+
         class View {
             addCanvasItem(item, canvasItem) {
                 var canvasItemId        = canvasItem.id,
-                    canvasItemPositionX = canvasItem.position_x * 32,
-                    canvasItemPositionY = canvasItem.position_y * 32;
+                    canvasItemPositionX = canvasItem.position_x * squareWidth,
+                    canvasItemPositionY = canvasItem.position_y * squareWidth;
 
                 var itemLocation = item.location,
                     itemWidth    = item.width,
-                    itemHeight   = item.height;
+                    itemHeight   = item.height; // TODO: Change to multipliers, don't store actual height
 
                 $('.drop-target').append(
-                    '<div class="drag-item" canvas-item-id="' + canvasItemId + '" style="display: none; left: ' + canvasItemPositionX + 'px; top: ' + canvasItemPositionY + 'px; background-image: url(\'{{ asset('assets/images/objects') }}/' + itemLocation + '\'); background-size: ' + itemWidth + 'px; height: ' + itemHeight + 'px; width: ' + itemWidth + 'px;"></div>'
+                    '<div class="drag-item" canvas-item-id="' + canvasItemId + '" style="display: none; left: ' + canvasItemPositionX + 'px; top: ' + canvasItemPositionY + 'px; background-image: url(\'{{ asset('assets/images/objects') }}/' + itemLocation + '\'); background-size: ' + squareWidth + 'px; height: ' + squareWidth + 'px; width: ' + squareWidth + 'px;"></div>'
                 );
 
                 $('.drop-target').children().show();
@@ -588,8 +594,8 @@
             updateCanvasItemPosition(canvasItemId, canvasItemPositionX, canvasItemPositionY) {
                 var canvasItem = this.getCanvasItem(canvasItemId);
 
-                canvasItem.css('left', canvasItemPositionX * 32);
-                canvasItem.css('top', canvasItemPositionY * 32);
+                canvasItem.css('left', canvasItemPositionX * squareWidth);
+                canvasItem.css('top', canvasItemPositionY * squareWidth);
             }
 
             removeCanvasItem(canvasItemId) {
@@ -1265,7 +1271,7 @@
                     view = this.view;
 
                 $('.drag-item').draggable({
-                    grid: [32, 32],
+                    grid: [squareWidth, squareWidth],
                     containment: '.drop-target',
                     drag: function() {
                         hasUserMadeChanges = true; // The users changed something. We'll use this to ask if they want to save
@@ -1273,8 +1279,8 @@
                         var parentCanvasItemId = view.getCanvasItemId($(this));
 
                         // We need the new location of the canvasItem as it may be outdated in the canvasItems array
-                        var newParentCanvasItemPositionX = Math.round($(this).position().left / 32),
-                            newParentCanvasItemPositionY = Math.round($(this).position().top / 32),
+                        var newParentCanvasItemPositionX = Math.round($(this).position().left / squareWidth),
+                            newParentCanvasItemPositionY = Math.round($(this).position().top / squareWidth),
                             oldParentCanvasItemPositionX = canvasItems[parentCanvasItemId].position_x,
                             oldParentCanvasItemPositionY = canvasItems[parentCanvasItemId].position_y;
 
@@ -2365,8 +2371,8 @@
             // If there's an object in position, you prevent dragging.
 
             if (canvasController.isCanvasItemInPosition(
-                    Math.round((pageX - this.offset.click.left - this.offset.parent.left) / 32),
-                    Math.round((pageY - this.offset.click.top - this.offset.parent.top) / 32))) {
+                    Math.round((pageX - this.offset.click.left - this.offset.parent.left) / squareWidth),
+                    Math.round((pageY - this.offset.click.top - this.offset.parent.top) / squareWidth))) {
                 return false;
             }
 
