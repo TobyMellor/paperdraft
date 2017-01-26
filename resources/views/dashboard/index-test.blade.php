@@ -1650,11 +1650,14 @@
         class StudentController {
             constructor() {
                 this.jsonClassStudents = [];
-                this.classStudents  = {}; // Stores students in an object
-                this.selectedStudents = {}
+                this.classStudents     = {}; // Stores students in an object
+                this.selectedStudents  = {};
+
+                this.maleSeatsAvailable   = [];
+                this.femaleSeatsAvailable = [];
 
                 this.classStudentsModel = new ClassStudentModel;
-                this.view = new View;
+                this.view               = new View;
             }
 
             loadClassStudents() {
@@ -1715,6 +1718,137 @@
                 $('select[name="assignment-algorithm"]').val('').trigger('change');
 
                 $('#modal_assign_seating_positions').modal('show')
+            }
+
+            pairOppositeGenders(canvasItemsGrid, anchorPoint, anchorsGender = 'males') {
+                var oppositesFound = this.middleOutHollowSearch(canvasItemsGrid, anchorPoint),
+                    i, j;
+                
+                if (anchorsGender === 'males') {
+                    this.maleSeatsAvailable.push(anchorPoint);
+                } else {
+                    this.femaleSeatsAvailable.push(anchorPoint);
+                }
+                
+                for (i = 0; i < oppositesFound.length; i++) {
+                    var oppositeFound = oppositesFound[i];
+                    
+                    for (j = 0; j < oppositeFound.length; j++) {
+                        if (oppositeFound[j] !== null) {
+                            if (!utils.isArrayInArray(this.maleSeatsAvailable, oppositeFound[j])
+                                    && !utils.isArrayInArray(this.femaleSeatsAvailable, oppositeFound[j])) {
+                                this.pairOppositeGenders(canvasItemsGrid, oppositeFound[j], anchorsGender === 'males' ? 'females' : 'males');
+                            }
+                        }
+                    }
+                }
+            }
+
+            middleOutHollowSearch(canvasItemsGrid, anchorPoint) {
+                var searchSize            = 3,
+                    totalSpacesToSearch   = (searchSize * 4) - 8,
+                    canvasItemsGridLength = canvasItemsGrid.length,
+                    itemsFound            = [
+                        [],
+                        [],
+                        [],
+                        []
+                    ],
+                    centerOffset, centerPoints, centerPoint, searchRadius, i;
+                    
+                while(!utils.doesEveryElementHaveChildren(itemsFound)) {
+                    searchRadius         = Math.floor(searchSize / 2);
+                    centerOffset         = -1;
+                    totalSpacesToSearch += 4;
+
+                    centerPoints = [
+                        [anchorPoint[0], anchorPoint[1] + searchRadius],
+                        [anchorPoint[0] + searchRadius, anchorPoint[1]],
+                        [anchorPoint[0], anchorPoint[1] - searchRadius],
+                        [anchorPoint[0] - searchRadius, anchorPoint[1]]
+                    ];
+
+                    for (i = 0; i < totalSpacesToSearch; i++) {
+                        if (i % 4 === 0) { // offset + 1 from center search for the next 4 iterations
+                            centerOffset++;
+                        }
+
+                        if (itemsFound[i % 4].length > 0) { // we don't need to check this direction anymore
+                            continue;
+                        }
+
+                        centerPoint = centerPoints[i % 4];
+
+                        if (!canvasController.isPositionInBounds(centerPoint[0], centerPoint[1])) {
+                            itemsFound[i % 4].push(null); // something is out of bounds so stop searching this direction
+                            continue;
+                        }
+                        
+                        if (i % 2 === 1) { // y is the changing plane
+                            if (totalSpacesToSearch - i > 3 || itemsFound[1].length === 0) {
+                                itemsFound = this.getNonEmptyCanvasItemsGridElement(canvasItemsGrid, centerPoint[0], centerPoint[1] + centerOffset, centerOffset, searchRadius, itemsFound, i);
+                            } else if (totalSpacesToSearch - i > 3 || itemsFound[3].length === 0) {
+                                itemsFound = this.getNonEmptyCanvasItemsGridElement(canvasItemsGrid, centerPoint[0], centerPoint[1] - centerOffset, centerOffset, searchRadius, itemsFound, i);
+                            }
+                        } else {
+                            if (totalSpacesToSearch - i > 3 || itemsFound[0].length === 0) {
+                                itemsFound = this.getNonEmptyCanvasItemsGridElement(canvasItemsGrid, centerPoint[0] + centerOffset, centerPoint[1], centerOffset, searchRadius, itemsFound, i);
+                            } else if (totalSpacesToSearch - i > 3 || itemsFound[2].length === 0) {
+                                itemsFound = this.getNonEmptyCanvasItemsGridElement(canvasItemsGrid, centerPoint[0] - centerOffset, centerPoint[1], centerOffset, searchRadius, itemsFound, i);
+                            }
+                        }
+                    }
+
+                    searchSize += 2;
+                }
+
+                return this.sortByDifference(itemsFound, anchorPoint);
+            }
+
+            getNonEmptyCanvasItemsGridElement(canvasItemsGrid, positionX, positionY, centerOffset, searchRadius, itemsFound, i) {
+                if (canvasController.isPositionInBounds(positionX, positionY)) {
+                    if (canvasItemsGrid[positionX][positionY] !== -1 && (i >= 4 || itemsFound[i % 4].length === 0)) {
+                        if (centerOffset !== searchRadius || (itemsFound[(i - 1) % 4].length === 0 && itemsFound[(i + 1) % 4].length === 0)) {
+                            itemsFound[i % 4].push([positionX, positionY]);
+                        }
+                    }
+                }
+                
+                return itemsFound;
+            }
+
+            sortByDifference(itemsFound, anchorPoint) {
+                var swapped;
+                
+                do {
+                    swapped = false;
+                    
+                    for (var i = 0; i < itemsFound.length - 1; i++) {
+                        if (this.shouldSwap(itemsFound[i][0], itemsFound[i + 1][0], anchorPoint, i)) {
+                            var temp = itemsFound[i];
+                            
+                            itemsFound[i] = itemsFound[i + 1];
+                            itemsFound[i + 1] = temp;
+                            
+                            swapped = true;
+                        }
+                    }
+                    
+                } while (swapped);
+                
+                return itemsFound
+            }
+
+            shouldSwap(a, b, anchorPoint, i) {
+                if (a === null || b === null) {
+                    return false;
+                }
+                
+                if (Math.abs((a[0] - anchorPoint[0]) + (a[1] - anchorPoint[1])) > Math.abs((b[0] - anchorPoint[0]) + (b[1] - anchorPoint[1]))) {
+                    return true;
+                }
+                
+                return false;
             }
         }
 
@@ -1894,6 +2028,7 @@
                         return true;
                     }
                 }
+
                 return false;
             }
 
@@ -1927,6 +2062,16 @@
                 return !isNaN(value) && 
                     parseInt(Number(value)) == value && 
                     !isNaN(parseInt(value, 10));
+            }
+
+            doesEveryElementHaveChildren(array) {
+                for (var i = 0; i < array.length; i++) {
+                    if (array[i].length === 0) {
+                        return false;
+                    }
+                }
+                
+                return true;
             }
         }
 
