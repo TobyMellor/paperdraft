@@ -1651,7 +1651,10 @@
             constructor() {
                 this.jsonClassStudents = [];
                 this.classStudents     = {}; // Stores students in an object
-                this.selectedStudents  = {};
+                this.selectedStudents  = {
+                    male:   [],
+                    female: []
+                };
 
                 this.maleSeatsAvailable   = [];
                 this.femaleSeatsAvailable = [];
@@ -1682,6 +1685,7 @@
             addClassStudent(classStudentRecord) {
                 this.classStudents[classStudentRecord.id] = {
                     student_id:               classStudentRecord.student_id,
+                    name:                     classStudentRecord.name,
                     gender:                   classStudentRecord.gender,
                     pupil_premium:            classStudentRecord.pupil_premium,
                     ability_cap:              classStudentRecord.ability_cap,
@@ -1708,7 +1712,7 @@
                 for (var i = 0; i < selectedStudents.length; i++) {
                     var selectedStudentId = selectedStudents[i];
 
-                    this.selectedStudents[this.classStudents[selectedStudentId].gender][selectedStudentId] = this.classStudents[selectedStudentId];
+                    this.selectedStudents[this.classStudents[selectedStudentId].gender].push(this.classStudents[selectedStudentId]);
                 }
 
                 this.view.updateStudentButtons();
@@ -1718,6 +1722,62 @@
                 $('select[name="assignment-algorithm"]').val('').trigger('change');
 
                 $('#modal_assign_seating_positions').modal('show')
+            }
+
+            assignmentAlgorithmBoyGirl(anchorPoint) {
+                this.pairOppositeGenders(canvasController.canvasItemsGrid, anchorPoint);
+                this.updateSelectedStudents();
+
+                var selectedStudents = this.selectedStudents,
+                    selectedStudent;
+
+                for (var i = 0; i <= (selectedStudents.male.length + selectedStudents.female.length); i++) {
+                    var index = Math.floor(i / 2);
+
+                    if (i % 2 === 0) {
+                        if (selectedStudents.male.length <= index) {
+                            continue;
+                        }
+
+                        selectedStudent = selectedStudents.male[index];
+
+                        if (!this.attemptSeatPlacement(this.maleSeatsAvailable, this.femaleSeatsAvailable, selectedStudent)) {
+                            break;
+                        }
+                    } else {
+                        if (selectedStudents.female.length <= index) {
+                            continue;
+                        }
+
+                        selectedStudent = selectedStudents.female[index];
+
+                        if (!this.attemptSeatPlacement(this.femaleSeatsAvailable, this.maleSeatsAvailable, selectedStudent)) {
+                            break;
+                        }
+                    }
+                }
+            }
+
+            attemptSeatPlacement(attemptedSeatsAvailable, incorrectSeatsAvailable, selectedStudent) {
+                if (attemptedSeatsAvailable.length === 0) {
+                    if (incorrectSeatsAvailable.length > 0) {
+                        console.log('3 Assign: ' + selectedStudent.name + ' (' + selectedStudent.gender + ') to male seat ' + incorrectSeatsAvailable[0]);
+
+                        notificationController.handleNotification(selectedStudent.name + ' was seated with the same gender due to lack of seats available.', 'warning');
+
+                        incorrectSeatsAvailable.shift();
+                    } else {
+                        notificationController.handleNotification('Some students could not be seated due to lack of seats available.', 'error');
+
+                        return false;
+                    }
+                } else {
+                    console.log('4 Assign: ' + selectedStudent.name + ' (' + selectedStudent.gender + ') to female seat ' + attemptedSeatsAvailable[0]);
+
+                    attemptedSeatsAvailable.shift();
+                }
+
+                return true;
             }
 
             pairOppositeGenders(canvasItemsGrid, anchorPoint, anchorsGender = 'males') {
