@@ -21,6 +21,7 @@ class ClassStudent extends Model
     protected $fillable = [
         'student_id',
         'class_id',
+        'canvas_item_id',
         'ability_cap',
         'current_attainment_level',
         'target_attainment_level'

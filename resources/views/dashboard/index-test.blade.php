@@ -1687,6 +1687,7 @@
                     student_id:               classStudentRecord.student_id,
                     name:                     classStudentRecord.name,
                     gender:                   classStudentRecord.gender,
+                    canvas_item_id:           classStudentRecord.canvas_item_id,
                     pupil_premium:            classStudentRecord.pupil_premium,
                     ability_cap:              classStudentRecord.ability_cap,
                     current_attainment_level: classStudentRecord.current_attainment_level,

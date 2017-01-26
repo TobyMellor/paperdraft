@@ -28,6 +28,7 @@ class ClassStudentController extends Controller
             $classStudents[$student->id] = [
                 'id'                       => $student->id,
                 'student_id'               => $student->student_id,
+                'canvas_item_id'           => $student->canvas_item_id,
                 'name'                     => $student->student->name,
                 'pupil_premium'            => ($student->student->pupil_premium ? 'true' : 'false'),
                 'gender'                   => $student->student->gender,
