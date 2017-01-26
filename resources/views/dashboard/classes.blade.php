@@ -604,6 +604,11 @@
 
                         $('#create-student').trigger('reset');
                         $('a[data-original-title="Information"]').tab('show');
+
+                        $('select').select2();
+                        $('.styled').uniform({
+                            radioClass: 'choice'
+                        });
                     },
                     error: function(jsonResponse) {}
                 });
