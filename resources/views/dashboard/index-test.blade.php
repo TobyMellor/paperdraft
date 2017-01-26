@@ -258,7 +258,7 @@
 
             <!-- Footer -->
             <div class="footer text-muted">
-                &copy; 2016 SeatingPlanner by Toby Mellor
+                &copy; 2017 SeatingPlanner by Toby Mellor
             </div>
             <!-- /footer -->
         </div>
@@ -282,71 +282,73 @@
                             </select>
                         </div>
                     </div>
+                    
+                    <div id="algorithm-boy-girl-settings" style="display: none;">
+                        <div class="row text-center">
+                            <p class="text-muted" style="margin-bottom: 5px; margin-top: 10px;">Choose which seats you want the algorithm to apply to</p>
 
-                    <div class="row text-center">
-                        <p class="text-muted" style="margin-bottom: 5px; margin-top: 10px;">Choose which seats you want the algorithm to apply to</p>
+                            <div class="btn-group" data-toggle="buttons">
+                                <label class="btn btn-primary active">
+                                    <input name="options" id="all-seats" type="radio"> All Seats
+                                </label>
 
-                        <div class="btn-group" data-toggle="buttons">
-                            <label class="btn btn-primary active">
-                                <input name="options" id="option1" type="radio"> All Seats
-                            </label>
-
-                            <label class="btn btn-primary">
-                                <input name="options" id="option2" type="radio"> Only Selected Seats
-                            </label>
+                                <label class="btn btn-primary">
+                                    <input name="options" id="only-selected-seats" type="radio"> <s>Only Selected Seats</s>
+                                </label>
+                            </div>
                         </div>
-                    </div>
 
-                    <br />
+                        <br />
 
-                    <div class="alert alert-warning alert-styled-left">
-                        <button type="button" class="close" data-dismiss="alert"><span>×</span><span class="sr-only">Close</span></button>
-                        <span class="text-semibold">Warning!</span> You've selected less chairs than students! You've got an uneven number of boys/girls.
-                    </div>
-
-                    <h5>Exemptions (optional)</h5>
-
-                    <div class="row">
-                        <div class="col-md-6">
-                            <label class="display-block text-bold">Select 1st student</label>
-                            <select class="select" name="assignment-algorithm">
-                                <option value="" disabled selected>Select 1st troublesum student</option>
-                                <option value="boy-girl">John Smith</option>
-                            </select>
-
-                            <label class="display-block text-bold" style="margin-top: 10px;">Select 2nd student to separate from 'John Smith'</label>
-                            <select class="select" name="assignment-algorithm">
-                                <option value="" disabled selected>Select 2nd troublesum student</option>
-                                <option value="boy-girl">John Smith</option>
-                            </select>
+                        <div class="alert alert-warning alert-styled-left" id="boy-girl-warning" style="display: none;">
+                            <button type="button" class="close" data-dismiss="alert"><span>×</span><span class="sr-only">Close</span></button>
+                            <span class="text-semibold">Warning!</span> <p id="boy-girl-warning-text">Loading...</p>
                         </div>
-                        <div class="col-md-6">
-                            <label class="display-block text-bold">Students exempt from sitting with 'John Smith'</label>
-                            <table class="table table-bordered table-striped">
-                                <thead>
-                                    <tr>
-                                        <th>First Name</th>
-                                        <th>Last Name</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td>Eugene</td>
-                                        <td>Kopyov</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Victoria</td>
-                                        <td>Baker</td>
-                                    </tr>
-                                </tbody>
-                            </table>
+
+                        <h5>Exemptions (optional)</h5>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <label class="display-block text-bold">Select 1st student</label>
+                                <select class="select" name="exemption-1">
+                                    <option value="" disabled selected>Select 1st troublesum student</option>
+                                    <option value="boy-girl">John Smith</option>
+                                </select>
+
+                                <label class="display-block text-bold" style="margin-top: 10px;">Select 2nd student to separate from 'John Smith'</label>
+                                <select class="select" name="exemption-2">
+                                    <option value="" disabled selected>Select 2nd troublesum student</option>
+                                    <option value="boy-girl">John Smith</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="display-block text-bold">Students exempt from sitting with 'John Smith'</label>
+                                <table class="table table-bordered table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>First Name</th>
+                                            <th>Last Name</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>Eugene</td>
+                                            <td>Kopyov</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Victoria</td>
+                                            <td>Baker</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
                 </div>
 
                 <div class="modal-footer">
                     <button data-dismiss="modal" class="btn btn-link" type="button">Close</button>
-                    <button class="btn btn-primary" type="submit" disabled>Auto-Assign Seating Positions</button>
+                    <button class="btn btn-primary" type="submit" disabled id="auto-assign-seating-positions">Auto-Assign Seating Positions</button>
                 </div>
             </div>
         </div>
@@ -389,6 +391,8 @@
 
             $('#save-button').click(function() {
                 canvasController.saveCanvasItems();
+
+                notificationController.handleNotification('The seating planner was saved successfully!', 'success');
             });
 
             $('.class-button').click(function() {
@@ -458,8 +462,45 @@
                 }
             });
 
-            $(document).on('change', 'select[name="assignment-algorithm"]', function() {
+            $(document).on('click', '#generate-seating-positions', function() {
+                $('#algorithm-boy-girl-settings').hide();
+                $('select[name="assignment-algorithm"]').val('').trigger('change');
+                $('#modal_assign_seating_positions').modal('show');
+                $('#auto-assign-seating-positions').prop('disabled', true);
+            });
 
+            $(document).on('change', 'select[name="assignment-algorithm"]', function() {
+                if ($(this).val() === 'boy-girl') {
+                    var selectedStudents       = studentController.getSelectedStudents(),
+                        sortedSelectedStudents = studentController.selectedStudents;
+
+                    $('#boy-girl-warning').hide();
+                    $('#boy-girl-warning-text').text('');
+
+                    if (Object.keys(canvasController.canvasItems).length < selectedStudents.length) {
+                        $('#boy-girl-warning-text').append('You have less desks than students. Some students will not be allocated a desk.<br />');
+                    }
+
+                    if (Math.abs(sortedSelectedStudents.male.length - sortedSelectedStudents.female.length) > sortedSelectedStudents.male.length * 0.25) {
+                        $('#boy-girl-warning-text').append('You have a drastically different number of boys/girls. Some students may be seated with the same gender.');
+                    }
+
+                    if ($('#boy-girl-warning-text').text() !== '') {
+                        $('#boy-girl-warning').show();
+                    }
+
+                    $('#algorithm-boy-girl-settings').fadeIn();
+
+                    $('#auto-assign-seating-positions').prop('disabled', false);
+                }
+            });
+
+            $(document).on('click', '#auto-assign-seating-positions', function() {
+                $('#modal_assign_seating_positions').modal('hide');
+
+                if ($('select[name="assignment-algorithm"]').val() === 'boy-girl') {
+                    studentController.assignmentAlgorithmBoyGirl();
+                }
             });
 
             $('select').select2();
@@ -1707,7 +1748,9 @@
 
                 this.view.updateStudentButtons();
 
-                canvasController.updateSelected([selectedCanvasItems.parent.id]);
+                if (!$.isEmptyObject(selectedCanvasItems.parent)) {
+                    canvasController.updateSelected([selectedCanvasItems.parent.id]);
+                }
             }
 
             addClassStudent(classStudentRecord) {
@@ -1725,6 +1768,8 @@
             }
 
             getSelectedStudents() {
+                this.updateSelectedStudents();
+
                 var selectedStudents = this.selectedStudents;
 
                 return selectedStudents.male.concat(selectedStudents.female);
@@ -1769,12 +1814,6 @@
                 this.view.updateStudentButtons();
             }
 
-            showModal() {
-                $('select[name="assignment-algorithm"]').val('').trigger('change');
-
-                $('#modal_assign_seating_positions').modal('show')
-            }
-
             assignmentAlgorithmBoyGirl() {
                 var selectedParent = canvasController.canvasItems[selectedCanvasItems.parent.id],
                     anchorPoint    = [selectedParent.position_x, selectedParent.position_y];
@@ -1811,6 +1850,8 @@
                         }
                     }
                 }
+
+                notificationController.handleNotification('Finished assigning ' + this.getSeatedStudents().length + ' students to seats.', 'success');
             }
 
             attemptSeatPlacement(attemptedSeatsAvailable, incorrectSeatsAvailable, selectedStudent) {
