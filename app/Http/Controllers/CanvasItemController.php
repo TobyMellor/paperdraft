@@ -57,14 +57,15 @@ class CanvasItemController extends Controller
 
         $storedCanvasItem = new CanvasItem;
 
-        $storedCanvasItem->item_id = $canvasItem['item_id'];
-        $storedCanvasItem->class_id = $classId;
+        $storedCanvasItem->item_id    = $canvasItem['item_id'];
+        $storedCanvasItem->class_id   = $classId;
+        $storedCanvasItem->student_id = $canvasItem['student_id'];
         $storedCanvasItem->position_x = $canvasItem['position_x'];
         $storedCanvasItem->position_y = $canvasItem['position_y'];
 
         $storedCanvasItem->save();
 
-        if ($canvasItem['soft_deleted'] === "true") {
+        if ($canvasItem['soft_deleted'] === 'true') {
             $storedCanvasItem->delete();
         }
 
@@ -97,6 +98,7 @@ class CanvasItemController extends Controller
         CanvasItem::where('class_id', $classId)
             ->where('id', $id)
             ->update([
+                'student_id' => $canvasItem['student_id'],
                 'position_x' => $canvasItem['position_x'],
                 'position_y' => $canvasItem['position_y']
             ]);

@@ -25,6 +25,13 @@ class CreateCanvasItemsTable extends Migration
                 ->references('id')
                 ->on('classes');
 
+            $table->integer('student_id')
+                ->unsigned()
+                ->nullable();
+            $table->foreign('student_id')
+                ->references('id')
+                ->on('students');
+
             $table->integer('position_x');
             $table->integer('position_y');
 

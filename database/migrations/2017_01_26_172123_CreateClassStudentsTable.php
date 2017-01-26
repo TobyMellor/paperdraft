@@ -25,13 +25,6 @@ class CreateClassStudentsTable extends Migration
                 ->references('id')
                 ->on('classes');
 
-            $table->integer('canvas_item_id')
-                ->unsigned()
-                ->nullable();
-            $table->foreign('canvas_item_id')
-                ->references('id')
-                ->on('canvas_items');
-
             $table->string('ability_cap');
             $table->string('current_attainment_level')
                 ->nullable();

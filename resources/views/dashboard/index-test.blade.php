@@ -55,9 +55,8 @@
                                 </ul>
                             </div>
                             <a class="heading-elements-toggle"><i class="icon-menu"></i></a></div>
-                        <div class="panel-body" style="height: 736px; overflow-x: scroll;">
-                            <div class="drop-target" id="paper">
-                            </div>
+                        <div class="panel-body" style="height: 736px; overflow-x: auto; overflow-y: hidden;">
+                            <div class="drop-target" id="paper"></div>
                         </div>
                     </div>
                 </div>
@@ -130,17 +129,17 @@
                                     <small>Settings</small>
                                 </h4>
                                 <table class="table table-bordered table-striped">
-                                    <thead>
-                                        <tr>
-                                            <th>Setting</th>
-                                            <th>Value</th>
-                                        </tr>
-                                    </thead>
                                     <tbody>
                                         <tr>
                                             <td>Location</td>
                                             <td id="selected-position">
                                                 <strong>X:</strong> 1, <strong>Y:</strong> 6<br />
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>Student(s)</td>
+                                            <td id="selected-students">
+                                                No student is assigned to this desk.
                                             </td>
                                         </tr>
                                         <tr>
@@ -578,6 +577,7 @@
                 }
 
                 $('#selected-position').empty();
+                $('#selected-students').empty();
                 $('.selected-name').empty();
                 $('.drag-item').removeClass('outline-highlight');
             }
@@ -587,14 +587,16 @@
                     selectedBoardItems[selectedBoardItems.length - 1].name = '[' + (selectedBoardItems.length - 2) + ' more]';
                 }
                 
-                var selectedNames = $.extend(true, [], selectedBoardItems);
-                selectedNames.splice(1, selectedBoardItems.length - 3);
+                var selectedItemNames = $.extend(true, [], selectedBoardItems),
+                    selectedStudents = [];
 
-                selectedNames = selectedNames.map(function(selectedName){
+                selectedItemNames.splice(1, selectedBoardItems.length - 3);
+
+                selectedItemNames = selectedItemNames.map(function(selectedName){
                     return selectedName.name;
                 }).join(', ');
 
-                $('.selected-name').text(selectedNames);
+                $('.selected-name').text(selectedItemNames);
                 $('#selected-image').attr('src', assetsBasePath + selectedBoardItems[0].location);
                 $('#selected-delete').html('Delete <i class="icon-diff-removed position-right"></i>');
 
@@ -614,7 +616,27 @@
                         $('#selected-position').append('<strong>X:</strong> ' + selectedBoardItemPositionX + ', <strong>Y:</strong> ' + selectedBoardItemPositionY + '<br />');
                     }
 
+                    if (Object.keys(studentController.classStudents).length > 0) {
+                        if (selectedBoardItem.student_id !== null) {
+                            selectedStudents.push(studentController.classStudents[selectedBoardItem.student_id].name);
+                        } else if (Object.keys(selectedBoardItems).length > 1) {
+                            selectedStudents.push('Unoccupied');
+                        } else {
+                            selectedStudents[0] = 'No student is assigned to this desk.';
+                        }
+                    } else {
+                        $('#selected-students').text('Loading...');
+                    }
+
                     this.getCanvasItem(selectedBoardItemId).addClass('outline-highlight');
+                }
+                
+                if (Object.keys(studentController.classStudents).length > 0) {
+                    if (selectedStudents.length > 1) {
+                        $('#selected-students').text(selectedStudents.slice(0, selectedStudents.length - 1).join(', ') + ", and " + selectedStudents.slice(-1));
+                    } else {
+                        $('#selected-students').text(selectedStudents[0]);
+                    }
                 }
             }
 
@@ -958,13 +980,14 @@
                     classId         = this.classId;
 
                 var canvasItem = {
-                    item_id: itemId
+                    item_id:    itemId,
+                    student_id: null
                 };
 
                 hasUserMadeChanges = true;
 
                 if (isPseudoCanvasItem) {
-                    canvasItem.id = 'Pseudo-' + Math.floor(Math.random() * 99999) + 1
+                    canvasItem.id = 'Pseudo-' + Math.floor(Math.random() * 99999) + 1;
                 }
 
                 if (!$.isEmptyObject(selectedCanvasItems.parent)) {
@@ -996,6 +1019,7 @@
                 var canvasItem = canvasItems[canvasItem.id] = {
                     'id':           canvasItem.id,
                     'item_id':      canvasItem.item_id,
+                    'student_id':   canvasItem.student_id,
                     'position_x':   canvasItem.position_x,
                     'position_y':   canvasItem.position_y,
                     'pseudo_item':  isPseudoCanvasItem,
@@ -1370,6 +1394,7 @@
 
                             selectedBoardItems[index] = {
                                 id:         canvasItemId,
+                                student_id: canvasItems[canvasItemId].student_id,
                                 position_x: canvasItems[canvasItemId].position_x,
                                 position_y: canvasItems[canvasItemId].position_y,
                                 location:   items[canvasItems[canvasItemId].item_id].location,
@@ -1391,6 +1416,7 @@
                         if (canvasItemId in canvasItems) { // We might have just deleted the child
                             selectedBoardItems[index] = {
                                 id:         canvasItemId,
+                                student_id: canvasItems[canvasItemId].student_id,
                                 position_x: canvasItems[canvasItemId].position_x,
                                 position_y: canvasItems[canvasItemId].position_y,
                                 location:   items[canvasItems[canvasItemId].item_id].location,
@@ -1672,7 +1698,7 @@
             init() {
                 var jsonClassStudentsRecords = this.jsonClassStudents;
 
-                // Take JSON array of all items and store them locally
+                // Take JSON array of all students and store them locally
                 for (var index in jsonClassStudentsRecords.class_students) {
                     var classStudentRecord = jsonClassStudentsRecords.class_students[index];
 
@@ -1680,6 +1706,8 @@
                 }
 
                 this.view.updateStudentButtons();
+
+                canvasController.updateSelected([selectedCanvasItems.parent.id]);
             }
 
             addClassStudent(classStudentRecord) {
@@ -1687,7 +1715,6 @@
                     student_id:               classStudentRecord.student_id,
                     name:                     classStudentRecord.name,
                     gender:                   classStudentRecord.gender,
-                    canvas_item_id:           classStudentRecord.canvas_item_id,
                     pupil_premium:            classStudentRecord.pupil_premium,
                     ability_cap:              classStudentRecord.ability_cap,
                     current_attainment_level: classStudentRecord.current_attainment_level,
@@ -1703,8 +1730,31 @@
                 return selectedStudents.male.concat(selectedStudents.female);
             }
 
+            getSeatedStudents() {
+                var canvasItems = canvasController.canvasItems,
+                    seatedStudents = [];
+
+                for (var index in canvasItems) {
+                    var canvasItem = canvasItems[index];
+
+                    if (canvasItem.student_id !== null) {
+                        seatedStudents.push(this.classStudents[canvasItem.student_id]);
+                    }
+                }
+
+                return seatedStudents;
+            }
+
+            clearSeatedStudents() {
+                var canvasItems = canvasController.canvasItems;
+
+                for (var index in canvasItems) {
+                    canvasItems[index].student_id = null;
+                }
+            }
+
             updateSelectedStudents() {
-                var selectedStudents = this.view.getSelectedStudents();
+                var selectedStudents  = this.view.getSelectedStudents();
                 this.selectedStudents = {
                     'male':   [],
                     'female': []
@@ -1725,7 +1775,11 @@
                 $('#modal_assign_seating_positions').modal('show')
             }
 
-            assignmentAlgorithmBoyGirl(anchorPoint) {
+            assignmentAlgorithmBoyGirl() {
+                var selectedParent = canvasController.canvasItems[selectedCanvasItems.parent.id],
+                    anchorPoint    = [selectedParent.position_x, selectedParent.position_y];
+
+                this.clearSeatedStudents();
                 this.pairOppositeGenders(canvasController.canvasItemsGrid, anchorPoint);
                 this.updateSelectedStudents();
 
@@ -1762,7 +1816,7 @@
             attemptSeatPlacement(attemptedSeatsAvailable, incorrectSeatsAvailable, selectedStudent) {
                 if (attemptedSeatsAvailable.length === 0) {
                     if (incorrectSeatsAvailable.length > 0) {
-                        console.log('3 Assign: ' + selectedStudent.name + ' (' + selectedStudent.gender + ') to male seat ' + incorrectSeatsAvailable[0]);
+                        selectedStudent.canvas_item_id = canvasController.canvasItemsGrid[incorrectSeatsAvailable[0]][incorrectSeatsAvailable[1]];
 
                         notificationController.handleNotification(selectedStudent.name + ' was seated with the same gender due to lack of seats available.', 'warning');
 
@@ -1773,7 +1827,7 @@
                         return false;
                     }
                 } else {
-                    console.log('4 Assign: ' + selectedStudent.name + ' (' + selectedStudent.gender + ') to female seat ' + attemptedSeatsAvailable[0]);
+                    canvasController.canvasItems[canvasController.canvasItemsGrid[attemptedSeatsAvailable[0][0]][attemptedSeatsAvailable[0][1]]].student_id = selectedStudent.student_id;
 
                     attemptedSeatsAvailable.shift();
                 }
@@ -1986,9 +2040,8 @@
                     softDeletedCanvasItems = canvasController.softDeletedCanvasItems;
 
                 if (Object.keys(canvasHistory).length - canvasActionUndoCount >= 0) {
-                    var action = canvasHistory[canvasHistory.length - canvasActionUndoCount];
-
-                    var canvasItemId = action.canvas_item_id;
+                    var action       = canvasHistory[canvasHistory.length - canvasActionUndoCount],
+                        canvasItemId = action.canvas_item_id;
 
                     switch (action.type) {
                         case 'deletion':

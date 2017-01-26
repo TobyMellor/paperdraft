@@ -31,6 +31,7 @@ class CanvasItem extends Model
     protected $fillable = [
         'item_id',
         'class_id',
+        'student_id',
         'position_x',
         'position_y',
     ];
