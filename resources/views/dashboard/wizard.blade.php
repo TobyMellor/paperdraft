@@ -8,12 +8,12 @@
         }
     </style>
 
-    <div class="panel panel-white">
+    <div class="panel panel-primary panel-bordered">
         <div class="panel-heading">
             <h6 class="panel-title">Get started</h6>
         </div>
         <div class="panel-body">
-            <form class="steps-validation" action="#">
+            <form class="steps-validation" action="javascript:void(0);">
                 <h6>Personal data</h6>
                 <fieldset>
                     <div class="row">
@@ -61,6 +61,14 @@
                             <div class="form-group">
                                 <label>Your last name: <span class="text-danger">*</span></label>
                                 <input type="text" name="last_name" value="{{ Auth::user()->last_name }}" class="form-control" placeholder="Your last name">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Institution Name:</label>
+                                <input type="text" name="institution_name" value="{{ Auth::user()->institution_name }}" class="form-control" placeholder="Your institutions name">
                             </div>
                         </div>
                     </div>
@@ -168,9 +176,9 @@
                 var requiredErrorLabel = '<label id="position-error" class="validation-error-label" for="position">This field is required.</label>';
 
                 if (currentIndex == 0) {
-                    var title = $('select[name=title]');
-                    var firstName = $('input[name=first_name]');
-                    var lastName = $('input[name=last_name]');
+                    var title     = $('select[name=title]'),
+                        firstName = $('input[name=first_name]'),
+                        lastName  = $('input[name=last_name]');
 
                     if (title.val() == "" || title.val() == null) {
                         title.parent().append(requiredErrorLabel);
@@ -214,11 +222,6 @@
                 // Allways allow previous action even if the current form is not valid!
                 if (currentIndex > newIndex) {
                     return true;
-                }
-
-                // Forbid next action on "Warning" step if the user is to young
-                if (newIndex === 3 && Number($("#age-2").val()) < 18) {
-                    return false;
                 }
 
                 return form.valid();
@@ -293,7 +296,8 @@
         });
 
         // Select2 selects
-        $('.select').select2();
+        $('select[name="title"]').val('{{ Auth::user()->title }}');
+        $('select').select2().trigger('change');
 
         // Styled checkboxes and radios
         $('.styled').uniform({
@@ -319,9 +323,9 @@
         });
 
         $('#create-class').on('click', function() {
-            var className = $('input[name=class_name]');
-            var classSubject = $('input[name=class_subject]');
-            var classRoom = $('input[name=class_room]');
+            var className    = $('input[name=class_name]'),
+                classSubject = $('input[name=class_subject]'),
+                classRoom    = $('input[name=class_room]');
 
             $('.validation-error-label').remove();
 
@@ -356,8 +360,6 @@
             deleteClass(classId);
         });
 
-        $('select[name=title]').select2('val', '{{ Auth::user()->title }}');
-
         function updateUser() {
             var formData = $('.steps-validation').serializeArray().reduce(function(obj, item) {
                 obj[item.name] = item.value;
@@ -368,9 +370,10 @@
                 url: '{{ url('api/user') }}/{{ Auth::user()->id }}',
                 type: 'PUT',
                 data: {
-                    title: formData['title'],
-                    first_name: formData['first_name'],
-                    last_name: formData['last_name']
+                    title:            formData['title'],
+                    first_name:       formData['first_name'],
+                    last_name:        formData['last_name'],
+                    institution_name: formData['institution_name'],
                 },
                 success: function(jsonResponse) {
                     handleNotification(jsonResponse.message, 'success');

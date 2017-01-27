@@ -11,7 +11,7 @@
                             Seating Planner
                         </span> 
                         <span class="text-muted">
-                            <small id="class-name">Year 11<small>
+                            <small id="class-name">Loading...<small>
                         </span>
                     </h6>
                     <div class="heading-elements">

@@ -4,16 +4,22 @@
 @section('main')
     <div class="row row-sortable">
         <div class="col-md-8">
-            <div class="panel panel-flat">
+            <div class="panel panel-primary panel-bordered">
                 <div class="panel-heading">
                     <h6 class="panel-title">
                         <span class="text-semibold">Manage Class</span>
                         <span class="text-muted">
-                            <small> {{ $selectedClass->class_name }}<small>
+                            <small id="class-name"> {{ $selectedClass->class_name }}<small>
                         </span>
                     </h6>
                     <div class="heading-elements">
-                        <a class="btn bg-teal-400" href="{{ url('dashboard') }}?class={{ $classId }}"><i class="icon-statistics position-left"></i> View Seating Plan</a>
+                        <ul class="icons-list">
+                            <li>
+                                <a href="{{ url('dashboard') }}?class={{ $classId }}" id="view-seating-plan-button">
+                                    <i class="icon-statistics position-left view-seating-plan-icon"></i> <u>View Seating Plan</u>
+                                </p>
+                            </li>
+                        </ul>
                     </div>
                 <a class="heading-elements-toggle"><i class="icon-menu"></i></a></div>
                 <table class="table text-nowrap">

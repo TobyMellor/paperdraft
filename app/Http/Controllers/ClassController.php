@@ -171,7 +171,7 @@ class ClassController extends Controller
 
             CanvasItem::withTrashed()
                 ->where('class_id', $id)
-                ->delete();
+                ->forceDelete();
 
             SchoolClass::where('id', $id)
                 ->delete();

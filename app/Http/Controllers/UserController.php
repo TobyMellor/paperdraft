@@ -81,6 +81,7 @@ class UserController extends Controller
         } else {
             $users = User::paginate($paginate);
         }
+
         return $users;
     }
 
@@ -229,14 +230,16 @@ class UserController extends Controller
      */
     public function update(Request $request)
     {
-        $title = $request->input('title');
-        $firstName = $request->input('first_name');
-        $lastName = $request->input('last_name');
+        $title           = $request->input('title');
+        $firstName       = $request->input('first_name');
+        $lastName        = $request->input('last_name');
+        $institutionName = $request->input('institution_name');
 
         $data = [
-            'title'      => $title,
-            'first_name' => $firstName,
-            'last_name'  => $lastName
+            'title'             => $title,
+            'first_name'        => $firstName,
+            'last_name'         => $lastName,
+            'institution_name'  => $institutionName
         ];
 
         $validation = $this->validateUpdatedUser($data);
@@ -244,9 +247,10 @@ class UserController extends Controller
         if (!$validation->fails()) {
             User::where('id', Auth::user()->id)
                 ->update([
-                    'title'      => $title,
-                    'first_name' => $firstName,
-                    'last_name'  => $lastName
+                    'title'             => $title,
+                    'first_name'        => $firstName,
+                    'last_name'         => $lastName,
+                    'institution_name'  => $institutionName
                 ]);
 
             return response()->json([
@@ -289,9 +293,10 @@ class UserController extends Controller
     protected function validateUpdatedUser(array $data)
     {
         return Validator::make($data, [
-            'title'      => 'required|string|in:Mr,Mrs,Miss,Ms,Dr',
-            'first_name' => 'required|between:1,20|regex:/^[a-zA-Z0-9\s-]+$/',
-            'last_name' => 'required|between:1,20|regex:/^[a-zA-Z0-9\s-]+$/',
+            'title'            => 'required|string|in:Mr,Mrs,Miss,Ms,Dr',
+            'first_name'       => 'required|between:1,20|regex:/^[a-zA-Z0-9\s-]+$/',
+            'last_name'        => 'required|between:1,20|regex:/^[a-zA-Z0-9\s-]+$/',
+            'institution_name' => 'nullable|between:1,20|regex:/^[a-zA-Z0-9\s-]+$/'
         ]);
     }
 
