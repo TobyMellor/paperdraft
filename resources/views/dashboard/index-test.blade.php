@@ -843,6 +843,10 @@
                 for (var i = 0; i < checkPositions.length; i++) {
                     if (checkExemptions.indexOf(i) === -1) {
                         for (var j = 0; j < checkPositions[i].length; j++) {
+                            if (i > 1 && j > 1) {
+                                continue; // don't bother checking for chairs too far to left/right
+                            }
+
                             if (!canvasController.isPositionInBounds(checkPositions[i][j][0], checkPositions[i][j][1]) || canvasController.isCanvasItemInPosition(checkPositions[i][j][0], checkPositions[i][j][1])) {
                                 break;
                             }
