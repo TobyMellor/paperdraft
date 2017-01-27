@@ -356,7 +356,6 @@
 @stop
 @section('scripts')
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/raphael/2.2.7/raphael.min.js"></script>
-    <script type="text/javascript" src="{{ asset('assets/js/plugins/drag_selection.js') }}"></script>
     <script>
         $(document).ready(function() {
             $('.drop-target').on('mousedown', '.drag-item', function() {
@@ -514,6 +513,8 @@
             $('#paper').css('margin-top', ($('.main-canvas').width() - (squareWidth * 23)) / 2);
             $('#paper').css('margin-left', ($('.main-canvas').width() - (squareWidth * 23)) / 2);
             $('.main-panel-body').css('height', $('.main-canvas').width());
+            $('svg').attr('width', $('#paper').width());
+            $('svg').attr('height', $('#paper').width());
 
             bootstrapper(); // Start initializing
         });
@@ -2481,6 +2482,7 @@
                 )
             };
         }
-
     </script>
+
+    <script type="text/javascript" src="{{ asset('assets/js/plugins/drag_selection.js') }}"></script>
 @stop

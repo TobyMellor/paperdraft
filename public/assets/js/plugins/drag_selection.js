@@ -56,20 +56,20 @@ var rect;
 
     function getCanvasItemsInsideSelection()
     {
-        var leftX = startX / 32;
-        var rightX = endX / 32;
+        var leftX = startX / squareWidth;
+        var rightX = endX / squareWidth;
 
-        var topY = startY / 32;
-        var bottomY = endY / 32;
+        var topY = startY / squareWidth;
+        var bottomY = endY / squareWidth;
 
         if (startX >= endX) {
-            leftX = endX / 32;
-            rightX = startX / 32;
+            leftX = endX / squareWidth;
+            rightX = startX / squareWidth;
         }
 
         if (startY >= endY) {
-            topY = endY / 32;
-            bottomY = startY / 32;
+            topY = endY / squareWidth;
+            bottomY = startY / squareWidth;
         }
 
         var selectedCanvasItems = [];
