@@ -604,6 +604,7 @@
             removeCanvasItem(canvasItemId) {
                 var canvasItem = this.getCanvasItem(canvasItemId);
 
+                canvasItem.tooltip('destroy');
                 canvasItem.draggable('destroy');
                 canvasItem.remove();
             }
@@ -770,23 +771,73 @@
             }
 
             setCanvasItemTooltip(canvasItemId, studentName, studentGender) {
-                var canvasItem = this.getCanvasItem(canvasItemId);
+                var canvasItem = this.getCanvasItem(canvasItemId),
+                    nameSplit  = studentName.split(' ');
+
+                if (nameSplit.length > 0) {
+                    studentName = nameSplit[0] + ' ' + nameSplit[1].charAt(0);
+                }
+
+                if (studentName.length > 9) {
+                    studentName = studentName.split(' ')[0].charAt(0);
+                }
 
                 canvasItem.attr('title', studentName);
+                canvasItem.attr('data-placement', this.getBestTooltipPlacement(canvasItemId));
 
                 if (studentGender === 'male') {
                     canvasItem.tooltip({
-                        template: '<div class="tooltip"><div class="bg-teal" style="background-color: #2196f3; border-color: #2196f3;"><div class="tooltip-arrow"></div><div class="tooltip-inner"></div></div></div>',
+                        template: '<div class="tooltip"><div class="bg-teal" style="background-color: #2196f3; border-color: #2196f3;"><div class="tooltip-arrow"></div><div class="tooltip-inner" style="padding: 3px 8px;"></div></div></div>',
                         trigger: 'manual',
                         animation: false
                     }).tooltip('show');
                 } else {
                     canvasItem.tooltip({
-                        template: '<div class="tooltip"><div class="bg-teal" style="background-color: #d2527f; border-color: #d2527f;"><div class="tooltip-arrow"></div><div class="tooltip-inner"></div></div></div>',
+                        template: '<div class="tooltip"><div class="bg-teal" style="background-color: #d2527f; border-color: #d2527f;"><div class="tooltip-arrow"></div><div class="tooltip-inner" style="padding: 3px 8px;"></div></div></div>',
                         trigger: 'manual',
                         animation: false
                     }).tooltip('show');
                 }
+            }
+
+            getBestTooltipPlacement(canvasItemId) {
+                var canvasItem = canvasController.canvasItems[canvasItemId],
+                    checkPositionX, checkPositionY;
+
+                for (var i = 0; i < 4; i++) {
+                    var checkPositionX = canvasItem.position_x + j,
+                        checkPositionY = canvasItem.position_y - 1;
+
+                    for (var j = -1; j < 2; j++) {
+                        if (i === 0 && j === -1) {
+                            checkPositionX = canvasItem.position_x + j;
+                            checkPositionY = canvasItem.position_y - 1;
+                        } else if (i === 1 && j === -1) {
+                            checkPositionY = canvasItem.position_y - 1;
+                        } else if (i === 2 && j === -1) {
+                            checkPositionX = canvasItem.position_x + j + 2;
+                            checkPositionY = canvasItem.position_y;
+                        } else if (i === 3 && j === -1) {
+                            checkPositionX = canvasItem.position_x + j - 2;
+                        }
+
+                        if (!canvasController.isPositionInBounds(checkPositionX, checkPositionY) || canvasController.isCanvasItemInPosition(checkPositionX, checkPositionY)) {
+                            break;
+                        }
+                    }
+
+                    if (i === 0 && j === 1) {
+                        return 'top';
+                    } else if (i === 1 && j === 1) {
+                        return 'bottom';
+                    } else if (i === 2 && j === 1) {
+                        return 'right';
+                    } else if (i === 3 && j === 1) {
+                        return 'left';
+                    }
+                }
+
+                return 'top';
             }
         }
 
@@ -1896,7 +1947,7 @@
             attemptSeatPlacement(attemptedSeatsAvailable, incorrectSeatsAvailable, selectedStudent) {
                 if (attemptedSeatsAvailable.length === 0) {
                     if (incorrectSeatsAvailable.length > 0) {
-                        selectedStudent.canvas_item_id = canvasController.canvasItemsGrid[incorrectSeatsAvailable[0]][incorrectSeatsAvailable[1]];
+                        selectedStudent.canvas_item_id = canvasController.canvasItemsGrid[incorrectSeatsAvailable[0][0]][incorrectSeatsAvailable[0][1]];
 
                         notificationController.handleNotification(selectedStudent.name + ' was seated with the same gender due to lack of seats available.', 'warning');
 
