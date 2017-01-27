@@ -22,7 +22,7 @@ class IndexController extends Controller
         $classes = $classController->getClasses();
         $items = $itemController->index();
 
-        if ($classes->first() != null) {
+        if ($classes->first() !== null) {
             $recentClassId = $classController->getRecentClassId();
             $classStudents = ClassStudent::where('class_id', $classes->first()->id)->paginate(9);
 
@@ -31,10 +31,9 @@ class IndexController extends Controller
                 ->with('classes', $classes)
                 ->with('items', $items)
                 ->with('recentClassId', $recentClassId);
-        } else {
-            return view('dashboard.index')
-                ->with('items', $items);
         }
+        
+        return redirect('dashboard/classes');
     }
 
     /**
