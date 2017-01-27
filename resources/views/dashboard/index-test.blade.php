@@ -808,38 +808,42 @@
                 canvasItem.tooltip_occupied_positions = null;
 
                 var occupiedTooltipPositions = canvasController.getTooltipOccupiedPositions(),
-                    checkPositions = [
+                    checkPositions = [ // TODO: Only check directly above, but still occupy all positions.
                         [
+                            [canvasItem.position_x,     canvasItem.position_y - 1], // directly above
                             [canvasItem.position_x - 1, canvasItem.position_y - 1],
-                            [canvasItem.position_x,     canvasItem.position_y - 1],
                             [canvasItem.position_x + 1, canvasItem.position_y - 1]
                         ],
                         [
+                            [canvasItem.position_x,     canvasItem.position_y + 1], // directly below
                             [canvasItem.position_x - 1, canvasItem.position_y + 1],
-                            [canvasItem.position_x,     canvasItem.position_y + 1],
                             [canvasItem.position_x + 1, canvasItem.position_y + 1]
                         ],
                         [
-                            [canvasItem.position_x + 1, canvasItem.position_y],
+                            [canvasItem.position_x + 1, canvasItem.position_y], // directly right
                             [canvasItem.position_x + 2, canvasItem.position_y],
                             [canvasItem.position_x + 3, canvasItem.position_y]
                         ],
                         [
-                            [canvasItem.position_x - 3, canvasItem.position_y],
+                            [canvasItem.position_x - 1, canvasItem.position_y], // directly left
                             [canvasItem.position_x - 2, canvasItem.position_y],
-                            [canvasItem.position_x - 1, canvasItem.position_y]
+                            [canvasItem.position_x - 3, canvasItem.position_y]
                         ]
                     ],
+                    checkExemptions = [],
                     checkPositionX, checkPositionY;
 
-                if (occupiedTooltipPositions.length > 0) {
-                    for (var i = 0; i < checkPositions.length; i++) {
-                        for (var j = 0; j < checkPositions[i].length; j++) {
-                            checkPositionX = checkPositions[i][j][0];
-                            checkPositionY = checkPositions[i][j][1];
+                for (var i = 0; i < checkPositions.length; i++) {
+                    if (utils.isArrayInArray(occupiedTooltipPositions, [checkPositions[i][0][0], checkPositions[i][0][1]])) {
+                        checkExemptions.push(i);
+                        break;
+                    }
+                }
 
-                            if (utils.isArrayInArray(occupiedTooltipPositions, [checkPositionX, checkPositionY])) {
-                                j = 4;
+                for (var i = 0; i < checkPositions.length; i++) {
+                    if (checkExemptions.indexOf(i) === -1) {
+                        for (var j = 0; j < checkPositions[i].length; j++) {
+                            if (!canvasController.isPositionInBounds(checkPositions[i][j][0], checkPositions[i][j][1]) || canvasController.isCanvasItemInPosition(checkPositions[i][j][0], checkPositions[i][j][1])) {
                                 break;
                             }
                         }
@@ -860,12 +864,6 @@
                         }
                     }
                 }
-
-                // Maybe return to this later. This makes it so tooltips won't overlap tables but makes function more complicated
-                // if (!canvasController.isPositionInBounds(checkPositionX, checkPositionY) || canvasController.isCanvasItemInPosition(checkPositionX, checkPositionY)) {
-                //     j = 3;
-                //     break;
-                // }
 
                 canvasItem.tooltip_occupied_positions = checkPositions[0];
 
