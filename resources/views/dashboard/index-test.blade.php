@@ -843,7 +843,7 @@
                 for (var i = 0; i < checkPositions.length; i++) {
                     if (checkExemptions.indexOf(i) === -1) {
                         for (var j = 0; j < checkPositions[i].length; j++) {
-                            if (i > 1 && j > 1) {
+                            if (i > 1 && j > 0) {
                                 continue; // don't bother checking for chairs too far to left/right
                             }
 
