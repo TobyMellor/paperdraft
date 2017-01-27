@@ -1205,12 +1205,14 @@
                     softDeletedCanvasItems = this.softDeletedCanvasItems;
 
                 softDeletedCanvasItems[softDeletedCanvasItem.id] = {
-                    'id':           softDeletedCanvasItem.id,
-                    'item_id':      softDeletedCanvasItem.item_id,
-                    'position_x':   softDeletedCanvasItem.position_x,
-                    'position_y':   softDeletedCanvasItem.position_y,
-                    'pseudo_item':  softDeletedCanvasItem.pseudo_item,
-                    'soft_deleted': true
+                    id:                         softDeletedCanvasItem.id,
+                    item_id:                    softDeletedCanvasItem.item_id,
+                    student_id:                 null,
+                    position_x:                 softDeletedCanvasItem.position_x,
+                    position_y:                 softDeletedCanvasItem.position_y,
+                    pseudo_item:                softDeletedCanvasItem.pseudo_item,
+                    soft_deleted:               true,
+                    tooltip_occupied_positions: null
                 };
             }
 
