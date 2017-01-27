@@ -489,7 +489,7 @@
         function handleNotification(notificationContent, type, timeout = 5000) {
             var n = noty({
                 text: notificationContent,
-                layout: 'topCenter',
+                layout: 'topRight',
                 type: type
             });
 

@@ -2313,7 +2313,7 @@
             handleNotification(notificationContent, type, timeout = 7500) {
                 var n = noty({
                     text:   notificationContent,
-                    layout: 'topCenter',
+                    layout: 'topRight',
                     type:   type
                 });
 
