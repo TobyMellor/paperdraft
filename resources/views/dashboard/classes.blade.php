@@ -337,13 +337,12 @@
                                     <div class="form-control-feedback">
                                         <i class="icon-home text-muted"></i>
                                     </div>
-                                    <span class="help-block">Recommended, gives option later to use seating layout across classes.</span>
                                 </div>
                                 @if (isset($classes))
                                     <br />
                                     <br />
                                     <label class="display-block text-bold">Should we use a seating template?</label>
-                                    <select name="class_template" id="template-picker">
+                                    <select name="class_template_id" id="template-picker">
                                         <optgroup label="Available class templates">
                                             <option value="" selected>Select a class template to copy</option>
                                             @foreach ($classes as $class)

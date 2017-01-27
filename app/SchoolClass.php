@@ -21,5 +21,7 @@ class SchoolClass extends Model
     protected $fillable = [
         'user_id',
         'class_name',
+        'class_subject',
+        'class_room'
     ];
 }

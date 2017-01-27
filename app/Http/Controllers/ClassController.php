@@ -12,11 +12,6 @@ use Illuminate\Http\Request;
 
 class ClassController extends Controller
 {
-    public function __construct(Request $request)
-    {
-        $this->request = $request;
-    }
-
     /**
      * Store a newly created resource in storage.
      *
@@ -25,9 +20,9 @@ class ClassController extends Controller
      */
     public function store(Request $request)
     {
-        $className = $request->input('class_name');
+        $className    = $request->input('class_name');
         $classSubject = $request->input('class_subject');
-        $classRoom = $request->input('class_room');
+        $classRoom    = $request->input('class_room');
 
         $data = [
             'class_name'    => $className,
@@ -39,7 +34,7 @@ class ClassController extends Controller
 
         if (!$validation->fails()) {
             $storedClass = SchoolClass::create([
-                'user_id'       => Auth::user()->id,
+                'user_id'       => Auth::id(),
                 'class_name'    => $className,
                 'class_subject' => $classSubject,
                 'class_room'    => $classRoom,
@@ -70,31 +65,36 @@ class ClassController extends Controller
      *
      * @return \Illuminate\Http\Redirect
      */
-    public function storeClass(CanvasItemController $canvasItemController)
+    public function storeClass(Request $request)
     {
-        $request = $this->request;
-
-        $className = $request->input('class_name');
-        $classTemplate = $request->input('class_template');
+        $className       = $request->input('class_name');
+        $classSubject    = $request->input('class_subject');
+        $classRoom       = $request->input('class_room');
+        $classTemplateId = $request->input('class_template_id');
 
         $data = [
-            'class_name' => $className
+            'class_name'    => $className,
+            'class_id'      => $classTemplateId,
+            'class_subject' => $classSubject,
+            'class_room'    => $classRoom
         ];
 
         $validation = $this->validator($data);
 
         if (!$validation->fails()) {
-            $class = SchoolClass::create([
-                'user_id'    => Auth::user()->id,
-                'class_name' => $className
-            ]);
-
-            if (!empty($classTemplate)) {
-                $canvasItemController->duplicateClassObjects($classTemplate, $class->id);
+            if ($classTemplateId !== null) {
+                $classId = $this->duplicateClass($classTemplateId, $className, $classSubject, $classRoom);
+            } else {
+                $classId = SchoolClass::create([
+                    'user_id'       => Auth::id(),
+                    'class_name'    => $className,
+                    'class_subject' => $classSubject,
+                    'class_room'    => $classRoom
+                ])->id;
             }
 
-            return redirect('/dashboard/classes/' . $class->id)
-                ->with('successMessage', 'The class has been successfully created');
+            return redirect('/dashboard/classes/' . $classId)
+                ->with('successMessage', trans('api.class.success.store'));
         }
 
         $response = $validation->messages();
@@ -112,7 +112,7 @@ class ClassController extends Controller
      */
     public function getClasses()
     {   
-        $classes = SchoolClass::where('user_id', Auth::user()->id)->get();
+        $classes = SchoolClass::where('user_id', Auth::id())->get();
 
         return $classes;
     }
@@ -124,7 +124,7 @@ class ClassController extends Controller
      */
     public function getClass($classId)
     {   
-        $class = SchoolClass::where('user_id', Auth::user()->id)
+        $class = SchoolClass::where('user_id', Auth::id())
             ->where('id', $classId)
             ->first();
 
@@ -139,7 +139,7 @@ class ClassController extends Controller
     public function getRecentClassId()
     {   
         $canvasItem = CanvasItem::whereHas('SchoolClass', function($query){                           
-            $query->where('classes.user_id', Auth::user()->id);                             
+            $query->where('classes.user_id', Auth::id());                             
         })->orderBy('created_at', 'desc')->first();
 
         if ($canvasItem != null) {
@@ -212,11 +212,13 @@ class ClassController extends Controller
      *
      * @return $classIdToPaste
      */
-    public function duplicateClass($classId)
+    public function duplicateClass($classId, $className = null, $classSubject = null, $classRoom = null)
     {
         $classIdToPaste = SchoolClass::create([
-            'user_id' => Auth::user()->id,
-            'class_name' => substr(SchoolClass::where('id', $classId)->first()->class_name, 0, 23) . ' (copy)'
+            'user_id'       => Auth::id(),
+            'class_name'    => $className === null ? substr(SchoolClass::where('id', $classId)->first()->class_name, 0, 23) . ' (copy)' : $className,
+            'class_subject' => $classSubject,
+            'class_room'    => $classRoom
         ])->id;
 
         $canvasItemsToCopy = CanvasItem::where('class_id', $classId)->get();
@@ -240,8 +242,10 @@ class ClassController extends Controller
     protected function validator(array $data)
     {
         return Validator::make($data, [
-            'class_name'     => 'required|between:1,30',
-            'class_template' => 'integer|exists:classes,id'
+            'class_name'        => 'required|between:1,30',
+            'class_subject'     => 'string|between:1,30',
+            'class_room'        => 'string|between:1,30',
+            'class_template_id' => 'integer|exists:classes,id,user_id,' . Auth::id(),
         ]);
     }
 
@@ -257,7 +261,7 @@ class ClassController extends Controller
     protected function validateClassId(array $data)
     {
         return Validator::make($data, [
-            'class_id' => 'required|integer|exists:classes,id,user_id,' . Auth::user()->id
+            'class_id' => 'required|integer|exists:classes,id,user_id,' . Auth::id()
         ]);
     }
 }
