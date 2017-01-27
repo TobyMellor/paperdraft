@@ -9,7 +9,11 @@
         <div class="page-header">
             <div class="breadcrumb-line">
                 <ul class="breadcrumb">
-                    <li><a href="index.html"><i class="icon-home2 position-left"></i> Home</a></li>
+                    <li>
+                        <a href="index.html">
+                            <i class="icon-home2 position-left"></i> Home
+                        </a>
+                    </li>
                     <li class="active">Dashboard</li>
                 </ul>
 
@@ -428,13 +432,17 @@
             });
 
             $(document).on('click', 'a', function(event) {
-                if (hasUserMadeChanges) {
-                    event.preventDefault();
+                console.log($(this));
+                console.log($(this).attr('href'));
+                if ($(this).attr('href') !== 'javascript:void(0);') {
+                    if (hasUserMadeChanges) {
+                        event.preventDefault();
 
-                    var clickedLink = $(this).attr('href');
+                        var clickedLink = $(this).attr('href');
 
-                    if (clickedLink != 'javascript:void(0);') {
-                        canvasController.confirmPageLeave(null, clickedLink);
+                        if (clickedLink != 'javascript:void(0);') {
+                            canvasController.confirmPageLeave(null, clickedLink);
+                        }
                     }
                 }
             });
@@ -1823,6 +1831,8 @@
                 this.deleteCanvasItems(this.softDeletedCanvasItems);
 
                 historyController.storeCanvasHistory(buttonElement, externalLink);
+
+                hasUserMadeChanges = false;
             }
 
             clearSession() {
