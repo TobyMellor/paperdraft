@@ -783,20 +783,22 @@
                     studentName = studentName.split(' ')[0].charAt(0);
                 }
 
+                canvasItem.tooltip('destroy');
                 canvasItem.attr('title', studentName);
-                canvasItem.attr('data-placement', this.getBestTooltipPlacement(canvasItemId));
 
                 if (studentGender === 'male') {
                     canvasItem.tooltip({
                         template: '<div class="tooltip"><div class="bg-teal" style="background-color: #2196f3; border-color: #2196f3;"><div class="tooltip-arrow"></div><div class="tooltip-inner" style="padding: 3px 8px;"></div></div></div>',
                         trigger: 'manual',
-                        animation: false
+                        animation: false,
+                        placement: this.getBestTooltipPlacement(canvasItemId)
                     }).tooltip('show');
                 } else {
                     canvasItem.tooltip({
                         template: '<div class="tooltip"><div class="bg-teal" style="background-color: #d2527f; border-color: #d2527f;"><div class="tooltip-arrow"></div><div class="tooltip-inner" style="padding: 3px 8px;"></div></div></div>',
                         trigger: 'manual',
-                        animation: false
+                        animation: false,
+                        placement: this.getBestTooltipPlacement(canvasItemId)
                     }).tooltip('show');
                 }
             }
@@ -810,30 +812,32 @@
                         checkPositionY = canvasItem.position_y - 1;
 
                     for (var j = -1; j < 2; j++) {
-                        if (i === 0 && j === -1) {
+                        if (i === 0) {
                             checkPositionX = canvasItem.position_x + j;
                             checkPositionY = canvasItem.position_y - 1;
-                        } else if (i === 1 && j === -1) {
-                            checkPositionY = canvasItem.position_y - 1;
-                        } else if (i === 2 && j === -1) {
+                        } else if (i === 1) {
+                            checkPositionX = canvasItem.position_x + j;
+                            checkPositionY = canvasItem.position_y + 1;
+                        } else if (i === 2) {
                             checkPositionX = canvasItem.position_x + j + 2;
                             checkPositionY = canvasItem.position_y;
-                        } else if (i === 3 && j === -1) {
+                        } else if (i === 3) {
                             checkPositionX = canvasItem.position_x + j - 2;
                         }
 
                         if (!canvasController.isPositionInBounds(checkPositionX, checkPositionY) || canvasController.isCanvasItemInPosition(checkPositionX, checkPositionY)) {
+                            j = 3;
                             break;
                         }
                     }
 
-                    if (i === 0 && j === 1) {
+                    if (i === 0 && j === 2) {
                         return 'top';
-                    } else if (i === 1 && j === 1) {
+                    } else if (i === 1 && j === 2) {
                         return 'bottom';
-                    } else if (i === 2 && j === 1) {
+                    } else if (i === 2 && j === 2) {
                         return 'right';
-                    } else if (i === 3 && j === 1) {
+                    } else if (i === 3 && j === 2) {
                         return 'left';
                     }
                 }
