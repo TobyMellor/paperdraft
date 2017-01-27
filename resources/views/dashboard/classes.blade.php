@@ -2,321 +2,278 @@
 
 @section('title', 'Classes')
 @section('main')
-    <!-- Main content -->
-    <div class="content-wrapper">
+    <div class="row row-sortable">
+        <div class="col-md-8">
+            <div class="panel panel-flat">
+                <div class="panel-heading">
+                    <h6 class="panel-title">
+                        <span class="text-semibold">Manage Class</span>
+                        <span class="text-muted">
+                            <small> {{ $selectedClass->class_name }}<small>
+                        </span>
+                    </h6>
+                    <div class="heading-elements">
+                        <a class="btn bg-teal-400" href="{{ url('dashboard') }}?class={{ $classId }}"><i class="icon-statistics position-left"></i> View Seating Plan</a>
+                    </div>
+                <a class="heading-elements-toggle"><i class="icon-menu"></i></a></div>
+                <table class="table text-nowrap">
+                    <thead>
+                        <tr>
+                            <th style="width: 300px;">Student</th>
+                            <th>CAL</th>
+                            <th>Target</th>
+                            <th>PP</th>
+                            <th>Ability</th>
+                            <th style="width: 20px;" class="text-center"><i class="icon-arrow-down12"></i></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (isset($classStudents))
+                            @foreach ($classStudents as $classStudent)
+                                <tr student-id="{{ $classStudent->student_id }}">
+                                    <td>
+                                        <div class="media-left media-middle">
+                                            <a class="btn bg-teal-400 btn-rounded btn-icon btn-xs" href="javascript:void(0);">
+                                                <div class="letter-icon">{{ strtoupper($classStudent->student->name[0]) }}</div>
+                                            </a>
+                                        </div>
 
-        <!-- Page header -->
-        <div class="page-header">
-            <div class="breadcrumb-line">
-                <ul class="breadcrumb">
-                    <li><a href="index.html"><i class="icon-home2 position-left"></i> Home</a></li>
-                    <li>Dashboard</li>
-                    <li class="active">Classes</li>
-                </ul>
-
-                <ul class="breadcrumb-elements">
-                    <li class="dropdown">
-                        <a href="javascript:void(0);" class="dropdown-toggle" data-toggle="dropdown">
-                            <i class="icon-gear position-left"></i>
-                            Settings
-                            <span class="caret"></span>
-                        </a>
-
-                        <ul class="dropdown-menu dropdown-menu-right">
-                            <li><a href="javascript:void(0);"><i class="icon-user-lock"></i> Account security</a></li>
-                            <li><a href="javascript:void(0);"><i class="icon-statistics"></i> Analytics</a></li>
-                            <li><a href="javascript:void(0);"><i class="icon-accessibility"></i> Accessibility</a></li>
-                            <li class="divider"></li>
-                            <li><a href="javascript:void(0);"><i class="icon-gear"></i> All settings</a></li>
-                        </ul>
-                    </li>
-                </ul>
-            </div>
-        </div>
-        <!-- /page header -->
-        <!-- Content area -->
-        <div class="content" style="padding-top: 20px;">
-            <div class="row row-sortable">
-                <div class="col-md-8">
-                    <div class="panel panel-flat">
-                        <div class="panel-heading">
-                            <h6 class="panel-title">
-                                <span class="text-semibold">Manage Class</span>
-                                <span class="text-muted">
-                                    <small> {{ $selectedClass->class_name }}<small>
-                                </span>
-                            </h6>
-                            <div class="heading-elements">
-                                <a class="btn bg-teal-400" href="{{ url('dashboard') }}?class={{ $classId }}"><i class="icon-statistics position-left"></i> View Seating Plan</a>
-                            </div>
-                        <a class="heading-elements-toggle"><i class="icon-menu"></i></a></div>
-                        <table class="table text-nowrap">
-                            <thead>
-                                <tr>
-                                    <th style="width: 300px;">Student</th>
-                                    <th>CAL</th>
-                                    <th>Target</th>
-                                    <th>PP</th>
-                                    <th>Ability</th>
-                                    <th style="width: 20px;" class="text-center"><i class="icon-arrow-down12"></i></th>
+                                        <div class="media-body media-middle">
+                                            <h6 class="display-inline-block text-default text-semibold letter-icon-title student-name" href="javascript:void(0);" style="margin-bottom: 3px; margin-top: 3px;">{{ $classStudent->student->name }}</h6>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <h6 class="no-margin current-attainment-level">{{ $classStudent->current_attainment_level or 'N/A'}}</h6>
+                                    </td>
+                                    <td>
+                                        <h6 class="no-margin target-attainment-level">{{ $classStudent->target_attainment_level or 'N/A'}}</h6>
+                                    </td>
+                                    <td>
+                                        <span class="pupil-premium">
+                                            <i class="@if ($classStudent->student->pupil_premium) icon-checkmark3 text-success @else icon-cross2 text-danger-400 @endif"></i>
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <h6 class="no-margin ability-cap">{{ $classStudent->ability_cap }}</h6>
+                                    </td>
+                                    <td>
+                                        <div class="gender" style="display: none;">{{ $classStudent->student->gender }}</div>
+                                        <div class="btn-group">
+                                            <button type="button" class="btn btn-danger dropdown-toggle" data-toggle="dropdown">Options <span class="caret"></span></button>
+                                            <ul class="dropdown-menu dropdown-menu-right">
+                                                <li><a class="delete-student"><i class="icon-user-minus"></i> Delete</a></li>
+                                                <li><a class="edit-student"><i class="icon-pencil"></i> Edit</a></li>
+                                            </ul>
+                                        </div>
+                                    </td>
                                 </tr>
-                            </thead>
-                            <tbody>
-                                @if (isset($classStudents))
-                                    @foreach ($classStudents as $classStudent)
-                                        <tr student-id="{{ $classStudent->student_id }}">
-                                            <td>
-                                                <div class="media-left media-middle">
-                                                    <a class="btn bg-teal-400 btn-rounded btn-icon btn-xs" href="javascript:void(0);">
-                                                        <div class="letter-icon">{{ strtoupper($classStudent->student->name[0]) }}</div>
-                                                    </a>
-                                                </div>
+                            @endforeach
+                        @endif
+                    </tbody>
+                </table>
+                <form action="javascript:void(0);" method="POST" id="create-student">
+                    <input name="_token" value="{{ csrf_token() }}" hidden>
+                    <input name="class_id" value="{{ $classId }}" hidden>
+                    <div class="content" style="padding-bottom: 20px;">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <fieldset class="text-semibold">
+                                    <legend><i class="icon-user-plus position-left"></i> Add Student</legend>
+                                    <div class="tabbable tab-content-bordered">
+                                        <ul class="nav nav-tabs nav-tabs-highlight">
+                                            <li class="active">
+                                                <a data-toggle="tab" href="#icon-only-tab1" title="" data-popup="tooltip" data-original-title="Information">
+                                                    <i class="icon-cog52"></i>
+                                                    <span class="visible-xs-inline-block position-right">Information</span>
+                                                </a>
+                                            </li>
 
-                                                <div class="media-body media-middle">
-                                                    <h6 class="display-inline-block text-default text-semibold letter-icon-title student-name" href="javascript:void(0);" style="margin-bottom: 3px; margin-top: 3px;">{{ $classStudent->student->name }}</h6>
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <h6 class="no-margin current-attainment-level">{{ $classStudent->current_attainment_level or 'N/A'}}</h6>
-                                            </td>
-                                            <td>
-                                                <h6 class="no-margin target-attainment-level">{{ $classStudent->target_attainment_level or 'N/A'}}</h6>
-                                            </td>
-                                            <td>
-                                                <span class="pupil-premium">
-                                                    <i class="@if ($classStudent->student->pupil_premium) icon-checkmark3 text-success @else icon-cross2 text-danger-400 @endif"></i>
-                                                </span>
-                                            </td>
-                                            <td>
-                                                <h6 class="no-margin ability-cap">{{ $classStudent->ability_cap }}</h6>
-                                            </td>
-                                            <td>
-                                                <div class="gender" style="display: none;">{{ $classStudent->student->gender }}</div>
-                                                <div class="btn-group">
-                                                    <button type="button" class="btn btn-danger dropdown-toggle" data-toggle="dropdown">Options <span class="caret"></span></button>
-                                                    <ul class="dropdown-menu dropdown-menu-right">
-                                                        <li><a class="delete-student"><i class="icon-user-minus"></i> Delete</a></li>
-                                                        <li><a class="edit-student"><i class="icon-pencil"></i> Edit</a></li>
-                                                    </ul>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    @endforeach
-                                @endif
-                            </tbody>
-                        </table>
-                        <form action="javascript:void(0);" method="POST" id="create-student">
-                            <input name="_token" value="{{ csrf_token() }}" hidden>
-                            <input name="class_id" value="{{ $classId }}" hidden>
-                            <div class="content" style="padding-bottom: 20px;">
-                                <div class="row">
-                                    <div class="col-md-12">
-                                        <fieldset class="text-semibold">
-                                            <legend><i class="icon-user-plus position-left"></i> Add Student</legend>
-                                            <div class="tabbable tab-content-bordered">
-                                                <ul class="nav nav-tabs nav-tabs-highlight">
-                                                    <li class="active">
-                                                        <a data-toggle="tab" href="#icon-only-tab1" title="" data-popup="tooltip" data-original-title="Information">
-                                                            <i class="icon-cog52"></i>
-                                                            <span class="visible-xs-inline-block position-right">Information</span>
-                                                        </a>
-                                                    </li>
+                                            <li>
+                                                <a data-toggle="tab" href="#icon-only-tab2" title="" data-popup="tooltip" data-original-title="Picture">
+                                                    <i class="icon-stack-picture"></i>
+                                                    <span class="visible-xs-inline-block position-right">Picture</span>
+                                                </a>
+                                            </li>
+                                        </ul>
 
-                                                    <li>
-                                                        <a data-toggle="tab" href="#icon-only-tab2" title="" data-popup="tooltip" data-original-title="Picture">
-                                                            <i class="icon-stack-picture"></i>
-                                                            <span class="visible-xs-inline-block position-right">Picture</span>
-                                                        </a>
-                                                    </li>
-                                                </ul>
-
-                                                <div class="tab-content">
-                                                    <div id="icon-only-tab1" class="tab-pane has-padding active">
-                                                        <div class="row">
-                                                            <div class="col-md-6">
-                                                                <label class="display-block text-bold">Basic Information <span class="text-danger">*</span></label>
-                                                                <input data-original-title="Enter the students name" class="form-control" data-popup="tooltip" title="" placeholder="Students Name" type="text" name="student_name" autocomplete="off" required id="student-name">
-                                                                <br />
-                                                                <div class="col-md-6" style="padding-left: 0;">
-                                                                    <label class="display-block text-bold">
-                                                                        Gender <span class="text-danger">*</span>
-                                                                        <span class="text-muted" style="padding-left: 6px;">
-                                                                            <small class="selected-name" id="guessing-text" style="display: none;">
-                                                                                Guessing gender...
-                                                                            </small>
-                                                                        </span>
-                                                                    </label>
-                                                                    <div class="radio">
-                                                                        <label>
-                                                                            <input type="radio" checked="checked" class="styled" name="gender" value="male">
-                                                                            Male
-                                                                        </label>
-                                                                    </div>
-                                                                    <div class="radio">
-                                                                        <label>
-                                                                            <input type="radio" class="styled" name="gender" value="female">
-                                                                            Female
-                                                                        </label>
-                                                                    </div>
-                                                                </div>
-                                                                <div class="col-md-6">
-                                                                    <label class="display-block text-bold">Additional Information</label>
-                                                                    <label class="checkbox-inline">
-                                                                        <input type="checkbox" class="styled" name="pupil_premium">
-                                                                        Pupil Premium
-                                                                    </label>
-                                                                </div>
+                                        <div class="tab-content">
+                                            <div id="icon-only-tab1" class="tab-pane has-padding active">
+                                                <div class="row">
+                                                    <div class="col-md-6">
+                                                        <label class="display-block text-bold">Basic Information <span class="text-danger">*</span></label>
+                                                        <input data-original-title="Enter the students name" class="form-control" data-popup="tooltip" title="" placeholder="Students Name" type="text" name="student_name" autocomplete="off" required id="student-name">
+                                                        <br />
+                                                        <div class="col-md-6" style="padding-left: 0;">
+                                                            <label class="display-block text-bold">
+                                                                Gender <span class="text-danger">*</span>
+                                                                <span class="text-muted" style="padding-left: 6px;">
+                                                                    <small class="selected-name" id="guessing-text" style="display: none;">
+                                                                        Guessing gender...
+                                                                    </small>
+                                                                </span>
+                                                            </label>
+                                                            <div class="radio">
+                                                                <label>
+                                                                    <input type="radio" checked="checked" class="styled" name="gender" value="male">
+                                                                    Male
+                                                                </label>
                                                             </div>
-                                                            <div class="col-md-6">
-                                                                <label class="display-block text-bold">Student Ability Tier</label>
-                                                                <div class="radio">
-                                                                    <label>
-                                                                        <input type="radio" class="styled" name="ability_cap" value="H">
-                                                                        High
-                                                                    </label>
-                                                                </div>
-                                                                <div class="radio">
-                                                                    <label>
-                                                                        <input type="radio" class="styled" checked="checked" name="ability_cap" value="M">
-                                                                        Medium
-                                                                    </label>
-                                                                </div>
-                                                                <div class="radio">
-                                                                    <label>
-                                                                        <input type="radio" class="styled" name="ability_cap" value="L">
-                                                                        Low
-                                                                    </label>
-                                                                </div>
+                                                            <div class="radio">
+                                                                <label>
+                                                                    <input type="radio" class="styled" name="gender" value="female">
+                                                                    Female
+                                                                </label>
                                                             </div>
                                                         </div>
-
-                                                        <br />
-
-                                                        <div class="row">
-                                                            <div class="col-md-6">
-                                                                <label class="display-block text-bold">Current Attainment Level</label>
-                                                                <div class="form-group">
-                                                                    <select name="current_attainment_level">
-                                                                        <optgroup label="Current Attainment Level">
-                                                                            <option value="" selected>Select a current attainment level</option>
-                                                                            <option value="A*">A*</option>
-                                                                            <option value="A">A</option>
-                                                                            <option value="B">B</option>
-                                                                            <option value="C">C</option>
-                                                                            <option value="D">D</option>
-                                                                            <option value="E">E</option>
-                                                                            <option value="F">F</option>
-                                                                            <option value="G">G</option>
-                                                                            <option value="U">U</option>
-                                                                        </optgroup>
-                                                                    </select>
-                                                                </div>
-                                                            </div>
-                                                            <div class="col-md-6">
-                                                                <label class="display-block text-bold">Target Level</label>
-                                                                <div class="form-group">
-                                                                    <select name="target_attainment_level">
-                                                                        <optgroup label="Target Level">
-                                                                            <option value="" selected>Select a target level</option>
-                                                                            <option value="A*">A*</option>
-                                                                            <option value="A">A</option>
-                                                                            <option value="B">B</option>
-                                                                            <option value="C">C</option>
-                                                                            <option value="D">D</option>
-                                                                            <option value="E">E</option>
-                                                                            <option value="F">F</option>
-                                                                            <option value="G">G</option>
-                                                                            <option value="U">U</option>
-                                                                        </optgroup>
-                                                                    </select>
-                                                                </div>
-                                                            </div>
+                                                        <div class="col-md-6">
+                                                            <label class="display-block text-bold">Additional Information</label>
+                                                            <label class="checkbox-inline">
+                                                                <input type="checkbox" class="styled" name="pupil_premium">
+                                                                Pupil Premium
+                                                            </label>
                                                         </div>
                                                     </div>
+                                                    <div class="col-md-6">
+                                                        <label class="display-block text-bold">Student Ability Tier</label>
+                                                        <div class="radio">
+                                                            <label>
+                                                                <input type="radio" class="styled" name="ability_cap" value="H">
+                                                                High
+                                                            </label>
+                                                        </div>
+                                                        <div class="radio">
+                                                            <label>
+                                                                <input type="radio" class="styled" checked="checked" name="ability_cap" value="M">
+                                                                Medium
+                                                            </label>
+                                                        </div>
+                                                        <div class="radio">
+                                                            <label>
+                                                                <input type="radio" class="styled" name="ability_cap" value="L">
+                                                                Low
+                                                            </label>
+                                                        </div>
+                                                    </div>
+                                                </div>
 
-                                                    <div id="icon-only-tab2" class="tab-pane has-padding">
-                                                        <div class="row">
-                                                            <label class="display-block text-bold" style="margin-left: 10px;">Student Image</label>
-                                                            <div class="col-md-6">
-                                                                <div class="form-group">
-                                                                    <input type="file" class="file-input" accept="image/*" name="student_image">
-                                                                </div>
-                                                            </div>
+                                                <br />
+
+                                                <div class="row">
+                                                    <div class="col-md-6">
+                                                        <label class="display-block text-bold">Current Attainment Level</label>
+                                                        <div class="form-group">
+                                                            <select name="current_attainment_level">
+                                                                <optgroup label="Current Attainment Level">
+                                                                    <option value="" selected>Select a current attainment level</option>
+                                                                    <option value="A*">A*</option>
+                                                                    <option value="A">A</option>
+                                                                    <option value="B">B</option>
+                                                                    <option value="C">C</option>
+                                                                    <option value="D">D</option>
+                                                                    <option value="E">E</option>
+                                                                    <option value="F">F</option>
+                                                                    <option value="G">G</option>
+                                                                    <option value="U">U</option>
+                                                                </optgroup>
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <label class="display-block text-bold">Target Level</label>
+                                                        <div class="form-group">
+                                                            <select name="target_attainment_level">
+                                                                <optgroup label="Target Level">
+                                                                    <option value="" selected>Select a target level</option>
+                                                                    <option value="A*">A*</option>
+                                                                    <option value="A">A</option>
+                                                                    <option value="B">B</option>
+                                                                    <option value="C">C</option>
+                                                                    <option value="D">D</option>
+                                                                    <option value="E">E</option>
+                                                                    <option value="F">F</option>
+                                                                    <option value="G">G</option>
+                                                                    <option value="U">U</option>
+                                                                </optgroup>
+                                                            </select>
                                                         </div>
                                                     </div>
                                                 </div>
                                             </div>
-                                        </fieldset>
-                                        <br />
-                                        <div class="text-right">
-                                            <button type="submit" class="btn btn-primary">Add Student<i class="icon-arrow-right14 position-right"></i></button>
+
+                                            <div id="icon-only-tab2" class="tab-pane has-padding">
+                                                <div class="row">
+                                                    <label class="display-block text-bold" style="margin-left: 10px;">Student Image</label>
+                                                    <div class="col-md-6">
+                                                        <div class="form-group">
+                                                            <input type="file" class="file-input" accept="image/*" name="student_image">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
+                                </fieldset>
+                                <br />
+                                <div class="text-right">
+                                    <button type="submit" class="btn btn-primary">Add Student<i class="icon-arrow-right14 position-right"></i></button>
                                 </div>
                             </div>
-                        </form>
+                        </div>
                     </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="tabbable">
-                        <ul class="nav nav-pills nav-pills-bordered nav-stacked">
-                            @if (isset($classes))
-                                @foreach ($classes as $key => $class)
-                                    <li>
-                                        <a href="/dashboard/classes/{{ $class->id }}" class="class-button @if ($selectedClass->id == $class->id) class-button-active @endif" class-id="{{ $class->id }}">
-                                            {{ $class->class_name }} <span class="text-muted"><small>{{ $class->class_room or '' }}</small></span>
-                                            
-                                            @if ($class->class_subject !== null)
-                                                <span class="label label-primary pull-right" style="margin-right: 60px;">
-                                                    {{ $class->class_subject }}
-                                                </span>
-                                            @endif
-                                        </a>
-                                        <div class="btn-group">
-                                            <a href="javascript:void(0);" class="btn btn-primary btn-icon dropdown-toggle @if ($selectedClass->id == $class->id) class-options-active @else class-options @endif" data-toggle="dropdown" class-id="{{ $class->id }}">
-                                                <i class="icon-menu7"></i>
-                                                <span class="caret"></span>
-                                            </a>
-                                            <ul class="dropdown-menu dropdown-menu-right">
-                                                <li>
-                                                    <a href="{{ url('dashboard/classes/' . $class->id . '/duplicate') }}">Duplicate Class Layout</a>
-                                                </li>
-                                                <li class="divider"></li>
-                                                <li>
-                                                    <a href="javascript:void(0);" class="clear-seatingplan">Clear Seating Plan</a>
-                                                </li>
-                                                <li>
-                                                    <a href="javascript:void(0);" class="delete-class">Delete Class</a>
-                                                </li>
-                                            </ul>
-                                        </div> 
-                                    </li>
-                                @endforeach
-                                <li>
-                                <br />
-                            @else
-                                <li>
-                            @endif
-                                <a href="javascript:void(0);" class="class-button class-button-create" data-toggle="modal" data-target="#modal_create_class">
-                                    <i class="icon-plus22" style="padding-bottom: 1px;"></i> Create a new class
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
+                </form>
             </div>
-            <!-- /dashboard content -->
-
-
-            <!-- Footer -->
-            <div class="footer text-muted">
-                &copy; 2016 SeatingPlanner by Toby Mellor
-            </div>
-            <!-- /footer -->
         </div>
-        <!-- /content area -->
+        <div class="col-md-4">
+            <div class="tabbable">
+                <ul class="nav nav-pills nav-pills-bordered nav-stacked">
+                    @if (isset($classes))
+                        @foreach ($classes as $key => $class)
+                            <li>
+                                <a href="/dashboard/classes/{{ $class->id }}" class="class-button @if ($selectedClass->id == $class->id) class-button-active @endif" class-id="{{ $class->id }}">
+                                    {{ $class->class_name }} <span class="text-muted"><small>{{ $class->class_room or '' }}</small></span>
+                                    
+                                    @if ($class->class_subject !== null)
+                                        <span class="label label-primary pull-right" style="margin-right: 60px;">
+                                            {{ $class->class_subject }}
+                                        </span>
+                                    @endif
+                                </a>
+                                <div class="btn-group">
+                                    <a href="javascript:void(0);" class="btn btn-primary btn-icon dropdown-toggle @if ($selectedClass->id == $class->id) class-options-active @else class-options @endif" data-toggle="dropdown" class-id="{{ $class->id }}">
+                                        <i class="icon-menu7"></i>
+                                        <span class="caret"></span>
+                                    </a>
+                                    <ul class="dropdown-menu dropdown-menu-right">
+                                        <li>
+                                            <a href="{{ url('dashboard/classes/' . $class->id . '/duplicate') }}">Duplicate Class Layout</a>
+                                        </li>
+                                        <li class="divider"></li>
+                                        <li>
+                                            <a href="javascript:void(0);" class="clear-seatingplan">Clear Seating Plan</a>
+                                        </li>
+                                        <li>
+                                            <a href="javascript:void(0);" class="delete-class">Delete Class</a>
+                                        </li>
+                                    </ul>
+                                </div> 
+                            </li>
+                        @endforeach
+                        <li>
+                        <br />
+                    @else
+                        <li>
+                    @endif
+                        <a href="javascript:void(0);" class="class-button class-button-create" data-toggle="modal" data-target="#modal_create_class">
+                            <i class="icon-plus22" style="padding-bottom: 1px;"></i> Create a new class
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
     </div>
-    <!-- /main content -->
+@stop
+
+@section('modals')
     <div id="modal_create_class" class="modal fade">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -497,6 +454,7 @@
         </div>
     </div>
 @stop
+
 @section('scripts')
     <script>
         @if (session('errorMessage') != null)

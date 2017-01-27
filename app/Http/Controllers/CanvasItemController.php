@@ -146,7 +146,7 @@ class CanvasItemController extends Controller
     public function destroy(Request $request, $id)
     {
         $canvasItem = $request->input('canvas_item');
-        $classId = $request->input('class_id');
+        $classId    = $request->input('class_id');
 
         CanvasItem::where('class_id', $classId)
             ->where('id', $id)
@@ -167,7 +167,7 @@ class CanvasItemController extends Controller
     public function batchDestroy(Request $request)
     {
         $canvasItems = $request->input('canvas_items');
-        $classId = $request->input('class_id');
+        $classId     = $request->input('class_id');
 
         if ($canvasItems != null) {
             $canvasItemIds = array_map(function($canvasItems) { return $canvasItems['id']; }, $canvasItems);

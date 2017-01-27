@@ -7,159 +7,119 @@
             overflow: visible !important;
         }
     </style>
-    <!-- Main content -->
-    <div class="content-wrapper">
-
-        <!-- Page header -->
-        <div class="page-header">
-            <div class="breadcrumb-line">
-                <ul class="breadcrumb">
-                    <li><a href="index.html"><i class="icon-home2 position-left"></i> Home</a></li>
-                    <li>Dashboard</li>
-                    <li class="active">Classes</li>
-                </ul>
-
-                <ul class="breadcrumb-elements">
-                    <li class="dropdown">
-                        <a href="javascript:void(0);" class="dropdown-toggle" data-toggle="dropdown">
-                            <i class="icon-gear position-left"></i>
-                            Settings
-                            <span class="caret"></span>
-                        </a>
-
-                        <ul class="dropdown-menu dropdown-menu-right">
-                            <li><a href="javascript:void(0);"><i class="icon-user-lock"></i> Account security</a></li>
-                            <li><a href="javascript:void(0);"><i class="icon-statistics"></i> Analytics</a></li>
-                            <li><a href="javascript:void(0);"><i class="icon-accessibility"></i> Accessibility</a></li>
-                            <li class="divider"></li>
-                            <li><a href="javascript:void(0);"><i class="icon-gear"></i> All settings</a></li>
-                        </ul>
-                    </li>
-                </ul>
-            </div>
+    
+    <div class="panel panel-white">
+        <div class="panel-heading">
+            <h6 class="panel-title">Get started</h6>
         </div>
-        <!-- /page header -->
-        <!-- Content area -->
-        <div class="content">
-            <!-- Wizard with validation -->
-            <div class="panel panel-white">
-                <div class="panel-heading">
-                    <h6 class="panel-title">Get started</h6>
-                </div>
-                <div class="panel-body">
-                    <form class="steps-validation" action="#">
-                        <h6>Personal data</h6>
-                        <fieldset>
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="form-group has-feedback">
-                                        <label>Email address: <span class="text-danger">*</span></label>
-                                        <input type="email" class="form-control" value="{{ Auth::user()->email }}" disabled>
-                                        <div class="form-control-feedback">
-                                            <i class="icon-vcard text-muted"></i>
-                                        </div>
-                                    </div>
-                                    <a class="btn btn-primary">Change Email</a>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="form-group has-feedback">
-                                        <label>Password: <span class="text-danger">*</span></label>
-                                        <input type="text" class="form-control" value="****" disabled>
-                                        <div class="form-control-feedback">
-                                            <i class="icon-user-lock text-muted"></i>
-                                        </div>
-                                    </div>
-                                    <a class="btn btn-primary">Change Password</a>
+        <div class="panel-body">
+            <form class="steps-validation" action="#">
+                <h6>Personal data</h6>
+                <fieldset>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group has-feedback">
+                                <label>Email address: <span class="text-danger">*</span></label>
+                                <input type="email" class="form-control" value="{{ Auth::user()->email }}" disabled>
+                                <div class="form-control-feedback">
+                                    <i class="icon-vcard text-muted"></i>
                                 </div>
                             </div>
-                            <div class="row" style="margin-top: 20px;">
-                                <div class="col-md-2">
-                                    <div class="form-group">
-                                        <label>Your title: <span class="text-danger">*</span></label>
-                                        <select name="title" data-placeholder="Select your title" class="select">
-                                            <option value="Mr">Mr</option>
-                                            <option value="Mrs">Mrs</option>
-                                            <option value="Miss">Miss</option>
-                                            <option value="Ms">Ms</option>
-                                            <option value="Dr">Dr</option>
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="col-md-5">
-                                    <div class="form-group">
-                                        <label>Your first name: <span class="text-danger">*</span></label>
-                                        <input type="text" name="first_name" value="{{ Auth::user()->first_name }}" class="form-control" placeholder="Your first name">
-                                    </div>
-                                </div>
-                                <div class="col-md-5">
-                                    <div class="form-group">
-                                        <label>Your last name: <span class="text-danger">*</span></label>
-                                        <input type="text" name="last_name" value="{{ Auth::user()->last_name }}" class="form-control" placeholder="Your last name">
-                                    </div>
+                            <a class="btn btn-primary">Change Email</a>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group has-feedback">
+                                <label>Password: <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" value="****" disabled>
+                                <div class="form-control-feedback">
+                                    <i class="icon-user-lock text-muted"></i>
                                 </div>
                             </div>
-                        </fieldset>
+                            <a class="btn btn-primary">Change Password</a>
+                        </div>
+                    </div>
+                    <div class="row" style="margin-top: 20px;">
+                        <div class="col-md-2">
+                            <div class="form-group">
+                                <label>Your title: <span class="text-danger">*</span></label>
+                                <select name="title" data-placeholder="Select your title" class="select">
+                                    <option value="Mr">Mr</option>
+                                    <option value="Mrs">Mrs</option>
+                                    <option value="Miss">Miss</option>
+                                    <option value="Ms">Ms</option>
+                                    <option value="Dr">Dr</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-5">
+                            <div class="form-group">
+                                <label>Your first name: <span class="text-danger">*</span></label>
+                                <input type="text" name="first_name" value="{{ Auth::user()->first_name }}" class="form-control" placeholder="Your first name">
+                            </div>
+                        </div>
+                        <div class="col-md-5">
+                            <div class="form-group">
+                                <label>Your last name: <span class="text-danger">*</span></label>
+                                <input type="text" name="last_name" value="{{ Auth::user()->last_name }}" class="form-control" placeholder="Your last name">
+                            </div>
+                        </div>
+                    </div>
+                </fieldset>
 
-                        <h6>Your classes</h6>
-                        <fieldset>
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="form-group has-feedback">
-                                        <label>Class Name: <span class="text-danger">*</span></label>
-                                        <input type="text" name="class_name" placeholder="Class name" class="form-control required">
-                                        <div class="form-control-feedback">
-                                            <i class="icon-book text-muted"></i>
-                                        </div>
-                                    </div>
-
-                                    <div class="form-group">
-                                        <label>Subject:</label>
-                                        <input type="text" name="class_subject" placeholder="Subject name" value="" data-role="tagsinput" class="form-control subject-typeahead">
-                                    </div>
-
-                                    <div class="form-group">
-                                        <label>Room:</label>
-                                        <input type="text" name="class_room" placeholder="Room name" value="" data-role="tagsinput" class="room-typeahead form-control">
-                                        <span class="help-block">Recommended, gives option later to use seating layout across classes.</span>
-                                    </div>
-
-                                    <a href="javascript:void(0);" class="btn btn-primary pull-right" id="create-class">Create Class <i class="icon-book" style="margin-left: 5px;"></i></a>
-                                </div>
-
-                                <div class="col-md-6">
-                                    <label>Your classes:</label>
-                                    <strong id="no-classes"><br />You have no classes yet. Create one using the form.</strong>
-                                    <div class="table-responsive" style="display: none;">
-                                        <table class="table table-bordered table-striped table-hover">
-                                            <thead>
-                                                <tr>
-                                                    <th>Class Name</th>
-                                                    <th>Subject</th>
-                                                    <th>Room</th>
-                                                    <th>Action</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody></tbody>
-                                        </table>
-                                    </div>
-
-                                    <br />
+                <h6>Your classes</h6>
+                <fieldset>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group has-feedback">
+                                <label>Class Name: <span class="text-danger">*</span></label>
+                                <input type="text" name="class_name" placeholder="Class name" class="form-control required">
+                                <div class="form-control-feedback">
+                                    <i class="icon-book text-muted"></i>
                                 </div>
                             </div>
-                        </fieldset>
 
-                        <h6>Your students</h6>
-                        <fieldset>
-                            <h2>We'll redirect you to the students page.</h2>
-                        </fieldset>
-                    </form>
-                </div>
-            </div>
-            <!-- /wizard with validation -->
+                            <div class="form-group">
+                                <label>Subject:</label>
+                                <input type="text" name="class_subject" placeholder="Subject name" value="" data-role="tagsinput" class="form-control subject-typeahead">
+                            </div>
+
+                            <div class="form-group">
+                                <label>Room:</label>
+                                <input type="text" name="class_room" placeholder="Room name" value="" data-role="tagsinput" class="room-typeahead form-control">
+                            </div>
+
+                            <a href="javascript:void(0);" class="btn btn-primary pull-right" id="create-class">Create Class <i class="icon-book" style="margin-left: 5px;"></i></a>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label>Your classes:</label>
+                            <strong id="no-classes"><br />You have no classes yet. Create one using the form.</strong>
+                            <div class="table-responsive" style="display: none;">
+                                <table class="table table-bordered table-striped table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Class Name</th>
+                                            <th>Subject</th>
+                                            <th>Room</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody></tbody>
+                                </table>
+                            </div>
+
+                            <br />
+                        </div>
+                    </div>
+                </fieldset>
+
+                <h6>Your students</h6>
+                <fieldset>
+                    <h2>We'll redirect you to the students page.</h2>
+                </fieldset>
+            </form>
         </div>
-        <!-- /content area -->
     </div>
-    <!-- /main content -->
 @stop
 @section('scripts')
     <script type="text/javascript" src="{{ asset('assets/js/plugins/forms/wizards/steps.min.js') }}"></script>

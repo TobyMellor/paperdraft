@@ -2,290 +2,289 @@
 
 @section('title', 'Dashboard')
 @section('main')
-    <!-- Main content -->
-    <div class="content-wrapper">
-
-        <!-- Page header -->
-        <div class="page-header">
-            <div class="breadcrumb-line">
-                <ul class="breadcrumb">
-                    <li>
-                        <a href="index.html">
-                            <i class="icon-home2 position-left"></i> Home
-                        </a>
-                    </li>
-                    <li class="active">Dashboard</li>
-                </ul>
-
-                <ul class="breadcrumb-elements">
-                    <li class="dropdown">
-                        <a href="javascript:void(0);" class="dropdown-toggle" data-toggle="dropdown">
-                            <i class="icon-gear position-left"></i>
-                            Settings
-                            <span class="caret"></span>
-                        </a>
-
-                        <ul class="dropdown-menu dropdown-menu-right">
-                            <li><a href="javascript:void(0);"><i class="icon-user-lock"></i> Account security</a></li>
-                            <li><a href="javascript:void(0);"><i class="icon-statistics"></i> Analytics</a></li>
-                            <li><a href="javascript:void(0);"><i class="icon-accessibility"></i> Accessibility</a></li>
-                            <li class="divider"></li>
-                            <li><a href="javascript:void(0);"><i class="icon-gear"></i> All settings</a></li>
+    <div class="row row-sortable">
+        <div class="col-md-8">
+            <div class="panel panel-white main-canvas">
+                <div class="panel-heading">
+                    <h6 class="panel-title">
+                        <span class="text-semibold">
+                            Seating Planner
+                        </span> 
+                        <span class="text-muted">
+                            <small id="class-name">Year 11<small>
+                        </span>
+                    </h6>
+                    <div class="heading-elements">
+                        <ul class="pagination pagination-flat pagination-sm">
+                            <li>
+                                <a href="javascript:void(0);">←</a>
+                            </li>
+                            <li class="active">
+                                <a href="javascript:void(0);">1</a>
+                            </li>
+                            <li>
+                                <a href="javascript:void(0);">2</a>
+                            </li>
+                            <li>
+                                <a href="javascript:void(0);">3</a>
+                            </li>
+                            <li>
+                                <a href="javascript:void(0);">→</a>
+                            </li>
                         </ul>
-                    </li>
-                </ul>
-            </div>
-        </div>
-        <!-- /page header -->
-        <!-- Content area -->
-        <div class="content" style="padding-top: 20px;">
-            <div class="row row-sortable">
-                <div class="col-md-8">
-                    <div class="panel panel-white main-canvas">
-                        <div class="panel-heading">
-                            <h6 class="panel-title"><span class="text-semibold">Seating Planner</span> <span class="text-muted"><small id="class-name">Year 11<small></span></h6>
-                            <div class="heading-elements">
-                                <ul class="pagination pagination-flat pagination-sm">
-                                    <li><a href="javascript:void(0);">←</a></li>
-                                    <li class="active"><a href="javascript:void(0);">1</a></li>
-                                    <li><a href="javascript:void(0);">2</a></li>
-                                    <li><a href="javascript:void(0);">3</a></li>
-                                    <li><a href="javascript:void(0);">→</a></li>
-                                </ul>
-                                <ul class="icons-list" style="margin-top: 11px;">
-                                    <li>
-                                        <i class="glyphicon glyphicon-floppy-save" id="save-button" style="cursor: pointer;"></i>
-                                    </li>
-                                </ul>
-                            </div>
-                            <a class="heading-elements-toggle"><i class="icon-menu"></i></a></div>
-                        <div class="panel-body main-panel-body" style="height: 736px; overflow-x: auto; overflow-y: hidden;">
-                            <div class="drop-target" id="paper"></div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="tabbable">
-                        <ul class="nav nav-pills nav-pills-bordered nav-stacked">
-                            @if (isset($classes))
-                                @foreach ($classes as $key => $class)
-                                    <li>
-                                        <a href="javascript:void(0);" class="class-button" class-id="{{ $class->id }}">
-                                            {{ $class->class_name }} <span class="text-muted"><small>{{ $class->class_room or '' }}</small></span>
-                                            
-                                            @if ($class->class_subject !== null)
-                                                <span class="label label-primary pull-right" style="margin-right: 60px;">
-                                                    {{ $class->class_subject }}
-                                                </span>
-                                            @endif
-                                        </a>
-                                        <div class="btn-group">
-                                            <a href="javascript:void(0);" class="btn btn-primary btn-icon dropdown-toggle class-options" data-toggle="dropdown" class-id="{{ $class->id }}">
-                                                <i class="icon-menu7"></i>
-                                                <span class="caret"></span>
-                                            </a>
-                                            <ul class="dropdown-menu dropdown-menu-right">
-                                                <li>
-                                                    <a href="{{ url('dashboard/classes/' . $class->id . '/duplicate') }}" data-toggle="modal" data-target="#modal_form_inline">Duplicate Class Layout</a>
-                                                </li>
-                                                <li class="divider"></li>
-                                                <li>
-                                                    <a href="javascript:void(0);" class="clear-seatingplan">Clear Seating Plan</a>
-                                                </li>
-                                                <li>
-                                                    <a href="javascript:void(0);" class="delete-class">Delete Class</a>
-                                                </li>
-                                            </ul>
-                                        </div> 
-                                    </li>
-                                @endforeach
-                                <li>
-                                <br />
-                            @else
-                                <li>
-                            @endif
-                                <a href="javascript:void(0);" class="class-button class-button-create" data-toggle="modal" data-target="#modal_create_class">
-                                    <i class="icon-plus22" style="padding-bottom: 1px;"></i> Create a new class
-                                </a>
+                        <ul class="icons-list" style="margin-top: 11px;">
+                            <li>
+                                <i class="glyphicon glyphicon-floppy-save" id="save-button" style="cursor: pointer;"></i>
                             </li>
                         </ul>
                     </div>
-                    <div class="panel panel-white">
-                        <div class="panel-heading">
-                            <h6 class="panel-title" style="word-wrap: break-word; width: 90%;">
-                                Selected item
-                                <span class="text-muted">
-                                    <small class="selected-name">Loading...</small>
-                                </span>
-                            </h6>
-                            <div class="heading-elements">
-                                <ul class="icons-list">
-                                    <li><a title="" data-popup="tooltip" data-action="move" href="javascript:void(0);" data-original-title="Move" class="ui-sortable-handle"></a></li>
-                                    <li><a title="" data-popup="tooltip" data-action="collapse" data-original-title="Collapse" class=""></a></li>
-                                </ul>
-                                <form class="heading-form" action="javascript:void(0);" hidden>
-                                    <div class="form-group">
-                                        <label class="checkbox-inline checkbox-switchery checkbox-right switchery-xs">
-                                            <input type="checkbox" class="switchery" checked="checked">
-                                            Enable editable:
-                                        </label>
-                                    </div>
-                                </form>
-                            </div>
-                            <a class="heading-elements-toggle"><i class="icon-menu"></i></a>
-                        </div>
-                        
-                        <div class="panel-body" style="display: none;">
-                            <div class="col-lg-3 col-sm-6">
-                                <div class="thumbnail" style="margin-top: 5px;">
-                                    <div class="thumb">
-                                        <img id="selected-image" src="assets/images/objects/desk.png" alt="" class="no-antialias">
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-lg-9 col-sm-6">
-                                <h5 class="no-margin">
-                                    <name class="selected-name">Student Desk</name>
-                                    <small>Settings</small>
-                                </h4>
-                                <table class="table table-bordered table-striped">
-                                    <tbody>
-                                        <tr>
-                                            <td>Location</td>
-                                            <td id="selected-position">
-                                                <strong>X:</strong> 1, <strong>Y:</strong> 6<br />
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>Student(s)</td>
-                                            <td id="selected-students">
-                                                No student is assigned to this desk.
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>Action</td>
-                                            <td>
-                                                <button id="selected-delete" class="btn btn-danger btn-sm" type="button" style="padding: 3px 6px;">
-                                                    Delete
-                                                    <i class="icon-diff-removed position-right"></i>
-                                                </button>
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                        <div class="panel-body" style="display: none;" id="selected-no-items">
-                            There is no items on the canvas. Start by clicking on an item in the items panel below.
-                        </div>
-                    </div>
-                    <!-- /editable inputs -->
-                    <div class="panel panel-white">
-                        <div class="panel-heading">
-                            <h6 class="panel-title">Items</h6>
-                            <div class="heading-elements">
-                                <form action="javascript:void(0);" class="heading-form" style="margin-left: 0px; margin-right: -12px;">
-                                    <div class="form-group has-feedback">
-                                        <input type="search" placeholder="Search..." class="form-control" style="width: 180px;">
-                                        <div class="form-control-feedback">
-                                            <i class="icon-search4 text-size-base text-muted"></i>
-                                        </div>
-                                    </div>
-                                </form>
-                                <ul class="icons-list">
-                                    <li><a title="" data-popup="tooltip" data-action="move" href="javascript:void(0);" data-original-title="Move" class="ui-sortable-handle"></a></li>
-                                    <li><a title="" data-popup="tooltip" data-action="collapse" data-original-title="Collapse" class=""></a></li>
-                                </ul>
-                            </div>
-                        <a class="heading-elements-toggle"><i class="icon-menu"></i></a></div>
-                        
-                        <div class="panel-body">
-                            @if(isset($items))
-                                @foreach($items as $item)
-                                    <div class="col-lg-4 col-sm-6">
-                                        <div class="thumbnail">
-                                            <div class="thumb">
-                                                <img class="no-antialias" src="assets/images/objects/{{ $item->location }}">
-                                                <div class="caption-overflow">
-                                                    <span>
-                                                        <a class="btn border-white text-white btn-flat btn-icon btn-rounded create-canvas-item" href="javascript:void(0);" item-id={{ $item->id }}><i class="icon-plus3"></i></a>
-                                                    </span>
-                                                </div>
-                                            </div>
-
-                                            <div class="caption" style="padding-top: 5px; padding-bottom: 5px; padding-left: 5px;">
-                                                <h6 class="no-margin"><a href="javascript:void(0);" class="text-default" style="font-size: 10px;">{{ $item->name }}</a></h6>
-                                            </div>
-                                        </div>
-                                    </div>
-                                @endforeach
-                            @endif
-                        </div>
-                    </div>
-
-                    <div class="panel panel-flat">
-                        <div class="panel-heading">
-                            <h6 class="panel-title">Students</h6>
-                            <div class="heading-elements">
-                                <form action="javascript:void(0);" class="heading-form" style="margin-left: 0px; margin-right: -12px;">
-                                    <div class="form-group has-feedback">
-                                        <input type="search" placeholder="Search..." class="form-control" style="width: 180px;">
-                                        <div class="form-control-feedback">
-                                            <i class="icon-search4 text-size-base text-muted"></i>
-                                        </div>
-                                    </div>
-                                </form>
-                                <ul class="icons-list">
-                                    <li><a title="" data-popup="tooltip" data-action="move" href="javascript:void(0);" data-original-title="Move" class="ui-sortable-handle"></a></li>
-                                    <li><a title="" data-popup="tooltip" data-action="collapse" data-original-title="Collapse" class=""></a></li>
-                                </ul>
-                            </div>
-                            <a class="heading-elements-toggle">
-                                <i class="icon-menu"></i>
-                            </a>
-                        </div>
-
-                        <div class="table-responsive" style="max-height: 275px;">
-                            <table class="table text-nowrap">
-                                <thead>
-                                    <tr>
-                                        <th>Name</th>
-                                        <th>Gender</th>
-                                        <th>Selected</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="class-students"></tbody>
-                            </table>
-                        </div>
-
-                        <div class="panel-footer">
-                            <div class="heading-elements">
-                                <div class="heading-btn pull-left">
-                                    <button class="btn btn-danger" type="button" id="generate-seating-positions">Loading...</button>
-                                </div>
-                                <div class="heading-btn pull-right">
-                                    <button class="btn btn-default" type="button" id="select-all">Deselect All</button>
-                                </div>
-                            </div>
-                            <a class="heading-elements-toggle">
-                                <i class="icon-more"></i>
-                            </a>
-                        </div>
-                    </div>
+                    <a class="heading-elements-toggle">
+                        <i class="icon-menu"></i>
+                    </a>
+                </div>
+                <div class="panel-body main-panel-body" style="height: 736px; overflow-x: auto; overflow-y: hidden;">
+                    <div class="drop-target" id="canvas"></div>
                 </div>
             </div>
-            <!-- /dashboard content -->
-
-            <!-- Footer -->
-            <div class="footer text-muted">
-                &copy; 2017 SeatingPlanner by Toby Mellor
-            </div>
-            <!-- /footer -->
         </div>
-        <!-- /content area -->
+        <div class="col-md-4">
+            <div class="tabbable">
+                <ul class="nav nav-pills nav-pills-bordered nav-stacked">
+                    @if (isset($classes))
+                        @foreach ($classes as $key => $class)
+                            <li>
+                                <a href="javascript:void(0);" class="class-button" class-id="{{ $class->id }}">
+                                    <span class="sidebar-class-name">
+                                        {{ $class->class_name }}
+                                    </span>
+                                    <span class="text-muted">
+                                        <small>{{ $class->class_room or '' }}</small>
+                                    </span>
+                                    
+                                    @if ($class->class_subject !== null)
+                                        <span class="label label-primary pull-right" style="margin-right: 60px;">
+                                            {{ $class->class_subject }}
+                                        </span>
+                                    @endif
+                                </a>
+                                <div class="btn-group">
+                                    <a href="javascript:void(0);" class="btn btn-primary btn-icon dropdown-toggle class-options" data-toggle="dropdown" class-id="{{ $class->id }}">
+                                        <i class="icon-menu7"></i>
+                                        <span class="caret"></span>
+                                    </a>
+                                    <ul class="dropdown-menu dropdown-menu-right">
+                                        <li>
+                                            <a href="{{ url('dashboard/classes/' . $class->id . '/duplicate') }}" data-toggle="modal" data-target="#modal_form_inline">Duplicate Class Layout</a>
+                                        </li>
+                                        <li class="divider"></li>
+                                        <li>
+                                            <a href="javascript:void(0);" class="clear-seatingplan">Clear Seating Plan</a>
+                                        </li>
+                                        <li>
+                                            <a href="javascript:void(0);" class="delete-class">Delete Class</a>
+                                        </li>
+                                    </ul>
+                                </div> 
+                            </li>
+                        @endforeach
+                        <li>
+                            <br />
+                    @else
+                        <li>
+                    @endif
+                        <a href="javascript:void(0);" class="class-button class-button-create">
+                            <i class="icon-plus22" style="padding-bottom: 1px;"></i> Create a new class
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="panel panel-white">
+                <div class="panel-heading">
+                    <h6 class="panel-title" style="word-wrap: break-word; width: 90%;">
+                        Selected item
+                        <span class="text-muted">
+                            <small class="selected-name">Loading...</small>
+                        </span>
+                    </h6>
+                    <div class="heading-elements">
+                        <ul class="icons-list">
+                            <li>
+                                <a title="Move" data-popup="tooltip" data-action="move" href="javascript:void(0);" class="ui-sortable-handle"></a>
+                            </li>
+                            <li>
+                                <a title="Collapse" data-popup="tooltip" data-action="collapse"></a>
+                            </li>
+                        </ul>
+                        <form class="heading-form" action="javascript:void(0);" hidden>
+                            <div class="form-group">
+                                <label class="checkbox-inline checkbox-switchery checkbox-right switchery-xs">
+                                    <input type="checkbox" class="switchery" checked="checked">
+                                    Enable editable:
+                                </label>
+                            </div>
+                        </form>
+                    </div>
+                    <a class="heading-elements-toggle">
+                        <i class="icon-menu"></i>
+                    </a>
+                </div>
+                
+                <div class="panel-body" style="display: none;">
+                    <div class="col-lg-3 col-sm-6">
+                        <div class="thumbnail" style="margin-top: 5px;">
+                            <div class="thumb">
+                                <img id="selected-image" src="{{ asset('assets/images/objects/desk.png') }}" class="no-antialias">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-9 col-sm-6">
+                        <h5 class="no-margin">
+                            <name class="selected-name">Student Desk</name>
+                            <small>Settings</small>
+                        </h4>
+                        <table class="table table-bordered table-striped">
+                            <tbody>
+                                <tr>
+                                    <td>Location</td>
+                                    <td id="selected-position">
+                                        <strong>X:</strong> 1, <strong>Y:</strong> 6<br />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Student(s)</td>
+                                    <td id="selected-students">
+                                        No student is assigned to this desk.
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Action</td>
+                                    <td>
+                                        <button id="selected-delete" class="btn btn-danger btn-sm" type="button" style="padding: 3px 6px;">
+                                            Delete
+                                            <i class="icon-diff-removed position-right"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="panel-body" style="display: none;" id="selected-no-items">
+                    There is no items on the canvas. Start by clicking on an item in the items panel below.
+                </div>
+            </div>
+
+            <div class="panel panel-white">
+                <div class="panel-heading">
+                    <h6 class="panel-title">Items</h6>
+                    <div class="heading-elements">
+                        <form action="javascript:void(0);" class="heading-form" style="margin-left: 0px; margin-right: -12px;">
+                            <div class="form-group has-feedback">
+                                <input type="search" placeholder="Search..." class="form-control" style="width: 180px;">
+                                <div class="form-control-feedback">
+                                    <i class="icon-search4 text-size-base text-muted"></i>
+                                </div>
+                            </div>
+                        </form>
+                        <ul class="icons-list">
+                            <li>
+                                <a title="Move" data-popup="tooltip" data-action="move" href="javascript:void(0);" class="ui-sortable-handle"></a>
+                            </li>
+                            <li>
+                                <a title="Collapse" data-popup="tooltip" data-action="collapse"></a>
+                            </li>
+                        </ul>
+                    </div>
+                    <a class="heading-elements-toggle">
+                        <i class="icon-menu"></i>
+                    </a>
+                </div>
+                
+                <div class="panel-body">
+                    @if(isset($items))
+                        @foreach($items as $item)
+                            <div class="col-lg-4 col-sm-6">
+                                <div class="thumbnail">
+                                    <div class="thumb">
+                                        <img class="no-antialias" src="assets/images/objects/{{ $item->location }}">
+                                        <div class="caption-overflow">
+                                            <span>
+                                                <a class="btn border-white text-white btn-flat btn-icon btn-rounded create-canvas-item" href="javascript:void(0);" item-id={{ $item->id }}><i class="icon-plus3"></i></a>
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <div class="caption" style="padding-top: 5px; padding-bottom: 5px; padding-left: 5px;">
+                                        <h6 class="no-margin"><a href="javascript:void(0);" class="text-default" style="font-size: 10px;">{{ $item->name }}</a></h6>
+                                    </div>
+                                </div>
+                            </div>
+                        @endforeach
+                    @endif
+                </div>
+            </div>
+
+            <div class="panel panel-flat">
+                <div class="panel-heading">
+                    <h6 class="panel-title">Students</h6>
+                    <div class="heading-elements">
+                        <form action="javascript:void(0);" class="heading-form" style="margin-left: 0px; margin-right: -12px;">
+                            <div class="form-group has-feedback">
+                                <input type="search" placeholder="Search..." class="form-control" style="width: 180px;">
+                                <div class="form-control-feedback">
+                                    <i class="icon-search4 text-size-base text-muted"></i>
+                                </div>
+                            </div>
+                        </form>
+                        <ul class="icons-list">
+                            <li>
+                                <a title="Move" data-popup="tooltip" data-action="move" href="javascript:void(0);" class="ui-sortable-handle"></a>
+                            </li>
+                            <li>
+                                <a title="Collapse" data-popup="tooltip" data-action="collapse"></a>
+                            </li>
+                        </ul>
+                    </div>
+                    <a class="heading-elements-toggle">
+                        <i class="icon-menu"></i>
+                    </a>
+                </div>
+
+                <div class="table-responsive" style="max-height: 275px;">
+                    <table class="table text-nowrap">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Gender</th>
+                                <th>Selected</th>
+                            </tr>
+                        </thead>
+                        <tbody id="class-students"></tbody>
+                    </table>
+                </div>
+
+                <div class="panel-footer">
+                    <div class="heading-elements">
+                        <div class="heading-btn pull-left">
+                            <button class="btn btn-danger" type="button" id="generate-seating-positions">Loading...</button>
+                        </div>
+                        <div class="heading-btn pull-right">
+                            <button class="btn btn-default" type="button" id="select-all">Deselect All</button>
+                        </div>
+                    </div>
+                    <a class="heading-elements-toggle">
+                        <i class="icon-more"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
     </div>
-    <!-- /main content -->
-    <div id="modal_assign_seating_positions" class="modal fade in">
+@stop
+
+@section('modals')
+    <div id="modal-assign-seating-positions" class="modal fade in">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header bg-primary text-center">
@@ -305,7 +304,9 @@
                     
                     <div id="algorithm-boy-girl-settings" style="display: none;">
                         <div class="row text-center">
-                            <p class="text-muted" style="margin-bottom: 5px; margin-top: 10px;">Choose which seats you want the algorithm to apply to</p>
+                            <p class="text-muted" style="margin-bottom: 5px; margin-top: 10px;">
+                                Choose which seats you want the algorithm to apply to.
+                            </p>
 
                             <div class="btn-group" data-toggle="buttons">
                                 <label class="btn btn-primary active">
@@ -321,7 +322,9 @@
                         <br />
 
                         <div class="alert alert-warning alert-styled-left" id="boy-girl-warning" style="display: none;">
-                            <button type="button" class="close" data-dismiss="alert"><span>×</span><span class="sr-only">Close</span></button>
+                            <button type="button" class="close" data-dismiss="alert">
+                                <span>×</span><span class="sr-only">Close</span>
+                            </button>
                             <span class="text-semibold">Warning!</span> <p id="boy-girl-warning-text">Loading...</p>
                         </div>
 
@@ -368,12 +371,15 @@
 
                 <div class="modal-footer">
                     <button data-dismiss="modal" class="btn btn-link" type="button">Close</button>
-                    <button class="btn btn-primary" type="submit" disabled id="auto-assign-seating-positions">Auto-Assign Seating Positions</button>
+                    <button class="btn btn-primary" type="submit" disabled id="auto-assign-seating-positions">
+                        Auto-Assign Seating Positions
+                    </button>
                 </div>
             </div>
         </div>
     </div>
 @stop
+
 @section('scripts')
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/raphael/2.2.7/raphael.min.js"></script>
     <script>
@@ -414,13 +420,11 @@
                 notificationController.handleNotification('The seating plan was saved successfully!', 'success');
             });
 
-            $('.class-button').click(function() {
-                if (!$(this).hasClass('class-button-active')) {
-                    if (hasUserMadeChanges) {
-                        canvasController.confirmPageLeave($(this));
-                    } else {
-                        canvasController.view.changeClass($(this));
-                    }
+            $('.class-button').not('.class-button-create').click(function() {
+                if (hasUserMadeChanges) {
+                    canvasController.confirmPageLeave($(this));
+                } else {
+                    canvasController.view.changeClass($(this));
                 }
             });
 
@@ -448,8 +452,6 @@
             });
 
             $(document).on('click', 'a', function(event) {
-                console.log($(this));
-                console.log($(this).attr('href'));
                 if ($(this).attr('href') !== 'javascript:void(0);') {
                     if (hasUserMadeChanges) {
                         event.preventDefault();
@@ -488,7 +490,7 @@
             $(document).on('click', '#generate-seating-positions', function() {
                 $('#algorithm-boy-girl-settings').hide();
                 $('select[name="assignment-algorithm"]').val('').trigger('change');
-                $('#modal_assign_seating_positions').modal('show');
+                $('#modal-assign-seating-positions').modal('show');
                 $('#auto-assign-seating-positions').prop('disabled', true);
             });
 
@@ -519,7 +521,7 @@
             });
 
             $(document).on('click', '#auto-assign-seating-positions', function() {
-                $('#modal_assign_seating_positions').modal('hide');
+                $('#modal-assign-seating-positions').modal('hide');
 
                 if ($('select[name="assignment-algorithm"]').val() === 'boy-girl') {
                     studentController.assignmentAlgorithmBoyGirl();
@@ -534,11 +536,11 @@
             $('.drop-target').css('width', squareWidth * 23);
             $('.drop-target').css('height', squareWidth * 23);
             $('.drop-target').css('background-size', squareWidth);
-            $('#paper').css('margin-top', ($('.main-canvas').width() - (squareWidth * 23)) / 2);
-            $('#paper').css('margin-left', ($('.main-canvas').width() - (squareWidth * 23)) / 2);
+            $('#canvas').css('margin-top', ($('.main-canvas').width() - (squareWidth * 23)) / 2);
+            $('#canvas').css('margin-left', ($('.main-canvas').width() - (squareWidth * 23)) / 2);
             $('.main-panel-body').css('height', $('.main-canvas').width());
-            $('svg').attr('width', $('#paper').width());
-            $('svg').attr('height', $('#paper').width());
+            $('svg').attr('width', $('#canvas').width());
+            $('svg').attr('height', $('#canvas').width());
 
             bootstrapper(); // Start initializing
         });
@@ -592,7 +594,7 @@
                     '<tr>' +
                         '<td>' +
                             '<div class="media-middle">' +
-                                '<img alt="" class="img-circle" src="">' +
+                                '<img class="img-circle" src="">' +
                             '</div>' +
                             '<div class="media-left media-middle">' +
                                 '<a class="btn bg-teal-400 btn-rounded btn-icon btn-xs" href="javascript:void(0);">' +
@@ -750,7 +752,7 @@
                 $('#classes-href').attr('href', '{{ url('dashboard/classes') }}/' + classId);
                 $('.class-button-create').attr('href', '{{ url('dashboard/classes') }}/' + classId + '/create');
 
-                $('#class-name').text($('.class-button-active[class-id=' + classId + ']').text());
+                $('#class-name').text($('.class-button-active').find('.sidebar-class-name').text());
             }
 
             changeClass(buttonElement) {

@@ -93,16 +93,16 @@ var rect;
     
     // Global variables
     var dropTarget = document.getElementsByClassName('drop-target')[0];
-    var paper = new Raphael('paper');
+    var canvas = new Raphael('canvas');
     var startX = 0, startY = 0, endX = 0, endY = 0;
     var offset = findPos(dropTarget);
-    rect = paper.rect(0, 0, 0, 0);
+    rect = canvas.rect(0, 0, 0, 0);
     
     dropTarget.onmousedown = function(event) {
         var mouseCoords = getCoords(event);
         startX = mouseCoords.x - offset[0];
         startY = mouseCoords.y - offset[1];
-        rect = paper.rect(startX, startY, 0, 0);
+        rect = canvas.rect(startX, startY, 0, 0);
         document.onmousemove = doDraw;
     };
     
