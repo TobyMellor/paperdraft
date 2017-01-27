@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\SchoolClass;
 use App\CanvasItem;
+use App\ClassStudent;
 
 use Auth;
 use Validator;
@@ -92,7 +93,7 @@ class ClassController extends Controller
                     'class_room'    => $classRoom
                 ])->id;
             }
-            
+
             return redirect('/dashboard/classes/' . $classId)
                 ->with('successMessage', trans('api.class.success.store'));
         }
@@ -150,26 +151,6 @@ class ClassController extends Controller
     }
 
     /**
-     * Deletes the class, along with all connected relationships
-     *
-     * @return null
-     */
-    public function deleteClass(
-        ObjectController $objectController,
-        StudentController $studentController
-    )
-    {
-        $request = $this->request;
-        $classId = $request->input('class_id');
-
-        $objectController->deleteClassObjects();
-        $studentController->deleteClassStudents();
-
-        SchoolClass::where('id', $classId)
-            ->delete(); 
-    }
-
-    /**
      * Remove the specified resource from storage.
      *
      * @param  \Illuminate\Http\Request  $request
@@ -185,7 +166,15 @@ class ClassController extends Controller
         $validation = $this->validateClassId($data);
 
         if (!$validation->fails()) {
-            SchoolClass::where('id', $id)->delete();
+            ClassStudent::where('class_id', $id)
+                ->delete();
+
+            CanvasItem::withTrashed()
+                ->where('class_id', $id)
+                ->delete();
+
+            SchoolClass::where('id', $id)
+                ->delete();
 
             return response()->json([
                 'error'   => 0,
