@@ -43,6 +43,12 @@
 
         <script type="text/javascript" src="{{ asset('assets/js/plugins/forms/selects/select2.min.js') }}"></script>
         <script type="text/javascript" src="{{ asset('assets/js/plugins/forms/styling/uniform.min.js') }}"></script>
+
+        <style>
+            .class-button-active > .text-muted {
+                color: #ddd;
+            }
+        </style>
     </head>
 
     <body>

@@ -70,17 +70,31 @@
                             @if (isset($classes))
                                 @foreach ($classes as $key => $class)
                                     <li>
-                                        <a href="javascript:void(0);" class="class-button" class-id="{{ $class->id }}">{{ $class->class_name }}</a>
+                                        <a href="javascript:void(0);" class="class-button" class-id="{{ $class->id }}">
+                                            {{ $class->class_name }} <span class="text-muted"><small>{{ $class->class_room or '' }}</small></span>
+                                            
+                                            @if ($class->class_subject !== null)
+                                                <span class="label label-primary pull-right" style="margin-right: 60px;">
+                                                    {{ $class->class_subject }}
+                                                </span>
+                                            @endif
+                                        </a>
                                         <div class="btn-group">
                                             <a href="javascript:void(0);" class="btn btn-primary btn-icon dropdown-toggle class-options" data-toggle="dropdown" class-id="{{ $class->id }}">
                                                 <i class="icon-menu7"></i>
                                                 <span class="caret"></span>
                                             </a>
                                             <ul class="dropdown-menu dropdown-menu-right">
-                                                <li><a href="{{ url('dashboard/classes/' . $class->id . '/duplicate') }}" data-toggle="modal" data-target="#modal_form_inline">Duplicate class template</a></li>
+                                                <li>
+                                                    <a href="{{ url('dashboard/classes/' . $class->id . '/duplicate') }}" data-toggle="modal" data-target="#modal_form_inline">Duplicate Class Layout</a>
+                                                </li>
                                                 <li class="divider"></li>
-                                                <li><a href="javascript:void(0);" class="clear-seatingplan" data-toggle="modal" data-target="#modal_delete_seatingplan">Clear seating plan</a></li>
-                                                <li><a href="javascript:void(0);" class="delete-class">Delete class</a></li>
+                                                <li>
+                                                    <a href="javascript:void(0);" class="clear-seatingplan">Clear Seating Plan</a>
+                                                </li>
+                                                <li>
+                                                    <a href="javascript:void(0);" class="delete-class">Delete Class</a>
+                                                </li>
                                             </ul>
                                         </div> 
                                     </li>
@@ -90,7 +104,9 @@
                             @else
                                 <li>
                             @endif
-                                <a href="javascript:void(0);" class="class-button-create">Create a new class</a>
+                                <a href="javascript:void(0);" class="class-button class-button-create" data-toggle="modal" data-target="#modal_create_class">
+                                    <i class="icon-plus22" style="padding-bottom: 1px;"></i> Create a new class
+                                </a>
                             </li>
                         </ul>
                     </div>

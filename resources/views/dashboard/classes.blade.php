@@ -35,7 +35,7 @@
         </div>
         <!-- /page header -->
         <!-- Content area -->
-        <div class="content">
+        <div class="content" style="padding-top: 20px;">
             <div class="row row-sortable">
                 <div class="col-md-8">
                     <div class="panel panel-flat">
@@ -108,7 +108,7 @@
                         <form action="javascript:void(0);" method="POST" id="create-student">
                             <input name="_token" value="{{ csrf_token() }}" hidden>
                             <input name="class_id" value="{{ $classId }}" hidden>
-                            <div class="content">
+                            <div class="content" style="padding-bottom: 20px;">
                                 <div class="row">
                                     <div class="col-md-12">
                                         <fieldset class="text-semibold">
@@ -263,17 +263,31 @@
                             @if (isset($classes))
                                 @foreach ($classes as $key => $class)
                                     <li>
-                                        <a href="/dashboard/classes/{{ $class->id }}" class="class-button @if ($selectedClass->id == $class->id) class-button-active @endif" class-id="{{ $class->id }}">{{ $class->class_name }}</a>
+                                        <a href="/dashboard/classes/{{ $class->id }}" class="class-button @if ($selectedClass->id == $class->id) class-button-active @endif" class-id="{{ $class->id }}">
+                                            {{ $class->class_name }} <span class="text-muted"><small>{{ $class->class_room or '' }}</small></span>
+                                            
+                                            @if ($class->class_subject !== null)
+                                                <span class="label label-primary pull-right" style="margin-right: 60px;">
+                                                    {{ $class->class_subject }}
+                                                </span>
+                                            @endif
+                                        </a>
                                         <div class="btn-group">
                                             <a href="javascript:void(0);" class="btn btn-primary btn-icon dropdown-toggle @if ($selectedClass->id == $class->id) class-options-active @else class-options @endif" data-toggle="dropdown" class-id="{{ $class->id }}">
                                                 <i class="icon-menu7"></i>
                                                 <span class="caret"></span>
                                             </a>
                                             <ul class="dropdown-menu dropdown-menu-right">
-                                                <li><a href="javascript:void(0);" class="duplicate-class" data-toggle="modal" data-target="#modal_create_class">Duplicate class template</a></li>
+                                                <li>
+                                                    <a href="{{ url('dashboard/classes/' . $class->id . '/duplicate') }}">Duplicate Class Layout</a>
+                                                </li>
                                                 <li class="divider"></li>
-                                                <li><a href="javascript:void(0);" class="delete-seatingplan" data-toggle="modal" data-target="#modal_delete_seatingplan">Clear seating plan</a></li>
-                                                <li><a href="javascript:void(0);" class="delete-class">Delete class</a></li>
+                                                <li>
+                                                    <a href="javascript:void(0);" class="clear-seatingplan">Clear Seating Plan</a>
+                                                </li>
+                                                <li>
+                                                    <a href="javascript:void(0);" class="delete-class">Delete Class</a>
+                                                </li>
                                             </ul>
                                         </div> 
                                     </li>
@@ -283,7 +297,9 @@
                             @else
                                 <li>
                             @endif
-                                <a href="javascript:void(0);" class="class-button class-button-create" data-toggle="modal" data-target="#modal_create_class">Create a new class</a>
+                                <a href="javascript:void(0);" class="class-button class-button-create" data-toggle="modal" data-target="#modal_create_class">
+                                    <i class="icon-plus22" style="padding-bottom: 1px;"></i> Create a new class
+                                </a>
                             </li>
                         </ul>
                     </div>

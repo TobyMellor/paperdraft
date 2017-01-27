@@ -92,7 +92,7 @@ class ClassController extends Controller
                     'class_room'    => $classRoom
                 ])->id;
             }
-
+            
             return redirect('/dashboard/classes/' . $classId)
                 ->with('successMessage', trans('api.class.success.store'));
         }
@@ -214,11 +214,13 @@ class ClassController extends Controller
      */
     public function duplicateClass($classId, $className = null, $classSubject = null, $classRoom = null)
     {
-        $classIdToPaste = SchoolClass::create([
+        $classToDuplicate = SchoolClass::where('id', $classId)->first();
+
+        $newClassId = SchoolClass::create([
             'user_id'       => Auth::id(),
-            'class_name'    => $className === null ? substr(SchoolClass::where('id', $classId)->first()->class_name, 0, 23) . ' (copy)' : $className,
+            'class_name'    => $className === null ? substr($classToDuplicate->class_name, 0, 23) . ' (copy)' : $className,
             'class_subject' => $classSubject,
-            'class_room'    => $classRoom
+            'class_room'    => $classRoom === null ? $classToDuplicate->class_room : $classRoom
         ])->id;
 
         $canvasItemsToCopy = CanvasItem::where('class_id', $classId)->get();
@@ -228,7 +230,7 @@ class ClassController extends Controller
         foreach ($canvasItemsToCopy as $canvasItemToCopy) {
             array_push($canvasItemsToPaste, [
                 'item_id'    => $canvasItemToCopy->item_id,
-                'class_id'   => $classIdToPaste,
+                'class_id'   => $newClassId,
                 'position_x' => $canvasItemToCopy->position_x,
                 'position_y' => $canvasItemToCopy->position_y,
             ]);
@@ -236,16 +238,16 @@ class ClassController extends Controller
 
         CanvasItem::insert($canvasItemsToPaste);
 
-        return $classIdToPaste;
+        return $newClassId;
     }
 
     protected function validator(array $data)
     {
         return Validator::make($data, [
             'class_name'        => 'required|between:1,30',
-            'class_subject'     => 'string|between:1,30',
-            'class_room'        => 'string|between:1,30',
-            'class_template_id' => 'integer|exists:classes,id,user_id,' . Auth::id(),
+            'class_subject'     => 'nullable|string|between:1,30',
+            'class_room'        => 'nullable|string|between:1,30',
+            'class_template_id' => 'nullable|integer|exists:classes,id,user_id,' . Auth::id(),
         ]);
     }
 
@@ -253,8 +255,8 @@ class ClassController extends Controller
     {
         return Validator::make($data, [
             'class_name'    => 'required|between:1,30',
-            'class_subject' => 'string|between:1,30',
-            'class_room'    => 'string|between:1,30'
+            'class_subject' => 'nullable|string|between:1,30',
+            'class_room'    => 'nullable|string|between:1,30'
         ]);
     }
 
