@@ -176,22 +176,7 @@ class StudentController extends Controller
      */
     public function destroy(Request $request, $id)
     {
-        $studentId = $request->input('student_id');
-        $classId = $request->input('class_id');
-
-        ClassStudent::where('class_id', $classId)
-            ->where('student_id', $id)
-            ->delete();
-
-        if (ClassStudent::where('student_id', $id)->count() == 0 && Student::where('id', $id)->first()->user_id == Auth::user()->id) {
-            Student::where('id', $id)
-                ->delete();
-        }
-
-        return response()->json([
-            'error'   => 0,
-            'message' => trans('api.student.success.destroy')
-        ]);
+        //
     }
 
     public function guessGender(Request $request)

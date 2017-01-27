@@ -771,7 +771,7 @@
 
         function deleteClassStudent(studentId) {
             $.APIAjax({
-                url: '{{ url('api/student') }}/' + studentId,
+                url: '{{ url('api/class-student') }}/' + studentId,
                 type: 'DELETE',
                 data: {
                     class_id: classId
