@@ -27,8 +27,8 @@
 }
 
 .class-button-create {
-    background-color: #4caf50 !important;
-    border: 1px solid #4caf50 !important;
+    background-color: #66BB6A !important;
+    border: 1px solid #66BB6A !important;
     border-radius: 3px !important;
     color: #fff !important;
 }
@@ -76,4 +76,144 @@
 .outline-highlight {
     -webkit-filter: drop-shadow(1px 1px 0 #26a69a) drop-shadow(-1px -1px 0 #26a69a);
     filter:drop-shadow(1px 1px 0 #26a69a) drop-shadow(-1px -1px 0 #26a69a);
+}
+
+.icons-list {
+    margin-top: 11px;
+}
+
+#save-button {
+    cursor: pointer;
+    color: white;
+}
+
+.main-panel-body {
+    height: 736px;
+    overflow-x: auto;
+    overflow-y: auto;
+}
+
+.icon-plus22 {
+    padding-bottom: 1px;
+}
+
+.selected-panel-header {
+    word-wrap: break-word;
+    width: 90%;
+}
+
+.selected-panel-body {
+    display: none;
+}
+
+.thumbnail {
+    margin-top: 5px;
+}
+
+.icon-cog3 {
+    margin-top: -15px;
+}
+
+#selected-delete {
+    padding: 3px 6px;
+}
+
+#selected-no-items {
+    display: none;
+}
+
+.item-thumb-frame {
+    height: 100px;
+    margin-bottom: 5px;
+}
+
+.item-thumb {
+    position: relative;
+    height: 80px;
+}
+
+.item-thumb > img {
+    position: absolute;
+    margin: auto;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+}
+
+.item-description {
+    position: absolute;
+    bottom: 5px;
+    padding-left: 0px;
+}
+
+.item-description > .text-default {
+    font-size: 10px;
+}
+
+.item-panel-body {
+    padding-left: 5px;
+    padding-right: 5px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+
+.student-table {
+    max-height: 275px;
+}
+
+#algorithm-boy-girl-settings {
+    display: none;
+}
+
+.text-center > .text-muted {
+    margin-bottom: 5px;
+    margin-top: 10px;
+}
+
+#boy-girl-warning {
+    display: none;
+}
+
+.second-student {
+    margin-top: 10px;
+}
+
+.drag-item {
+    display: none;
+}
+
+.tooltip-blue {
+    background-color: #2196f3;
+    border-color: #2196f3;
+}
+
+.tooltip-blue {
+    background-color: #d2527f;
+    border-color: #d2527f;
+}
+
+.custom-tooltip-inner {
+    padding: 3px 8px;
+}
+
+.confirming-spinner {
+    margin-left: 5px;
+}
+
+.sidebar-label {
+    margin-right: 60px;
+}
+
+.class-button-active > .text-muted {
+    color: #ddd;
+}
+
+#class-name {
+    color: #ddd;
+}
+
+.class-create-list-item {
+    margin-top: 10px !important;
+    margin-bottom: 20px;
 }

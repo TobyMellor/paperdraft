@@ -1,10 +1,10 @@
 @extends('template.dashboard')
 
-@section('title', 'Dashboard')
+@section('title', 'Seating Plans')
 @section('main')
     <div class="row row-sortable">
         <div class="col-md-8">
-            <div class="panel panel-white main-canvas">
+            <div class="panel panel-primary panel-bordered main-canvas">
                 <div class="panel-heading">
                     <h6 class="panel-title">
                         <span class="text-semibold">
@@ -15,26 +15,11 @@
                         </span>
                     </h6>
                     <div class="heading-elements">
-                        <ul class="pagination pagination-flat pagination-sm">
+                        <ul class="icons-list">
                             <li>
-                                <a href="javascript:void(0);">←</a>
-                            </li>
-                            <li class="active">
-                                <a href="javascript:void(0);">1</a>
-                            </li>
-                            <li>
-                                <a href="javascript:void(0);">2</a>
-                            </li>
-                            <li>
-                                <a href="javascript:void(0);">3</a>
-                            </li>
-                            <li>
-                                <a href="javascript:void(0);">→</a>
-                            </li>
-                        </ul>
-                        <ul class="icons-list" style="margin-top: 11px;">
-                            <li>
-                                <i class="glyphicon glyphicon-floppy-save" id="save-button" style="cursor: pointer;"></i>
+                                <p id="save-button">
+                                    <i class="glyphicon glyphicon-floppy-save"></i> <u>Save Seating Plan</u>
+                                </p>
                             </li>
                         </ul>
                     </div>
@@ -42,7 +27,7 @@
                         <i class="icon-menu"></i>
                     </a>
                 </div>
-                <div class="panel-body main-panel-body" style="height: 736px; overflow-x: auto; overflow-y: hidden;">
+                <div class="panel-body main-panel-body">
                     <div class="drop-target" id="canvas"></div>
                 </div>
             </div>
@@ -62,7 +47,7 @@
                                     </span>
                                     
                                     @if ($class->class_subject !== null)
-                                        <span class="label label-primary pull-right" style="margin-right: 60px;">
+                                        <span class="label label-primary pull-right sidebar-label">
                                             {{ $class->class_subject }}
                                         </span>
                                     @endif
@@ -87,21 +72,20 @@
                                 </div> 
                             </li>
                         @endforeach
-                        <li>
-                            <br />
+                        <li class="class-create-list-item">
                     @else
                         <li>
                     @endif
                         <a href="javascript:void(0);" class="class-button class-button-create">
-                            <i class="icon-plus22" style="padding-bottom: 1px;"></i> Create a new class
+                            <i class="icon-plus22"></i> Create a new class
                         </a>
                     </li>
                 </ul>
             </div>
 
-            <div class="panel panel-white">
+            <div class="panel panel-primary panel-bordered">
                 <div class="panel-heading">
-                    <h6 class="panel-title" style="word-wrap: break-word; width: 90%;">
+                    <h6 class="panel-title selected-panel-header">
                         Selected item
                         <span class="text-muted">
                             <small class="selected-name">Loading...</small>
@@ -130,9 +114,9 @@
                     </a>
                 </div>
                 
-                <div class="panel-body" style="display: none;">
+                <div class="panel-body selected-panel-body">
                     <div class="col-lg-3 col-sm-6">
-                        <div class="thumbnail" style="margin-top: 5px;">
+                        <div class="thumbnail">
                             <div class="thumb">
                                 <img id="selected-image" src="{{ asset('assets/images/objects/desk.png') }}" class="no-antialias">
                             </div>
@@ -160,7 +144,7 @@
                                 <tr>
                                     <td>Action</td>
                                     <td>
-                                        <button id="selected-delete" class="btn btn-danger btn-sm" type="button" style="padding: 3px 6px;">
+                                        <button id="selected-delete" class="btn btn-danger btn-sm" type="button">
                                             Delete
                                             <i class="icon-diff-removed position-right"></i>
                                         </button>
@@ -171,23 +155,15 @@
                     </div>
                 </div>
 
-                <div class="panel-body" style="display: none;" id="selected-no-items">
+                <div class="panel-body" id="selected-no-items">
                     There is no items on the canvas. Start by clicking on an item in the items panel below.
                 </div>
             </div>
 
-            <div class="panel panel-white">
+            <div class="panel panel-primary panel-bordered">
                 <div class="panel-heading">
                     <h6 class="panel-title">Items</h6>
                     <div class="heading-elements">
-                        <form action="javascript:void(0);" class="heading-form" style="margin-left: 0px; margin-right: -12px;">
-                            <div class="form-group has-feedback">
-                                <input type="search" placeholder="Search..." class="form-control" style="width: 180px;">
-                                <div class="form-control-feedback">
-                                    <i class="icon-search4 text-size-base text-muted"></i>
-                                </div>
-                            </div>
-                        </form>
                         <ul class="icons-list">
                             <li>
                                 <a title="Move" data-popup="tooltip" data-action="move" href="javascript:void(0);" class="ui-sortable-handle"></a>
@@ -202,12 +178,12 @@
                     </a>
                 </div>
                 
-                <div class="panel-body">
+                <div class="panel-body item-panel-body">
                     @if(isset($items))
                         @foreach($items as $item)
-                            <div class="col-lg-4 col-sm-6">
-                                <div class="thumbnail">
-                                    <div class="thumb">
+                            <div class="col-lg-3 col-sm-6">
+                                <div class="thumbnail item-thumb-frame">
+                                    <div class="thumb item-thumb">
                                         <img class="no-antialias" src="assets/images/objects/{{ $item->location }}">
                                         <div class="caption-overflow">
                                             <span>
@@ -216,9 +192,11 @@
                                         </div>
                                     </div>
 
-                                    <div class="caption" style="padding-top: 5px; padding-bottom: 5px; padding-left: 5px;">
-                                        <h6 class="no-margin"><a href="javascript:void(0);" class="text-default" style="font-size: 10px;">{{ $item->name }}</a></h6>
-                                    </div>
+                                    <p class="no-margin item-description">
+                                        <a href="javascript:void(0);" class="text-default">
+                                            <strong>{{ $item->name }}</strong>
+                                        </a>
+                                    </p>
                                 </div>
                             </div>
                         @endforeach
@@ -226,18 +204,10 @@
                 </div>
             </div>
 
-            <div class="panel panel-flat">
+            <div class="panel panel-primary panel-bordered">
                 <div class="panel-heading">
                     <h6 class="panel-title">Students</h6>
                     <div class="heading-elements">
-                        <form action="javascript:void(0);" class="heading-form" style="margin-left: 0px; margin-right: -12px;">
-                            <div class="form-group has-feedback">
-                                <input type="search" placeholder="Search..." class="form-control" style="width: 180px;">
-                                <div class="form-control-feedback">
-                                    <i class="icon-search4 text-size-base text-muted"></i>
-                                </div>
-                            </div>
-                        </form>
                         <ul class="icons-list">
                             <li>
                                 <a title="Move" data-popup="tooltip" data-action="move" href="javascript:void(0);" class="ui-sortable-handle"></a>
@@ -252,7 +222,7 @@
                     </a>
                 </div>
 
-                <div class="table-responsive" style="max-height: 275px;">
+                <div class="table-responsive student-table">
                     <table class="table text-nowrap">
                         <thead>
                             <tr>
@@ -302,9 +272,9 @@
                         </div>
                     </div>
                     
-                    <div id="algorithm-boy-girl-settings" style="display: none;">
+                    <div id="algorithm-boy-girl-settings">
                         <div class="row text-center">
-                            <p class="text-muted" style="margin-bottom: 5px; margin-top: 10px;">
+                            <p class="text-muted">
                                 Choose which seats you want the algorithm to apply to.
                             </p>
 
@@ -321,7 +291,7 @@
 
                         <br />
 
-                        <div class="alert alert-warning alert-styled-left" id="boy-girl-warning" style="display: none;">
+                        <div class="alert alert-warning alert-styled-left" id="boy-girl-warning">
                             <button type="button" class="close" data-dismiss="alert">
                                 <span>×</span><span class="sr-only">Close</span>
                             </button>
@@ -338,7 +308,7 @@
                                     <option value="boy-girl">John Smith</option>
                                 </select>
 
-                                <label class="display-block text-bold" style="margin-top: 10px;">Select 2nd student to separate from 'John Smith'</label>
+                                <label class="display-block text-bold second-student">Select 2nd student to separate from 'John Smith'</label>
                                 <select class="select" name="exemption-2">
                                     <option value="" disabled selected>Select 2nd troublesum student</option>
                                     <option value="boy-girl">John Smith</option>
@@ -575,7 +545,7 @@
                     itemHeight   = item.height; // TODO: Change to multipliers, don't store actual height
 
                 $('.drop-target').append(
-                    '<div class="drag-item" canvas-item-id="' + canvasItemId + '" style="display: none; left: ' + canvasItemPositionX + 'px; top: ' + canvasItemPositionY + 'px; background-image: url(\'{{ asset('assets/images/objects') }}/' + itemLocation + '\'); background-size: ' + squareWidth + 'px; height: ' + squareWidth + 'px; width: ' + squareWidth + 'px;"></div>'
+                    '<div class="drag-item" canvas-item-id="' + canvasItemId + '" style="left: ' + canvasItemPositionX + 'px; top: ' + canvasItemPositionY + 'px; background-image: url(\'{{ asset('assets/images/objects') }}/' + itemLocation + '\'); background-size: ' + squareWidth + 'px; height: ' + squareWidth + 'px; width: ' + squareWidth + 'px;"></div>'
                 );
 
                 $('.drop-target').children().show();
@@ -814,14 +784,14 @@
 
                 if (studentGender === 'male') {
                     canvasItem.tooltip({
-                        template: '<div class="tooltip"><div class="bg-teal" style="background-color: #2196f3; border-color: #2196f3;"><div class="tooltip-arrow"></div><div class="tooltip-inner" style="padding: 3px 8px;"></div></div></div>',
+                        template: '<div class="tooltip"><div class="bg-teal tooltip-blue"><div class="tooltip-arrow"></div><div class="tooltip-inner custom-tooltip-inner"></div></div></div>',
                         trigger: 'manual',
                         animation: false,
                         placement: this.getBestTooltipPlacement(canvasItemId)
                     }).tooltip('show');
                 } else {
                     canvasItem.tooltip({
-                        template: '<div class="tooltip"><div class="bg-teal" style="background-color: #d2527f; border-color: #d2527f;"><div class="tooltip-arrow"></div><div class="tooltip-inner" style="padding: 3px 8px;"></div></div></div>',
+                        template: '<div class="tooltip"><div class="bg-teal tooltip-pink"><div class="tooltip-arrow"></div><div class="tooltip-inner custom-tooltip-inner"></div></div></div>',
                         trigger: 'manual',
                         animation: false,
                         placement: this.getBestTooltipPlacement(canvasItemId)
@@ -1804,7 +1774,7 @@
                     closeOnCancel:      true
                 }, function(isConfirm){
                     if (isConfirm) {
-                        $('.confirm').html('Loading <i class="icon-spinner2 spinner" style="margin-left: 5px;"></i>');
+                        $('.confirm').html('Loading <i class="icon-spinner2 spinner confirming-spinner"></i>');
 
                         canvasController.saveCanvasItems(buttonElement, externalLink);
 

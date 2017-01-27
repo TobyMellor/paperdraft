@@ -37,12 +37,6 @@
 
         <script type="text/javascript" src="{{ asset('assets/js/plugins/forms/selects/select2.min.js') }}"></script>
         <script type="text/javascript" src="{{ asset('assets/js/plugins/forms/styling/uniform.min.js') }}"></script>
-
-        <style>
-            .class-button-active > .text-muted {
-                color: #ddd;
-            }
-        </style>
     </head>
 
     <body>
@@ -65,19 +59,32 @@
 
             <div class="navbar-collapse collapse" id="navbar-mobile">
                 <ul class="nav navbar-nav">
-                    <li><a class="sidebar-control sidebar-main-toggle hidden-xs"><i class="icon-paragraph-justify3"></i></a></li>
+                    <li>
+                        <a class="sidebar-control sidebar-main-toggle hidden-xs">
+                            <i class="icon-paragraph-justify3"></i>
+                        </a>
+                    </li>
                 </ul>
-                <p class="navbar-text"><span class="label bg-success-400">Online</span></p>
                 <ul class="nav navbar-nav navbar-right">
                     <li class="dropdown dropdown-user">
                         <a class="dropdown-toggle" data-toggle="dropdown" href="javascript:void(0);">
-                        <img src="{{ asset('assets/images/placeholder.jpg') }}">
-                        <span class="username">@if (isset(Auth::user()->last_name)){{ Auth::user()->title }}. {{ Auth::user()->last_name }}@else{{ current(explode("@", Auth::user()->email, 2)) }}@endif</span>
-                        <i class="caret"></i>
+                            <img src="{{ asset('assets/images/placeholder.jpg') }}">
+                            <span class="username">
+                                @if (isset(Auth::user()->last_name)){{ Auth::user()->title }}. {{ Auth::user()->last_name }}@else{{ current(explode("@", Auth::user()->email, 2)) }}@endif
+                            </span>
+                            <i class="caret"></i>
                         </a>
                         <ul class="dropdown-menu dropdown-menu-right">
-                            <li><a href="javascript:void(0);"><i class="icon-cog5"></i> Account settings</a></li>
-                            <li><a href="{{ url('logout') }}"><i class="icon-switch2"></i> Logout</a></li>
+                            <li>
+                                <a href="javascript:void(0);">
+                                    <i class="icon-cog5"></i> Account settings
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{{ url('logout') }}">
+                                    <i class="icon-switch2"></i> Logout
+                                </a>
+                            </li>
                         </ul>
                     </li>
                 </ul>
@@ -118,7 +125,7 @@
                                     <li @if (app('url')->current() == url('dashboard')) class="active" @endif>
                                         <a id="planner-href" href="{{ url('dashboard') }}">
                                             <i class="icon-home4"></i>
-                                            <span>Dashboard</span>
+                                            <span>Seating Plans</span>
                                         </a>
                                     </li>
                                     <li @if (strpos(app('url')->current(), url('dashboard/classes')) !== false) class="active" @endif>
@@ -142,41 +149,7 @@
                                         <i class="icon-home2 position-left"></i> Home
                                     </a>
                                 </li>
-                                <li class="active">Dashboard</li>
-                            </ul>
-
-                            <ul class="breadcrumb-elements">
-                                <li class="dropdown">
-                                    <a href="javascript:void(0);" class="dropdown-toggle" data-toggle="dropdown">
-                                        <i class="icon-gear position-left"></i>
-                                        Settings
-                                        <span class="caret"></span>
-                                    </a>
-
-                                    <ul class="dropdown-menu dropdown-menu-right">
-                                        <li>
-                                            <a href="javascript:void(0);">
-                                                <i class="icon-user-lock"></i> Account security
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <a href="javascript:void(0);">
-                                                <i class="icon-statistics"></i> Analytics
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <a href="javascript:void(0);">
-                                                <i class="icon-accessibility"></i> Accessibility
-                                            </a>
-                                        </li>
-                                        <li class="divider"></li>
-                                        <li>
-                                            <a href="javascript:void(0);">
-                                                <i class="icon-gear"></i> All settings
-                                            </a>
-                                        </li>
-                                    </ul>
-                                </li>
+                                <li class="active">@yield('title')</li>
                             </ul>
                         </div>
                     </div>

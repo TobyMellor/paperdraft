@@ -1,13 +1,13 @@
 @extends('template.dashboard')
 
-@section('title', 'Classes')
+@section('title', 'Manage Classes')
 @section('main')
     <style>
         .content {
             overflow: visible !important;
         }
     </style>
-    
+
     <div class="panel panel-white">
         <div class="panel-heading">
             <h6 class="panel-title">Get started</h6>
