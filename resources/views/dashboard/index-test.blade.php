@@ -682,7 +682,7 @@
 
                     this.getCanvasItem(selectedBoardItemId).addClass('outline-highlight');
                 }
-                
+
                 if (Object.keys(studentController.classStudents).length > 0) {
                     if (selectedStudents.length > 1) {
                         $('#selected-students').text(selectedStudents.slice(0, selectedStudents.length - 1).join(', ') + ", and " + selectedStudents.slice(-1));
@@ -804,43 +804,70 @@
             }
 
             getBestTooltipPlacement(canvasItemId) {
-                var canvasItem = canvasController.canvasItems[canvasItemId],
+                var canvasItem = canvasController.canvasItems[canvasItemId];
+                canvasItem.tooltip_occupied_positions = null;
+
+                var occupiedTooltipPositions = canvasController.getTooltipOccupiedPositions(),
+                    checkPositions = [
+                        [
+                            [canvasItem.position_x - 1, canvasItem.position_y - 1],
+                            [canvasItem.position_x,     canvasItem.position_y - 1],
+                            [canvasItem.position_x + 1, canvasItem.position_y - 1]
+                        ],
+                        [
+                            [canvasItem.position_x - 1, canvasItem.position_y + 1],
+                            [canvasItem.position_x,     canvasItem.position_y + 1],
+                            [canvasItem.position_x + 1, canvasItem.position_y + 1]
+                        ],
+                        [
+                            [canvasItem.position_x + 1, canvasItem.position_y],
+                            [canvasItem.position_x + 2, canvasItem.position_y],
+                            [canvasItem.position_x + 3, canvasItem.position_y]
+                        ],
+                        [
+                            [canvasItem.position_x - 3, canvasItem.position_y],
+                            [canvasItem.position_x - 2, canvasItem.position_y],
+                            [canvasItem.position_x - 1, canvasItem.position_y]
+                        ]
+                    ],
                     checkPositionX, checkPositionY;
 
-                for (var i = 0; i < 4; i++) {
-                    var checkPositionX = canvasItem.position_x + j,
-                        checkPositionY = canvasItem.position_y - 1;
+                if (occupiedTooltipPositions.length > 0) {
+                    for (var i = 0; i < checkPositions.length; i++) {
+                        for (var j = 0; j < checkPositions[i].length; j++) {
+                            checkPositionX = checkPositions[i][j][0];
+                            checkPositionY = checkPositions[i][j][1];
 
-                    for (var j = -1; j < 2; j++) {
-                        if (i === 0) {
-                            checkPositionX = canvasItem.position_x + j;
-                            checkPositionY = canvasItem.position_y - 1;
-                        } else if (i === 1) {
-                            checkPositionX = canvasItem.position_x + j;
-                            checkPositionY = canvasItem.position_y + 1;
-                        } else if (i === 2) {
-                            checkPositionX = canvasItem.position_x + j + 2;
-                            checkPositionY = canvasItem.position_y;
-                        } else if (i === 3) {
-                            checkPositionX = canvasItem.position_x + j - 2;
+                            if (utils.isArrayInArray(occupiedTooltipPositions, [checkPositionX, checkPositionY])) {
+                                j = 4;
+                                break;
+                            }
                         }
 
-                        if (!canvasController.isPositionInBounds(checkPositionX, checkPositionY) || canvasController.isCanvasItemInPosition(checkPositionX, checkPositionY)) {
-                            j = 3;
-                            break;
-                        }
-                    }
+                        if (j === 3) {
+                            canvasItem.tooltip_occupied_positions = checkPositions[i];
 
-                    if (i === 0 && j === 2) {
-                        return 'top';
-                    } else if (i === 1 && j === 2) {
-                        return 'bottom';
-                    } else if (i === 2 && j === 2) {
-                        return 'right';
-                    } else if (i === 3 && j === 2) {
-                        return 'left';
+                            switch (i) {
+                                case 0:
+                                    return 'top';
+                                case 1:
+                                    return 'bottom';
+                                case 2:
+                                    return 'right';
+                                default:
+                                    return 'left';
+                            }
+                        }
                     }
                 }
+
+                // Maybe return to this later. This makes it so tooltips won't overlap tables but makes function more complicated
+                // if (!canvasController.isPositionInBounds(checkPositionX, checkPositionY) || canvasController.isCanvasItemInPosition(checkPositionX, checkPositionY)) {
+                //     j = 3;
+                //     break;
+                // }
+
+                canvasItem.tooltip_occupied_positions = checkPositions[0];
 
                 return 'top';
             }
@@ -1106,8 +1133,9 @@
                     classId         = this.classId;
 
                 var canvasItem = {
-                    item_id:    itemId,
-                    student_id: null
+                    item_id:                    itemId,
+                    student_id:                 null,
+                    tooltip_occupied_positions: null
                 };
 
                 hasUserMadeChanges = true;
@@ -1143,13 +1171,14 @@
                     canvasItemsGrid = this.canvasItemsGrid;
 
                 var canvasItem = canvasItems[canvasItem.id] = {
-                    'id':           canvasItem.id,
-                    'item_id':      canvasItem.item_id,
-                    'student_id':   canvasItem.student_id,
-                    'position_x':   canvasItem.position_x,
-                    'position_y':   canvasItem.position_y,
-                    'pseudo_item':  isPseudoCanvasItem,
-                    'soft_deleted': false
+                    id:                         canvasItem.id,
+                    item_id:                    canvasItem.item_id,
+                    student_id:                 canvasItem.student_id,
+                    position_x:                 canvasItem.position_x,
+                    position_y:                 canvasItem.position_y,
+                    pseudo_item:                isPseudoCanvasItem,
+                    soft_deleted:               false,
+                    tooltip_occupied_positions: null
                 };
 
                 var item = items[canvasItem.item_id];
@@ -1433,8 +1462,6 @@
                                         canvasController.updateConnectedCanvasItems(childCanvasItem.position_x, childCanvasItem.position_y, [
                                             [oldChildPositionX, oldChildPositionY, []]
                                         ], 0);
-                                    } else {
-                                        console.log('somethings already in that position or out of bounds (child)');
                                     }
                                 }
 
@@ -1445,8 +1472,6 @@
                                 canvasController.updateConnectedCanvasItems(newParentCanvasItemPositionX, newParentCanvasItemPositionY, [
                                     [oldParentCanvasItemPositionX, oldParentCanvasItemPositionY, []]
                                 ], 0);
-                            } else {
-                                console.log('somethings already in that position or out of bounds (parent)')
                             }
                         }
                     },
@@ -1807,6 +1832,26 @@
                     children: {}
                 };
             }
+
+            getTooltipOccupiedPositions() {
+                var occupiedTooltipPositions = [],
+                    canvasItems              = this.canvasItems,
+                    j;
+
+                for (var index in canvasItems) {
+                    var canvasItem = canvasItems[index];
+
+                    if (canvasItem.tooltip_occupied_positions !== null) {
+                        for (j = 0; j < canvasItem.tooltip_occupied_positions.length; j++) {
+                            var tooltipOccupiedPosition = canvasItem.tooltip_occupied_positions[j];
+
+                            occupiedTooltipPositions.push(tooltipOccupiedPosition);
+                        }
+                    }
+                }
+
+                return occupiedTooltipPositions;
+            }
         }
 
         class StudentController {
@@ -1850,13 +1895,14 @@
 
             addClassStudent(classStudentRecord) {
                 this.classStudents[classStudentRecord.id] = {
-                    student_id:               classStudentRecord.student_id,
-                    name:                     classStudentRecord.name,
-                    gender:                   classStudentRecord.gender,
-                    pupil_premium:            classStudentRecord.pupil_premium,
-                    ability_cap:              classStudentRecord.ability_cap,
-                    current_attainment_level: classStudentRecord.current_attainment_level,
-                    target_attainment_level:  classStudentRecord.target_attainment_level
+                    student_id:                 classStudentRecord.student_id,
+                    name:                       classStudentRecord.name,
+                    gender:                     classStudentRecord.gender,
+                    pupil_premium:              classStudentRecord.pupil_premium,
+                    ability_cap:                classStudentRecord.ability_cap,
+                    current_attainment_level:   classStudentRecord.current_attainment_level,
+                    target_attainment_level:    classStudentRecord.target_attainment_level,
+                    tooltip_occupied_positions: null
                 }
 
                 this.view.addClassStudent(classStudentRecord);
