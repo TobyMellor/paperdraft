@@ -2063,6 +2063,9 @@
                 var canvasItems = canvasController.canvasItems,
                     classStudentId;
 
+                this.maleSeatsAvailable   = [];
+                this.femaleSeatsAvailable = [];
+
                 for (var index in canvasItems) {
                     classStudentId = canvasItems[index].student_id;
 
@@ -2137,9 +2140,13 @@
             }
 
             attemptSeatPlacement(attemptedSeatsAvailable, incorrectSeatsAvailable, selectedStudent) {
+                var canvasItemId;
+
                 if (attemptedSeatsAvailable.length === 0) {
                     if (incorrectSeatsAvailable.length > 0) {
-                        selectedStudent.canvas_item_id = canvasController.canvasItemsGrid[incorrectSeatsAvailable[0][0]][incorrectSeatsAvailable[0][1]];
+                        canvasItemId = canvasController.canvasItemsGrid[incorrectSeatsAvailable[0][0]][incorrectSeatsAvailable[0][1]];
+
+                        canvasController.canvasItems[canvasItemId].student_id = selectedStudent.student_id;
 
                         notificationController.handleNotification(selectedStudent.name + ' was seated with the same gender due to lack of seats available.', 'warning');
 
@@ -2150,7 +2157,7 @@
                         return false;
                     }
                 } else {
-                    var canvasItemId = canvasController.canvasItemsGrid[attemptedSeatsAvailable[0][0]][attemptedSeatsAvailable[0][1]];
+                    canvasItemId = canvasController.canvasItemsGrid[attemptedSeatsAvailable[0][0]][attemptedSeatsAvailable[0][1]];
 
                     canvasController.canvasItems[canvasItemId].student_id = selectedStudent.student_id;
 
