@@ -148,7 +148,7 @@
                 </div>
 
                 <div class="panel-body" id="selected-no-items">
-                    There is no items on the canvas. Start by clicking on an item in the items panel below.
+                    There's no items on the canvas. Start by clicking on an item in the 'Items' panel below.
                 </div>
             </div>
 
@@ -231,43 +231,49 @@
                     </a>
                 </div>
 
-                <div class="table-responsive student-table">
-                    <table class="table text-nowrap">
-                        <thead>
-                            <tr>
-                                <th>Name</th>
-                                <th>Gender</th>
-                                <th>Selected</th>
-                            </tr>
-                        </thead>
-                        <tbody id="class-students"></tbody>
-                    </table>
+                <div class="panel-body" id="no-students" style="display: none;">
+                    There's no students in this class. You can add students by going to 'Manage Classes', or click <a href="{{ url('dashboard/classes') }}">here</a>.
                 </div>
+                
+                <div id="student-panel-content">
+                    <div class="table-responsive student-table">
+                        <table class="table text-nowrap">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Gender</th>
+                                    <th>Selected</th>
+                                </tr>
+                            </thead>
+                            <tbody id="class-students"></tbody>
+                        </table>
+                    </div>
 
-                <div class="panel-footer">
-                    <div class="heading-elements">
-                        <div class="heading-btn pull-left">
-                            <div class="btn-group">
-                                <button type="button" class="btn btn-primary" id="generate-seating-positions">
-                                    Loading...
-                                </button>
-                                <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown"><span class="caret"></span></button>
-                                <ul class="dropdown-menu dropdown-menu-right">
-                                    <li>
-                                        <a href="javascript:void(0);" id="remove-seating-positions">
-                                            Remove all seated students
-                                        </a>
-                                    </li>
-                                </ul>
+                    <div class="panel-footer">
+                        <div class="heading-elements">
+                            <div class="heading-btn pull-left">
+                                <div class="btn-group">
+                                    <button type="button" class="btn btn-primary" id="generate-seating-positions">
+                                        Loading...
+                                    </button>
+                                    <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown"><span class="caret"></span></button>
+                                    <ul class="dropdown-menu dropdown-menu-right">
+                                        <li>
+                                            <a href="javascript:void(0);" id="remove-seating-positions">
+                                                Remove all seated students
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="heading-btn pull-right">
+                                <button class="btn btn-default" type="button" id="select-all">Deselect All</button>
                             </div>
                         </div>
-                        <div class="heading-btn pull-right">
-                            <button class="btn btn-default" type="button" id="select-all">Deselect All</button>
-                        </div>
+                        <a class="heading-elements-toggle">
+                            <i class="icon-more"></i>
+                        </a>
                     </div>
-                    <a class="heading-elements-toggle">
-                        <i class="icon-more"></i>
-                    </a>
                 </div>
             </div>
         </div>
@@ -2020,6 +2026,16 @@
 
             init() {
                 var jsonClassStudentsRecords = this.jsonClassStudents;
+
+                if (jsonClassStudentsRecords.class_students.length === 0) {
+                    $('#student-panel-content').fadeOut(300, function() {
+                        $('#no-students').fadeIn();
+                    });
+                } else {
+                    $('#no-students').fadeOut(300, function() {
+                        $('#student-panel-content').fadeIn();
+                    });
+                }
 
                 // Take JSON array of all students and store them locally
                 for (var index in jsonClassStudentsRecords.class_students) {
