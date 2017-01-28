@@ -640,6 +640,7 @@
                 $('.drag-item').removeClass('outline-highlight');
             }
 
+            // TODO: Needs code refactoring
             updateSelectedBoard(selectedBoardItems) {
                 if (Object.keys(selectedBoardItems).length > 2) {
                     selectedBoardItems[selectedBoardItems.length - 1].name = '[' + (selectedBoardItems.length - 2) + ' more]';
@@ -658,6 +659,8 @@
                 $('#selected-image').attr('src', assetsBasePath + selectedBoardItems[0].location);
                 $('#selected-delete').html('Delete <i class="icon-diff-removed position-right"></i>');
 
+                $('.drag-item').tooltip('destroy');
+
                 for (var index in selectedBoardItems) {
                     var selectedBoardItem          = selectedBoardItems[index],
                         selectedBoardItemId        = selectedBoardItem.id,
@@ -674,9 +677,16 @@
                         $('#selected-position').append('<strong>X:</strong> ' + selectedBoardItemPositionX + ', <strong>Y:</strong> ' + selectedBoardItemPositionY + '<br />');
                     }
 
+                    var classStudents = studentController.classStudents;
+
                     if (Object.keys(studentController.classStudents).length > 0) {
                         if (selectedBoardItem.student_id !== null) {
+                            var canvasItems = canvasController.canvasItems;
+
                             selectedStudents.push(studentController.classStudents[selectedBoardItem.student_id].name);
+
+                            this.setCanvasItemTooltip(selectedBoardItemId, classStudents[canvasItems[selectedBoardItemId].student_id].name, classStudents[canvasItems[selectedBoardItemId].student_id].gender);
+                            this.showCanvasItemTooltip(selectedBoardItemId);
                         } else if (Object.keys(selectedBoardItems).length > 1) {
                             selectedStudents.push('Unoccupied');
                         } else {
@@ -793,7 +803,6 @@
                     studentName = studentName.split(' ')[0].charAt(0);
                 }
 
-                canvasItem.tooltip('destroy');
                 canvasItem.attr('title', studentName);
 
                 if (studentGender === 'male') {
@@ -802,15 +811,21 @@
                         trigger: 'manual',
                         animation: false,
                         placement: this.getBestTooltipPlacement(canvasItemId)
-                    }).tooltip('show');
+                    });
                 } else {
                     canvasItem.tooltip({
                         template: '<div class="tooltip"><div class="bg-teal tooltip-pink"><div class="tooltip-arrow"></div><div class="tooltip-inner custom-tooltip-inner"></div></div></div>',
                         trigger: 'manual',
                         animation: false,
                         placement: this.getBestTooltipPlacement(canvasItemId)
-                    }).tooltip('show');
+                    });
                 }
+            }
+
+            showCanvasItemTooltip(canvasItemId) {
+                var canvasItem = this.getCanvasItem(canvasItemId);
+
+                canvasItem.tooltip('show');
             }
 
             getBestTooltipPlacement(canvasItemId) {
@@ -1262,7 +1277,7 @@
                 softDeletedCanvasItems[softDeletedCanvasItem.id] = {
                     id:                         softDeletedCanvasItem.id,
                     item_id:                    softDeletedCanvasItem.item_id,
-                    student_id:                 null,
+                    student_id:                 softDeletedCanvasItem.student_id,
                     position_x:                 softDeletedCanvasItem.position_x,
                     position_y:                 softDeletedCanvasItem.position_y,
                     pseudo_item:                softDeletedCanvasItem.pseudo_item,
@@ -1330,7 +1345,14 @@
             }
 
             restoreSoftDeletedCanvasItem(softDeletedCanvasItemId) {
-                var softDeletedCanvasItems = this.softDeletedCanvasItems;
+                var softDeletedCanvasItems = this.softDeletedCanvasItems,
+                    classStudentId         = softDeletedCanvasItems[softDeletedCanvasItemId].student_id;
+
+                if (classStudentId !== null) {
+                    if (studentController.isStudentSeated(classStudentId)) {
+                        classStudentId = null;
+                    }
+                }
 
                 this.addCanvasItem($.extend({}, softDeletedCanvasItems[softDeletedCanvasItemId]));
 
@@ -1459,12 +1481,6 @@
                                 newParentCanvasItemPositionX,
                                 newParentCanvasItemPositionY
                             )) {
-                                var classStudents = studentController.classStudents;
-
-                                if (canvasItems[parentCanvasItemId].student_id !== null) {
-                                    view.setCanvasItemTooltip(parentCanvasItemId, classStudents[canvasItems[parentCanvasItemId].student_id].name, classStudents[canvasItems[parentCanvasItemId].student_id].gender);
-                                }
-
                                 var lastDeltaX = newParentCanvasItemPositionX - oldParentCanvasItemPositionX,
                                     lastDeltaY = newParentCanvasItemPositionY - oldParentCanvasItemPositionY;
 
@@ -1513,10 +1529,6 @@
                                         selectedCanvasItemIds.push(childCanvasItemId);
 
                                         view.addCanvasItem(items[childCanvasItem.item_id], childCanvasItem);
-
-                                        if (canvasItems[childCanvasItemId].student_id !== null) {
-                                            view.setCanvasItemTooltip(childCanvasItemId, classStudents[canvasItems[childCanvasItemId].student_id].name, classStudents[canvasItems[childCanvasItemId].student_id].gender);
-                                        }
 
                                         canvasController.updateConnectedCanvasItems(oldChildPositionX, oldChildPositionY, [], null);
                                         canvasController.updateConnectedCanvasItems(childCanvasItem.position_x, childCanvasItem.position_y, [
@@ -1923,6 +1935,27 @@
 
                 return occupiedTooltipPositions;
             }
+
+            showCanvasItemTooltips() {
+                var canvasItems   = this.canvasItems,
+                    selectedIds   = this.getSelectedIds(),
+                    classStudents = studentController.classStudents,
+                    canvasItem, classStudentId, classStudent;
+
+                for (var index in canvasItems) {
+                    canvasItem     = canvasItems[index];
+                    classStudentId = canvasItem.student_id;
+
+                    if (classStudentId !== null) {
+                        if (selectedIds.indexOf(index) === -1) {
+                            classStudent = classStudents[classStudentId];
+
+                            canvasController.view.setCanvasItemTooltip(index, classStudent.name, classStudent.gender);
+                            canvasController.view.showCanvasItemTooltip(index);
+                        }
+                    }
+                }
+            }
         }
 
         class StudentController {
@@ -2003,11 +2036,28 @@
                 return seatedStudents;
             }
 
+            isStudentSeated(classStudentId) {
+                var seatedStudents = this.getSeatedStudents();
+
+                if (seatedStudents.hasOwnProperty(classStudentId)) {
+                    return true;
+                }
+
+                return false;
+            }
+
             clearSeatedStudents() {
-                var canvasItems = canvasController.canvasItems;
+                var canvasItems = canvasController.canvasItems,
+                    classStudentId;
 
                 for (var index in canvasItems) {
-                    canvasItems[index].student_id = null;
+                    classStudentId = canvasItems[index].student_id;
+
+                    if (classStudentId !== null) {
+                        this.view.updateSeatAssignmentLabel(classStudentId, false);
+                    }
+
+                    classStudentId = null;
                 }
             }
 
@@ -2065,6 +2115,9 @@
                 }
 
                 notificationController.handleNotification('Finished assigning ' + this.getSeatedStudents().length + ' student(s) to seat(s).', 'success');
+                canvasController.showCanvasItemTooltips();
+
+                this.view.updateSeatAssignmentLabels();
             }
 
             attemptSeatPlacement(attemptedSeatsAvailable, incorrectSeatsAvailable, selectedStudent) {
@@ -2084,8 +2137,6 @@
                     var canvasItemId = canvasController.canvasItemsGrid[attemptedSeatsAvailable[0][0]][attemptedSeatsAvailable[0][1]];
 
                     canvasController.canvasItems[canvasItemId].student_id = selectedStudent.student_id;
-
-                    canvasController.view.setCanvasItemTooltip(canvasItemId, selectedStudent.name, selectedStudent.gender);
 
                     attemptedSeatsAvailable.shift();
                 }
