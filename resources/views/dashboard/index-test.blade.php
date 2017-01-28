@@ -245,7 +245,19 @@
                 <div class="panel-footer">
                     <div class="heading-elements">
                         <div class="heading-btn pull-left">
-                            <button class="btn btn-danger" type="button" id="generate-seating-positions">Loading...</button>
+                            <div class="btn-group">
+                                <button type="button" class="btn btn-primary" id="generate-seating-positions">
+                                    Loading...
+                                </button>
+                                <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown"><span class="caret"></span></button>
+                                <ul class="dropdown-menu dropdown-menu-right">
+                                    <li>
+                                        <a href="javascript:void(0);" id="remove-seating-positions">
+                                            Remove all seated students
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
                         </div>
                         <div class="heading-btn pull-right">
                             <button class="btn btn-default" type="button" id="select-all">Deselect All</button>
@@ -471,6 +483,11 @@
                 $('#auto-assign-seating-positions').prop('disabled', true);
             });
 
+            $(document).on('click', '#remove-seating-positions', function() {
+                studentController.clearSeatedStudents();
+                notificationController.handleNotification('All students have been successfully cleared from all seats!', 'success');
+            });
+
             $(document).on('change', 'select[name="assignment-algorithm"]', function() {
                 if ($(this).val() === 'boy-girl') {
                     var selectedStudents       = studentController.getSelectedStudents(),
@@ -687,10 +704,6 @@
 
                             this.setCanvasItemTooltip(selectedBoardItemId, classStudents[canvasItems[selectedBoardItemId].student_id].name, classStudents[canvasItems[selectedBoardItemId].student_id].gender);
                             this.showCanvasItemTooltip(selectedBoardItemId);
-                        } else if (Object.keys(selectedBoardItems).length > 1) {
-                            selectedStudents.push('Unoccupied');
-                        } else {
-                            selectedStudents[0] = 'No student is assigned to this desk.';
                         }
                     } else {
                         $('#selected-students').text('Loading...');
@@ -703,7 +716,7 @@
                     if (selectedStudents.length > 1) {
                         $('#selected-students').text(selectedStudents.slice(0, selectedStudents.length - 1).join(', ') + ", and " + selectedStudents.slice(-1));
                     } else {
-                        $('#selected-students').text(selectedStudents[0]);
+                        $('#selected-students').text('No student is assigned to the desk(s).');
                     }
                 }
             }
@@ -2057,8 +2070,11 @@
                         this.view.updateSeatAssignmentLabel(classStudentId, false);
                     }
 
-                    classStudentId = null;
+                    canvasItems[index].student_id = null;
                 }
+
+
+                $('.drag-item').tooltip('destroy');
             }
 
             updateSelectedStudents() {
