@@ -49,9 +49,9 @@ class CreatePeriodsTable extends Migration
         foreach($weekdays as $weekday) {
             foreach($periodTimes as $periodStart => $periodEnd) {    
                 array_push($periods, [
-                    'period_day' => $weekday,
+                    'period_day'   => $weekday,
                     'period_start' => $periodStart,
-                    'period_end' => $periodEnd
+                    'period_end'   => $periodEnd
                 ]);
             }
         }

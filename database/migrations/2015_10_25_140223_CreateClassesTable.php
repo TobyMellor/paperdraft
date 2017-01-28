@@ -40,14 +40,22 @@ class CreateClassesTable extends Migration
 
         DB::table('classes')->insert([
             [
-                'user_id' => 1,
-                //'period_id' => 1,
-                'class_name' => 'Year 11'
+                'user_id'       => 1,
+                'class_name'    => 'Year 11',
+                'class_subject' => 'Mathematics',
+                'class_room'    => 'Room 101'
             ],
             [
-                'user_id' => 1,
-                //'period_id' => 1,
-                'class_name' => 'Year 12'
+                'user_id'       => 1,
+                'class_name'    => 'Year 12',
+                'class_subject' => 'Mathematics',
+                'class_room'    => 'Room 102'
+            ],
+            [
+                'user_id'       => 1,
+                'class_name'    => 'Year 13',
+                'class_subject' => 'ICT',
+                'class_room'    => 'Room 101'
             ]
         ]);
     }

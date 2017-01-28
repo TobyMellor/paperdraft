@@ -217,7 +217,7 @@
     color: #ddd;
 }
 
-.selected-name {
+.text-muted > .selected-name {
     color: #ddd;
 }
 

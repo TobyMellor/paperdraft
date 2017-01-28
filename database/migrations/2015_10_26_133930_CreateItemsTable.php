@@ -25,29 +25,30 @@ class CreateItemsTable extends Migration
             $table->timestamps();
         });
 
+        // TODO: Change to width_multiplier and height_multiplier as widths and heights may not be 32
         DB::table('items')->insert([
             [
-                'name' => 'Student Desk',
-                'width' => 32,
-                'height' => 32,
+                'name'     => 'Student Desk',
+                'width'    => 32,
+                'height'   => 32,
                 'location' => 'desk.png'
             ],
             [
-                'name' => 'Sofa',
-                'width' => 32,
-                'height' => 32,
+                'name'     => 'Sofa',
+                'width'    => 32,
+                'height'   => 32,
                 'location' => 'sofa-1.png'
             ],
             [
-                'name' => 'Chair',
-                'width' => 32,
-                'height' => 32,
+                'name'     => 'Chair',
+                'width'    => 32,
+                'height'   => 32,
                 'location' => 'chair-1.png'
             ],
             [
-                'name' => 'Teacher Desk',
-                'width' => 64,
-                'height' => 32,
+                'name'     => 'Teacher Desk',
+                'width'    => 64,
+                'height'   => 32,
                 'location' => 'teacher-desk-1.png'
             ]
         ]);
