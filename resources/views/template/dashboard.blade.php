@@ -70,13 +70,17 @@
                         <a class="dropdown-toggle" data-toggle="dropdown" href="javascript:void(0);">
                             <img src="{{ asset('assets/images/placeholder.jpg') }}">
                             <span class="username">
-                                @if (isset(Auth::user()->last_name)){{ Auth::user()->title }}. {{ Auth::user()->last_name }}@else{{ current(explode("@", Auth::user()->email, 2)) }}@endif
+                                @if (isset(Auth::user()->last_name))
+                                    {{ Auth::user()->title }}. {{ Auth::user()->last_name }}
+                                @else
+                                    {{ current(explode("@", Auth::user()->email, 2)) }}
+                                @endif
                             </span>
                             <i class="caret"></i>
                         </a>
                         <ul class="dropdown-menu dropdown-menu-right">
                             <li>
-                                <a href="javascript:void(0);">
+                                <a href="{{ url('dashboard/settings') }}">
                                     <i class="icon-cog5"></i> Account settings
                                 </a>
                             </li>
@@ -101,13 +105,18 @@
                                     <div class="media-body">
                                         <span class="media-heading text-semibold username">@if (isset(Auth::user()->last_name)){{ Auth::user()->title }}. {{ Auth::user()->last_name }}@else{{ current(explode("@", Auth::user()->email, 2)) }}@endif</span>
                                         <div class="text-size-mini text-muted">
-                                            <i class="icon-pin text-size-small"></i> &nbsp;Santa Ana, CA
+                                            <i class="icon-pin text-size-small"></i>
+                                            @if (isset(Auth::user()->institution_name))
+                                                {{ Auth::user()->institution_name }}
+                                            @else
+                                                PaperDraft
+                                            @endif
                                         </div>
                                     </div>
                                     <div class="media-right media-middle">
                                         <ul class="icons-list">
                                             <li>
-                                                <a href="javascript:void(0);"><i class="icon-cog3"></i></a>
+                                                <a href="{{ url('dashboard/settings') }}"><i class="icon-cog3"></i></a>
                                             </li>
                                         </ul>
                                     </div>
@@ -119,7 +128,7 @@
                             <div class="category-content no-padding">
                                 <ul class="navigation navigation-main navigation-accordion">
                                     <li class="navigation-header">
-                                        <span>Main</span>
+                                        <span>Main Menu</span>
                                         <i class="icon-menu" title="Main pages"></i>
                                     </li>
                                     <li @if (app('url')->current() == url('dashboard')) class="active" @endif>
@@ -145,7 +154,7 @@
                         <div class="breadcrumb-line">
                             <ul class="breadcrumb">
                                 <li>
-                                    <a href="index.html">
+                                    <a href="{{ url('dashboard') }}">
                                         <i class="icon-home2 position-left"></i> Home
                                     </a>
                                 </li>

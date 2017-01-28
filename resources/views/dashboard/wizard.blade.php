@@ -1,6 +1,6 @@
 @extends('template.dashboard')
 
-@section('title', 'Manage Classes')
+@section('title', 'Basic Settings')
 @section('main')
     <style>
         .content {
@@ -10,7 +10,7 @@
 
     <div class="panel panel-primary panel-bordered">
         <div class="panel-heading">
-            <h6 class="panel-title">Get started</h6>
+            <h6 class="panel-title">Your Basic Settings</h6>
         </div>
         <div class="panel-body">
             <form class="steps-validation" action="javascript:void(0);">
@@ -167,7 +167,7 @@
             transitionEffect: "fade",
             titleTemplate: '<span class="number">#index#</span> #title#',
             autoFocus: true,
-            @if (Auth::user()->last_name != null)
+            @if (Auth::user()->last_name !== null && !strpos(url()->current(), 'dashboard/settings'))
                 startIndex: 1,
             @endif
             onStepChanging: function (event, currentIndex, newIndex) {

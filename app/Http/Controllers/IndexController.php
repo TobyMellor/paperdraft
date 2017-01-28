@@ -32,8 +32,13 @@ class IndexController extends Controller
                 ->with('items', $items)
                 ->with('recentClassId', $recentClassId);
         }
-        
-        return redirect('dashboard/classes');
+
+        return $this->getClassesDashboard($classController);
+    }
+
+    public function getWizardDashboard()
+    {
+        return view('dashboard.wizard');
     }
 
     /**
@@ -45,11 +50,11 @@ class IndexController extends Controller
     {
         $classes = $classController->getClasses();
 
-        if ($classes->first() != null) {
+        if ($classes->first() !== null) {
             return redirect('/dashboard/classes/' . $classes->first()->id);
         }
         
-        return view('dashboard.wizard');
+        return $this->getWizardDashboard();
     }
 
     /**

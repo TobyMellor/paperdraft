@@ -32,6 +32,8 @@ Route::group(['middleware' => ['guest']], function () {
 Route::group(['middleware' => ['auth']], function () {
     Route::get('dashboard', 'IndexController@getDashboard');
 
+    Route::get('dashboard/settings', 'IndexController@getWizardDashboard');
+
     Route::get('dashboard/classes', 'IndexController@getClassesDashboard');
     Route::get('dashboard/classes/{classId}', 'IndexController@getClassDashboard');
     Route::get('dashboard/classes/{classId}/create', function($classId) {
