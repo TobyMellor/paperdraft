@@ -240,9 +240,10 @@
                         <table class="table text-nowrap">
                             <thead>
                                 <tr>
-                                    <th>Name</th>
-                                    <th>Gender</th>
-                                    <th>Selected</th>
+                                    <th></th>
+                                    <th class="student-th-2">Name</th>
+                                    <th class="student-th-3">Gender</th>
+                                    <th>Action</th>
                                 </tr>
                             </thead>
                             <tbody id="class-students"></tbody>
@@ -535,6 +536,23 @@
                 shouldAlwaysLabel = $(this).prop('checked');
             });
 
+            $(document).delegate('#delete-student', 'click', function() {
+                var tableRow = $(this).parent().parent();
+
+                studentController.deleteClassStudent(tableRow.attr('class-student-id'));
+
+                tableRow.fadeOut(300, function() {
+                    $(this).remove();
+
+                    
+                    if ($('.student-table').find('tr').length === 1) {
+                        $('#student-panel-content').fadeOut(300, function() {
+                            $('#no-students').fadeIn();
+                        });
+                    }
+                });
+            });
+
             $('select').select2();
             $('.styled').uniform({
                 radioClass: 'choice'
@@ -608,7 +626,10 @@
 
                 $('#class-students').append(
                     '<tr class-student-id="' + classStudentId + '">' +
-                        '<td>' +
+                        '<td class="student-td-1">' +
+                            '<input class="styled selected-student" checked="checked" class-student-id="' + classStudentId + '" type="checkbox">' +
+                        '</td>' +
+                        '<td class="student-td-2">' +
                             '<div class="media-left media-middle">' +
                                 '<a class="btn bg-teal-400 ' + (gender === 'male' ? 'tooltip-blue' : 'tooltip-pink') + ' btn-rounded btn-icon btn-xs" href="javascript:void(0);">' +
                                     '<div class="letter-icon">' + name.charAt(0).toUpperCase() + '</div>' +
@@ -623,11 +644,13 @@
                                 '</div>' +
                             '</div>' +
                         '</td>' +
-                        '<td>' +
+                        '<td class="student-td-3">' +
                             '<span class="text-muted text-size-small">' + (gender[0].toUpperCase() + gender.slice(1)) + '</span>' +
                         '</td>' +
-                        '<td>' +
-                            '<input type="checkbox" class="styled selected-student" checked="checked" class-student-id="' + classStudentId + '">' +
+                        '<td class="student-td-4">' +
+                            '<button type="button" class="btn btn-danger" id="delete-student">' +
+                                'Remove' +
+                            '</button>' +
                         '</td>' +
                     '</tr>');
 
@@ -1138,12 +1161,26 @@
                     url: '{{ url('api/class-student') }}',
                     type: 'GET',
                     data: {
-                        class_id: classId
+                        class_id: classId,
                     },
                     success: function(jsonResponse) {
                         studentController.jsonClassStudents = jsonResponse;
 
                         studentController.init();
+                    },
+                    error: function(jsonResponse) {}
+                });
+            }
+
+            destroy(classId, classStudentId) {
+                $.APIAjax({
+                    url: '{{ url('api/class-student') }}/' + classStudentId,
+                    type: 'DELETE',
+                    data: {
+                        class_id: classId
+                    },
+                    success: function(jsonResponse) {
+                        notificationController.handleNotification(jsonResponse.message, 'success');  
                     },
                     error: function(jsonResponse) {}
                 });
@@ -2065,6 +2102,22 @@
                 }
 
                 this.view.addClassStudent(classStudentRecord);
+            }
+
+            deleteClassStudent(classStudentId) {
+                var canvasItems        = canvasController.canvasItems,
+                    classStudentsModel = this.classStudentsModel;
+
+                for (var index in canvasItems) {
+                    var canvasItem = canvasItems[index];
+
+                    if (canvasItem.student_id === classStudentId) {
+                        canvasItem.student_id = null;
+                    }
+                }
+
+                delete this.classStudents[classStudentId];
+                classStudentsModel.destroy(canvasController.classId, classStudentId);
             }
 
             getSelectedStudents() {
