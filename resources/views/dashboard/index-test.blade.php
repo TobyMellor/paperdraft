@@ -563,9 +563,6 @@
                 $('#class-students').append(
                     '<tr>' +
                         '<td>' +
-                            '<div class="media-middle">' +
-                                '<img class="img-circle" src="">' +
-                            '</div>' +
                             '<div class="media-left media-middle">' +
                                 '<a class="btn bg-teal-400 btn-rounded btn-icon btn-xs" href="javascript:void(0);">' +
                                     '<div class="letter-icon">' + name.charAt(0).toUpperCase() + '</div>' +
@@ -609,6 +606,7 @@
             removeCanvasItems() {
                 $('.drag-item').fadeOut(1000, function() {
                     $(this).draggable('destroy');
+                    $(this).tooltip('destroy');
                     $(this).remove();
                 });
             }
@@ -738,13 +736,17 @@
                     .addClass('class-options-active')
                     .removeClass('class-options');
 
+                $('#class-students').html('');
+
                 var classId = parseInt(buttonElement.attr('class-id'));
+
                 canvasController.view.setActiveClass(classId);
 
                 canvasController.classId = classId;
                 canvasController.clearSession();
-                canvasController.loadCanvasItems();
 
+                canvasController.loadCanvasItems();
+                studentController.loadClassStudents();
                 historyController.loadCanvasHistory();
             }
 
@@ -1833,6 +1835,15 @@
                     parent:   {},
                     children: {}
                 };
+
+                studentController.classStudents     = {};
+                studentController.selectedStudents  = {
+                    male:   [],
+                    female: []
+                };
+
+                studentController.maleSeatsAvailable   = [];
+                studentController.femaleSeatsAvailable = [];
             }
 
             getTooltipOccupiedPositions() {
