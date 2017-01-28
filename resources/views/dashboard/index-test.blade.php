@@ -138,6 +138,13 @@
                                     <td>
                                         <button id="selected-delete" class="btn btn-danger btn-sm" type="button">
                                             Delete
+                                            <i class="icon-database-remove position-right"></i>
+                                        </button>
+                                        
+                                        <br />
+
+                                        <button id="remove-seated-students" class="btn btn-danger btn-sm" type="button">
+                                            Remove Seated
                                             <i class="icon-diff-removed position-right"></i>
                                         </button>
                                     </td>
@@ -544,13 +551,17 @@
                 tableRow.fadeOut(300, function() {
                     $(this).remove();
 
-                    
+
                     if ($('.student-table').find('tr').length === 1) {
                         $('#student-panel-content').fadeOut(300, function() {
                             $('#no-students').fadeIn();
                         });
                     }
                 });
+            });
+
+            $(document).on('click', '#remove-seated-students', function() {
+                studentController.removeSelectedStudents();
             });
 
             $('select').select2();
@@ -714,7 +725,8 @@
 
                 $('.selected-name').text(selectedItemNames);
                 $('#selected-image').attr('src', assetsBasePath + selectedBoardItems[0].location);
-                $('#selected-delete').html('Delete <i class="icon-diff-removed position-right"></i>');
+                $('#selected-delete').html('Delete <i class="icon-database-remove position-right"></i>');
+                $('#remove-seated-students').hide();
 
                 if (!shouldAlwaysLabel) {
                     $('.drag-item').tooltip('destroy');
@@ -727,7 +739,7 @@
                         selectedBoardItemPositionY = selectedBoardItem.position_y;
 
                     if (index == 1) {
-                        $('#selected-delete').html('Delete All <i class="icon-diff-removed position-right"></i>');
+                        $('#selected-delete').html('Delete All <i class="icon-database-remove position-right"></i>');
                     }
 
                     if (index == 2) {
@@ -746,6 +758,8 @@
 
                             this.setCanvasItemTooltip(selectedBoardItemId, classStudents[canvasItems[selectedBoardItemId].student_id].name, classStudents[canvasItems[selectedBoardItemId].student_id].gender);
                             this.showCanvasItemTooltip(selectedBoardItemId);
+
+                            $('#remove-seated-students').show();
                         }
                     } else {
                         $('#selected-students').text('Loading...');
@@ -757,6 +771,8 @@
                 if (Object.keys(studentController.classStudents).length > 0) {
                     if (selectedStudents.length > 1) {
                         $('#selected-students').text(selectedStudents.slice(0, selectedStudents.length - 1).join(', ') + ", and " + selectedStudents.slice(-1));
+                    } else if (selectedStudents.length === 1) {
+                        $('#selected-students').text(selectedStudents[0]);
                     } else {
                         $('#selected-students').text('No student is assigned to the desk(s).');
                     }
@@ -1753,6 +1769,10 @@
                 }
             }
 
+            refreshSelected() {
+                this.updateSelected(this.getSelectedIds());
+            }
+
             getSelectedIds() {
                 var selectedIds = [selectedCanvasItems.parent.id];
 
@@ -2111,13 +2131,41 @@
                 for (var index in canvasItems) {
                     var canvasItem = canvasItems[index];
 
-                    if (canvasItem.student_id === classStudentId) {
+                    if (canvasItem.student_id == classStudentId) {
+                        this.view.getCanvasItem(canvasItem.id).tooltip('destroy');
+
                         canvasItem.student_id = null;
+
+                        break;
                     }
                 }
 
+                canvasController.refreshSelected();
                 delete this.classStudents[classStudentId];
                 classStudentsModel.destroy(canvasController.classId, classStudentId);
+            }
+
+            removeSelectedStudents() {
+                var canvasItems = canvasController.canvasItems,
+                    selectedIds = canvasController.getSelectedIds(),
+                    classStudentId, i;
+
+                for (i = 0; i < selectedIds.length; i++) {
+                    classStudentId = canvasItems[selectedIds[i]].student_id;
+
+                    if (classStudentId !== null) {
+                        this.view.updateSeatAssignmentLabel(classStudentId, false);
+                    }
+
+                    canvasItems[selectedIds[i]].student_id = null;
+
+                    this.view.getCanvasItem(selectedIds[i]).tooltip('destroy');
+                }
+
+                canvasController.refreshSelected();
+                $('#remove-seated-students').fadeOut();
+
+                notificationController.handleNotification('The selected students were successfully removed from their seats!', 'success');
             }
 
             getSelectedStudents() {

@@ -265,3 +265,8 @@
 .student-th-2 {
     padding-left: 0 !important;
 }
+
+#remove-seated-students {
+    padding: 3px 6px;
+    margin-top: 5px;
+}
