@@ -100,14 +100,6 @@
                                 <a title="Collapse" data-popup="tooltip" data-action="collapse"></a>
                             </li>
                         </ul>
-                        <form class="heading-form" action="javascript:void(0);" hidden>
-                            <div class="form-group">
-                                <label class="checkbox-inline checkbox-switchery checkbox-right switchery-xs">
-                                    <input type="checkbox" class="switchery" checked="checked">
-                                    Enable editable:
-                                </label>
-                            </div>
-                        </form>
                     </div>
                     <a class="heading-elements-toggle">
                         <i class="icon-menu"></i>
@@ -215,6 +207,16 @@
                 <div class="panel-heading">
                     <h6 class="panel-title">Students</h6>
                     <div class="heading-elements">
+                        <form class="heading-form" action="javascript:void(0);">
+                            <div class="form-group">
+                                <label class="checkbox-inline checkbox-right">
+                                    <input type="checkbox" class="styled-white" id="always-label-seats"> 
+                                    <p style="margin-top: 2px;">
+                                        Always Label Seats?
+                                    </p>
+                                </label>
+                            </div>
+                        </form>
                         <ul class="icons-list">
                             <li>
                                 <a title="Move" data-popup="tooltip" data-action="move" href="javascript:void(0);" class="ui-sortable-handle"></a>
@@ -371,6 +373,7 @@
 
 @section('scripts')
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/raphael/2.2.7/raphael.min.js"></script>
+
     <script>
         $(document).ready(function() {
             $('.drop-target').on('mousedown', '.drag-item', function() {
@@ -522,9 +525,16 @@
                 }
             });
 
+            $(document).on('click', '#always-label-seats', function() {
+                shouldAlwaysLabel = $(this).prop('checked');
+            });
+
             $('select').select2();
             $('.styled').uniform({
                 radioClass: 'choice'
+            });
+            $('.styled-white').uniform({
+                wrapperClass: 'uniform-styled-white'
             });
 
             $('.drop-target').css('width', squareWidth * 23);
@@ -547,7 +557,8 @@
             children: {}
         };
 
-        var hasUserMadeChanges = false;
+        var hasUserMadeChanges = false,
+            shouldAlwaysLabel  = $('#always-label-seats').prop('checked');
 
         var canvasController,
             historyController,
@@ -676,7 +687,9 @@
                 $('#selected-image').attr('src', assetsBasePath + selectedBoardItems[0].location);
                 $('#selected-delete').html('Delete <i class="icon-diff-removed position-right"></i>');
 
-                $('.drag-item').tooltip('destroy');
+                if (!shouldAlwaysLabel) {
+                    $('.drag-item').tooltip('destroy');
+                }
 
                 for (var index in selectedBoardItems) {
                     var selectedBoardItem          = selectedBoardItems[index],
@@ -816,6 +829,10 @@
                     studentName = studentName.split(' ')[0].charAt(0);
                 }
 
+                if (shouldAlwaysLabel) {
+                    canvasItem.tooltip('destroy');
+                }
+
                 canvasItem.attr('title', studentName);
 
                 if (studentGender === 'male') {
@@ -832,6 +849,10 @@
                         animation: false,
                         placement: this.getBestTooltipPlacement(canvasItemId)
                     });
+                }
+
+                if (shouldAlwaysLabel) {
+                    canvasItem.tooltip('show');
                 }
             }
 
@@ -1595,6 +1616,10 @@
 
                                 historyController.addCanvasHistory(pendingCanvasHistoryRecord);
                             }
+                        }
+
+                        if (shouldAlwaysLabel) {
+                            canvasController.showCanvasItemTooltips();
                         }
                     },
                     create: function() {

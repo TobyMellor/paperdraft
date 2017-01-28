@@ -229,3 +229,8 @@
 .navbar-brand > img {
     height: 25px;
 }
+
+.uniform-styled-white > span {
+    color: white !important;
+    border: 2px solid white !important;
+}
