@@ -10,7 +10,7 @@
                         <span class="text-semibold">
                             Seating Planner
                         </span> 
-                        <span class="text-muted">
+                        <span class="text-muted text-muted-light">
                             <small id="class-name">Loading...<small>
                         </span>
                     </h6>
@@ -86,8 +86,8 @@
             <div class="panel panel-primary panel-bordered">
                 <div class="panel-heading">
                     <h6 class="panel-title selected-panel-header">
-                        Selected item
-                        <span class="text-muted">
+                        Selected Item
+                        <span class="text-muted text-muted-light">
                             <small class="selected-name">Loading...</small>
                         </span>
                     </h6>
@@ -162,7 +162,14 @@
 
             <div class="panel panel-primary panel-bordered">
                 <div class="panel-heading">
-                    <h6 class="panel-title">Items</h6>
+                    <h6 class="panel-title">
+                        Items
+                        @if (isset($items))
+                            <span class="text-muted text-muted-light">
+                                <small>Click any of the {{ sizeOf($items) }} items to add them</small>
+                            </span>
+                        @endif
+                    </h6>
                     <div class="heading-elements">
                         <ul class="icons-list">
                             <li>
@@ -179,8 +186,8 @@
                 </div>
                 
                 <div class="panel-body item-panel-body">
-                    @if(isset($items))
-                        @foreach($items as $item)
+                    @if (isset($items))
+                        @foreach ($items as $item)
                             <div class="col-lg-3 col-sm-6">
                                 <div class="thumbnail item-thumb-frame">
                                     <div class="thumb item-thumb">
@@ -537,12 +544,17 @@
         class View {
             addCanvasItem(item, canvasItem) {
                 var canvasItemId        = canvasItem.id,
+                    classStudentId      = canvasItem.student_id,
                     canvasItemPositionX = canvasItem.position_x * squareWidth,
                     canvasItemPositionY = canvasItem.position_y * squareWidth;
 
                 var itemLocation = item.location,
                     itemWidth    = item.width,
                     itemHeight   = item.height; // TODO: Change to multipliers, don't store actual height
+
+                if (classStudentId !== null) {
+                    this.updateSeatAssignmentLabel(classStudentId, true);
+                }
 
                 $('.drop-target').append(
                     '<div class="drag-item" canvas-item-id="' + canvasItemId + '" style="left: ' + canvasItemPositionX + 'px; top: ' + canvasItemPositionY + 'px; background-image: url(\'{{ asset('assets/images/objects') }}/' + itemLocation + '\'); background-size: ' + squareWidth + 'px; height: ' + squareWidth + 'px; width: ' + squareWidth + 'px;"></div>'
@@ -561,19 +573,19 @@
                     targetAttainmentLevel   = classStudent.target_attainment_level;
 
                 $('#class-students').append(
-                    '<tr>' +
+                    '<tr class-student-id="' + classStudentId + '">' +
                         '<td>' +
                             '<div class="media-left media-middle">' +
-                                '<a class="btn bg-teal-400 btn-rounded btn-icon btn-xs" href="javascript:void(0);">' +
+                                '<a class="btn bg-teal-400 ' + (gender === 'male' ? 'tooltip-blue' : 'tooltip-pink') + ' btn-rounded btn-icon btn-xs" href="javascript:void(0);">' +
                                     '<div class="letter-icon">' + name.charAt(0).toUpperCase() + '</div>' +
                                 '</a>' +
                             '</div>' +
                             '<div class="media-body">' +
-                                '<div class="media-heading">' +
-                                    '<a href="javascript:void(0);" class="letter-icon-title">' + name + '</a>' +
-                                '</div>' +
-                                '<div class="text-muted text-size-small">' +
-                                    'CAL: ' + currentAttainmentLevel + ' | Trgt: ' + targetAttainmentLevel + ' | Tier: ' + abilityCap + ' | PP: ' + (pupilPremium ? '<i class="icon-checkmark3"></i>' : '<i class="icon-cross2"></i>') +
+                                '<a href="javascript:void(0);" class="display-inline-block text-default text-semibold letter-icon-title">' +
+                                    name +
+                                '</a>' +
+                                '<div class="text-muted text-size-small assignment-status">' +
+                                    '<span class="status-mark border-danger position-left"></span> Not assigned to a seat' +
                                 '</div>' +
                             '</div>' +
                         '</td>' +
@@ -870,6 +882,47 @@
                 canvasItem.tooltip_occupied_positions = checkPositions[0];
 
                 return 'top';
+            }
+
+            updateSeatAssignmentLabels() {
+                var classStudents = studentController.classStudents,
+                    canvasItems   = canvasController.canvasItems,
+                    canvasItem, classStudentId, classStudent;
+
+                for (var index in canvasItems) {
+                    canvasItem     = canvasItems[index];
+                    classStudentId = canvasItem.student_id;
+
+                    if (classStudentId !== null) {
+                        classStudent = classStudents[classStudentId];
+
+                        $('tr[class-student-id="' + classStudentId + '"]').find('.media-body').html(
+                            '<a href="javascript:void(0);" class="display-inline-block text-default text-semibold letter-icon-title">' +
+                                classStudent.name +
+                            '</a>' +
+                            '<div class="text-muted text-size-small assignment-status">' +
+                                '<span class="status-mark border-success position-left"></span> Assigned to a seat' +
+                            '</div>'
+                        );
+                    }
+                }
+            }
+
+            updateSeatAssignmentLabel(classStudentId, isAssignedSeat) {
+                var classStudents = studentController.classStudents;
+
+                if (Object.keys(classStudents).length > 0) {
+                    var classStudent = classStudents[classStudentId];
+
+                    $('tr[class-student-id="' + classStudentId + '"]').find('.media-body').html(
+                        '<a href="javascript:void(0);" class="display-inline-block text-default text-semibold letter-icon-title">' +
+                            classStudent.name +
+                        '</a>' +
+                        '<div class="text-muted text-size-small assignment-status">' +
+                            '<span class="status-mark ' + (isAssignedSeat ? 'border-success' : 'border-danger') + ' position-left"></span> ' + (isAssignedSeat ? 'Assigned to a seat' : 'Not assigned to a seat') + 
+                        '</div>'
+                    );
+                }
             }
         }
 
@@ -1257,16 +1310,21 @@
                 var canvasItems            = this.canvasItems,
                     canvasItemsGrid        = this.canvasItemsGrid,
                     softDeletedCanvasItems = this.softDeletedCanvasItems, 
-                    view                   = this.view;
-
-                var canvasItem = canvasItems[canvasItemId];
+                    view                   = this.view,
+                    canvasItem             = canvasItems[canvasItemId],
+                    classStudentId         = canvasItem.student_id;
 
                 canvasItemsGrid[canvasItem.position_x][canvasItem.position_y] = -1;
 
                 this.updateConnectedCanvasItems(canvasItem.position_x, canvasItem.position_y, [], null)
 
                 this.addSoftDeletedCanvasItem(canvasItem);
+
                 delete canvasItems[canvasItem.id];
+
+                if (classStudentId !== null) {
+                    view.updateSeatAssignmentLabel(classStudentId, false);
+                }
 
                 view.removeCanvasItem(canvasItemId);
             }
@@ -1899,6 +1957,7 @@
                     this.addClassStudent(classStudentRecord);
                 }
 
+                this.view.updateSeatAssignmentLabels();
                 this.view.updateStudentButtons();
 
                 if (!$.isEmptyObject(selectedCanvasItems.parent)) {

@@ -8,7 +8,7 @@
                 <div class="panel-heading">
                     <h6 class="panel-title">
                         <span class="text-semibold">Manage Class</span>
-                        <span class="text-muted">
+                        <span class="text-muted text-muted-light">
                             <small id="class-name"> {{ $selectedClass->class_name }}<small>
                         </span>
                     </h6>
@@ -39,7 +39,7 @@
                                 <tr student-id="{{ $classStudent->student_id }}">
                                     <td>
                                         <div class="media-left media-middle">
-                                            <a class="btn bg-teal-400 btn-rounded btn-icon btn-xs" href="javascript:void(0);">
+                                            <a class="btn bg-teal-400 @if ($classStudent->student->gender === 'male') tooltip-blue @else tooltip-pink @endif btn-rounded btn-icon btn-xs" href="javascript:void(0);">
                                                 <div class="letter-icon">{{ strtoupper($classStudent->student->name[0]) }}</div>
                                             </a>
                                         </div>
@@ -542,7 +542,7 @@
                         var html = '<tr student-id="' + jsonResponse.student.id + '" style="display: none;">' +
                             '<td>' +
                                 '<div class="media-left media-middle">' +
-                                    '<a class="btn bg-teal-400 btn-rounded btn-icon btn-xs" href="javascript:void(0);">' +
+                                    '<a class="btn bg-teal-400 ' + (formData['gender'] === 'male' ? 'tooltip-blue' : 'tooltip-pink') + ' btn-rounded btn-icon btn-xs" href="javascript:void(0);">' +
                                         '<span class="letter-icon">' + formData['student_name'].charAt(0).toUpperCase() + '</span>' +
                                     '</a>' +
                                 '</div>' +

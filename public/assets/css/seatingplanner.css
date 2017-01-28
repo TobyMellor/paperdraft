@@ -192,7 +192,7 @@
     border-color: #2196f3;
 }
 
-.tooltip-blue {
+.tooltip-pink {
     background-color: #d2527f;
     border-color: #d2527f;
 }
@@ -213,11 +213,7 @@
     color: #ddd;
 }
 
-.text-muted > #class-name {
-    color: #ddd;
-}
-
-.text-muted > .selected-name {
+.text-muted-light > small {
     color: #ddd;
 }
 
