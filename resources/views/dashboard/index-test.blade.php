@@ -2104,7 +2104,7 @@
                 var selectedStudents = this.selectedStudents,
                     selectedStudent;
 
-                for (var i = 0; i <= (selectedStudents.male.length + selectedStudents.female.length); i++) {
+                for (var i = 0; i < this.getSelectedStudents().length * 2; i++) { // * 2 because could be 100% of one gender
                     var index = Math.floor(i / 2);
 
                     if (i % 2 === 0) {
@@ -2196,7 +2196,7 @@
                     ],
                     centerOffset, centerPoints, centerPoint, searchRadius, i;
                     
-                while(!utils.doesEveryElementHaveChildren(itemsFound)) {
+                while (!utils.doesEveryElementHaveChildren(itemsFound)) {
                     searchRadius         = Math.floor(searchSize / 2);
                     centerOffset         = -1;
                     totalSpacesToSearch += 4;
