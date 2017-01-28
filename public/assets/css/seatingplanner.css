@@ -234,3 +234,7 @@
     color: white !important;
     border: 2px solid white !important;
 }
+
+.tooltip {
+    z-index: 1000;
+}
