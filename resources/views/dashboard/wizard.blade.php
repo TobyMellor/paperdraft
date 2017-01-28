@@ -101,7 +101,6 @@
 
                         <div class="col-md-6">
                             <label>Your classes:</label>
-                            <strong id="no-classes"><br />You have no classes yet. Create one using the form.</strong>
                             <div class="table-responsive" style="display: none;">
                                 <table class="table table-bordered table-striped table-hover">
                                     <thead>
@@ -112,9 +111,25 @@
                                             <th>Action</th>
                                         </tr>
                                     </thead>
-                                    <tbody></tbody>
+                                    <tbody>
+                                        @if (sizeOf($classes) > 0)
+                                            @foreach ($classes as $class)
+                                                <tr>
+                                                    <td>{{ $class->class_name }}</td>
+                                                    <td>{{ $class->class_subject }}</td>
+                                                    <td>{{ $class->class_room }}</td>
+                                                    <td>
+                                                        <div class="btn-group">
+                                                            <button type="button" class="btn btn-danger delete-class" class-id="{{ $class->id }}">Delete</span></button>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            @endforeach
+                                        @endif
+                                    </tbody>
                                 </table>
                             </div>
+                            <strong id="no-classes"><br />You have no classes yet. Create one using the form.</strong>
 
                             <br />
                         </div>
@@ -360,6 +375,11 @@
             deleteClass(classId);
         });
 
+        @if (sizeOf($classes) > 0)
+            $('#no-classes').hide();
+            $('.table-responsive').show();
+        @endif
+
         function updateUser() {
             var formData = $('.steps-validation').serializeArray().reduce(function(obj, item) {
                 obj[item.name] = item.value;
@@ -403,29 +423,35 @@
                 url: '{{ url('api/class') }}',
                 type: 'POST',
                 data: {
-                    class_name: formData['class_name'],
+                    class_name:    formData['class_name'],
                     class_subject: formData['class_subject'],
-                    class_room: formData['class_room']
+                    class_room:    formData['class_room']
                 },
                 success: function(jsonResponse) {
                     handleNotification(jsonResponse.message, 'success');
 
-                    if (formData['class_subject'] == "") {
+                    if (formData['class_subject'] === "") {
                         formData['class_subject'] = 'N/A';
                     } else if (subjectsAvailable.indexOf(formData['class_subject']) == -1) {
                         subjectsAvailable.push(formData['class_subject']);
                     }
 
-                    if (formData['class_room'] == "") {
+                    if (formData['class_room'] === "") {
                         formData['class_room'] = 'N/A';
                     } else if (roomsAvailable.indexOf(formData['class_room']) == -1) {
                         roomsAvailable.push(formData['class_room']);
                     }
 
                     $('tbody').append('<tr>' +
-                        '<td>' + formData['class_name'] + '</td>' +
-                        '<td>' + formData['class_subject'] + '</td>' +
-                        '<td>' + formData['class_room'] + '</td>' +
+                        '<td>' +
+                            formData['class_name'] + 
+                        '</td>' +
+                        '<td>' + 
+                            formData['class_subject'] +
+                        '</td>' +
+                        '<td>' +
+                            formData['class_room'] +
+                        '</td>' +
                         '<td>' +
                             '<div class="btn-group">' +
                                 '<button type="button" class="btn btn-danger delete-class" class-id="' + jsonResponse.class.id + '">Delete</span></button>' +

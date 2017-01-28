@@ -36,9 +36,12 @@ class IndexController extends Controller
         return $this->getClassesDashboard($classController);
     }
 
-    public function getWizardDashboard()
+    public function getWizardDashboard(ClassController $classController)
     {
-        return view('dashboard.wizard');
+        $classes = $classController->getClasses();
+        
+        return view('dashboard.wizard')
+            ->with('classes', $classes);
     }
 
     /**
@@ -54,7 +57,7 @@ class IndexController extends Controller
             return redirect('/dashboard/classes/' . $classes->first()->id);
         }
         
-        return $this->getWizardDashboard();
+        return $this->getWizardDashboard($classController);
     }
 
     /**
