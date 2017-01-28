@@ -792,9 +792,9 @@
                 if (selectedStudents.length > 0) {
                     generateButton.text('Assign Seats to Selected (' + selectedStudents.length + ')');
 
-                    generateButton.show();
+                    generateButton.parent().show();
                 } else {
-                    generateButton.hide();
+                    generateButton.parent().hide();
                 }
             }
 
