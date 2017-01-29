@@ -449,7 +449,7 @@ class CreateClassStudentsTable extends Migration
                 'target_attainment_level'  => 'B'
             ],
             [
-                'student_id'               => 50,
+                'student_id'               => 60,
                 'class_id'                 => 3,
                 'ability_cap'              => 'L',
                 'current_attainment_level' => 'C',
