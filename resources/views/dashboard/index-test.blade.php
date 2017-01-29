@@ -424,7 +424,7 @@
 
             $('.class-button').not('.class-button-create').click(function() {
                 if (hasUserMadeChanges) {
-                    canvasController.confirmPageLeave($(this));
+                    canvasController.view.confirmPageLeave($(this));
                 } else {
                     canvasController.view.changeClass($(this));
                 }
@@ -461,7 +461,7 @@
                         var clickedLink = $(this).attr('href');
 
                         if (clickedLink != 'javascript:void(0);') {
-                            canvasController.confirmPageLeave(null, clickedLink);
+                            canvasController.view.confirmPageLeave(null, clickedLink);
                         }
                     }
                 }
@@ -1110,6 +1110,40 @@
                 if ($('#modal-assign-seating-positions').is(':visible')) {
                     notificationController.handleNotification('Exemption successfully removed!', 'success');
                 }
+            }
+
+            confirmPageLeave(buttonElement = null, externalLink = null) {
+                swal({
+                    title:              "Do you want to save changes made to '" + $('#class-name').text() + "'?",
+                    text:               "Your changes will be lost if you don’t save them.",
+                    type:               "warning",
+                    showCancelButton:   true,
+                    confirmButtonColor: "#66BB6A",
+                    confirmButtonText:  "Save seating plan",
+                    cancelButtonText:   "Continue without saving",
+                    closeOnConfirm:     false,
+                    closeOnCancel:      true
+                }, function(isConfirm){
+                    if (isConfirm) {
+                        $('.confirm').html('Loading <i class="icon-spinner2 spinner confirming-spinner"></i>');
+
+                        canvasController.saveCanvasItems(buttonElement, externalLink);
+
+                        swal({
+                            title:              "Saved!",
+                            text:               "Your changes to '" + $('#class-name').text() + "' have been saved.",
+                            confirmButtonColor: "#66BB6A",
+                            type:               "success",
+                            timer:              2000
+                        });
+                    } else {
+                        if (buttonElement != null) {
+                            canvasController.view.changeClass(buttonElement);
+                        } else if (externalLink != null) {
+                            window.location.href = externalLink;
+                        }
+                    }
+                });
             }
         }
 
@@ -2027,40 +2061,6 @@
                 return false;
             }
 
-            confirmPageLeave(buttonElement = null, externalLink = null) {
-                swal({
-                    title:              "Do you want to save changes made to '" + $('#class-name').text() + "'?",
-                    text:               "Your changes will be lost if you don’t save them.",
-                    type:               "warning",
-                    showCancelButton:   true,
-                    confirmButtonColor: "#66BB6A",
-                    confirmButtonText:  "Save seating plan",
-                    cancelButtonText:   "Continue without saving",
-                    closeOnConfirm:     false,
-                    closeOnCancel:      true
-                }, function(isConfirm){
-                    if (isConfirm) {
-                        $('.confirm').html('Loading <i class="icon-spinner2 spinner confirming-spinner"></i>');
-
-                        canvasController.saveCanvasItems(buttonElement, externalLink);
-
-                        swal({
-                            title:              "Saved!",
-                            text:               "Your changes to '" + $('#class-name').text() + "' have been saved.",
-                            confirmButtonColor: "#66BB6A",
-                            type:               "success",
-                            timer:              2000
-                        });
-                    } else {
-                        if (buttonElement != null) {
-                            canvasController.view.changeClass(buttonElement);
-                        } else if (externalLink != null) {
-                            window.location.href = externalLink;
-                        }
-                    }
-                });
-            }
-
             saveCanvasItems(buttonElement = null, externalLink = null) {   
                 var canvasItems            = this.canvasItems,
                     softDeletedCanvasItems = this.softDeletedCanvasItems,
@@ -2264,12 +2264,26 @@
                 notificationController.handleNotification('The selected students were successfully removed from their seats!', 'success');
             }
 
-            getSelectedStudents() {
+            getSelectedStudents(orderExemptions = false) {
                 this.updateSelectedStudents();
 
                 var selectedStudents = this.selectedStudents;
+                selectedStudents = selectedStudents.male.concat(selectedStudents.female);
 
-                return selectedStudents.male.concat(selectedStudents.female);
+                if (orderExemptions) { // deal with exemptions first
+                    for (var i = 0; i < selectedStudents.length; i++) {
+                        var selectedStudent = selectedStudents[i],
+                            exemptions      = selectedStudent.exemptions;
+
+                        if (exemptions.length > 0) {
+                            selectedStudents = selectedStudents.splice(i, 1).concat(selectedStudents); // make exemptions appear first because we should deal with them first
+                        }
+                    }
+
+                    return selectedStudents;
+                }
+
+                return selectedStudents;
             }
 
             getSeatedStudents() {
@@ -2380,7 +2394,7 @@
             attemptSeatPlacement(attemptedSeatsAvailable, incorrectSeatsAvailable, selectedStudent) {
                 var canvasItemId;
 
-                if (attemptedSeatsAvailable.length === 0) {
+                if (attemptedSeatsAvailable.length === 0 && selectedStudent.exemptions.length === 0) { // for simplicity, don't allow exempt students to sit in incorrect gender seats
                     if (incorrectSeatsAvailable.length > 0) {
                         canvasItemId = canvasController.canvasItemsGrid[incorrectSeatsAvailable[0][0]][incorrectSeatsAvailable[0][1]];
 
@@ -2395,11 +2409,47 @@
                         return false;
                     }
                 } else {
-                    canvasItemId = canvasController.canvasItemsGrid[attemptedSeatsAvailable[0][0]][attemptedSeatsAvailable[0][1]];
+                    if (selectedStudent.exemptions.length > 0) {
+                        var validSeatFound = false;
 
-                    canvasController.canvasItems[canvasItemId].student_id = selectedStudent.student_id;
+                        for (var i = 0; i < attemptedSeatsAvailable.length; i++) { // check every correct-gendered seating position for one that we're not exempt from
+                            var potentialCanvasItemId = canvasController.canvasItemsGrid[attemptedSeatsAvailable[i][0]][attemptedSeatsAvailable[i][1]];
 
-                    attemptedSeatsAvailable.shift();
+                            var potentialExemptPositions = this.middleOutHollowSearch(canvasController.canvasItemsGrid, [attemptedSeatsAvailable[i][0], attemptedSeatsAvailable[i][1]]);
+
+                            for (var j = 0; j < potentialExemptPositions.length; j++) {
+                                var potentialExemptPosition = potentialExemptPositions[j];
+
+                                if (potentialExemptPosition[0] !== null) {
+                                    var canvasItemId = canvasController.canvasItemsGrid[potentialExemptPosition[0][0]][potentialExemptPosition[0][1]],
+                                        canvasItem   = canvasController.canvasItems[canvasItemId];
+
+                                    if (selectedStudent.exemptions.indexOf(canvasItem.student_id) > -1) { // this seat is no good as a surrounding seat contains an exempt student
+                                        j = potentialExemptPositions.length + 1;
+                                        break;
+                                    }
+                                }
+                            }
+
+                            if (j !== potentialExemptPositions.length + 1) { 
+                                validSeatFound = true;
+                                break;
+                            }
+                        }
+
+                        if (validSeatFound) {
+                            canvasController.canvasItems[potentialCanvasItemId].student_id = selectedStudent.student_id;
+
+                            attemptedSeatsAvailable.splice(utils.getArrayInArrayPosition(attemptedSeatsAvailable, [attemptedSeatsAvailable[i][0], attemptedSeatsAvailable[i][1]]), 1);
+                        } else {
+                            notificationController.handleNotification(selectedStudent.name + ' could not be seated in any same-gendered seats while satisfying all exemption rules.', 'error');
+                        }
+                    } else {
+                        canvasItemId = canvasController.canvasItemsGrid[attemptedSeatsAvailable[0][0]][attemptedSeatsAvailable[0][1]];
+                        canvasController.canvasItems[canvasItemId].student_id = selectedStudent.student_id;
+
+                        attemptedSeatsAvailable.shift();
+                    }
                 }
 
                 return true;
@@ -2782,11 +2832,19 @@
         }
 
         class Utils {
-            isArrayInArray(arrayToSearch, arrayToFind) {
+            getArrayInArrayPosition(arrayToSearch, arrayToFind) {
                 for (let i = 0; i < arrayToSearch.length; i++) {
                     if (arrayToSearch[i][0] == arrayToFind[0] && arrayToSearch[i][1] == arrayToFind[1]) {
-                        return true;
+                        return i;
                     }
+                }
+
+                return -1;
+            }
+
+            isArrayInArray(arrayToSearch, arrayToFind) {
+                if (this.getArrayInArrayPosition(arrayToSearch, arrayToFind) > -1) {
+                    return true;
                 }
 
                 return false;
