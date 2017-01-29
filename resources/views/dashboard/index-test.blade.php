@@ -39,9 +39,7 @@
                         @foreach ($classes as $key => $class)
                             <li>
                                 <a href="javascript:void(0);" class="class-button" class-id="{{ $class->id }}">
-                                    <span class="sidebar-class-name">
-                                        {{ $class->class_name }}
-                                    </span>
+                                    <span class="sidebar-class-name">{{ $class->class_name }}</span>
                                     <span class="text-muted">
                                         <small>{{ $class->class_room or '' }}</small>
                                     </span>
@@ -583,6 +581,10 @@
                 });
             });
 
+            $(document).on('click', '.clear-seatingplan', function() {
+                canvasController.view.confirmPlanDeletion();
+            });
+
             $(document).on('click', '#remove-seated-students', function() {
                 studentController.removeSelectedStudents();
             });
@@ -1115,7 +1117,7 @@
             confirmPageLeave(buttonElement = null, externalLink = null) {
                 swal({
                     title:              "Do you want to save changes made to '" + $('#class-name').text() + "'?",
-                    text:               "Your changes will be lost if you don’t save them.",
+                    text:               "Your changes will be lost if you don't save them.",
                     type:               "warning",
                     showCancelButton:   true,
                     confirmButtonColor: "#66BB6A",
@@ -1142,6 +1144,24 @@
                         } else if (externalLink != null) {
                             window.location.href = externalLink;
                         }
+                    }
+                });
+            }
+
+            confirmPlanDeletion() {
+                swal({
+                    title:              "Are you sure you want to clear '" + $('#class-name').text() + "'?",
+                    text:               "Your changes will be lost.",
+                    type:               "warning",
+                    showCancelButton:   true,
+                    confirmButtonColor: "#FF7043",
+                    confirmButtonText:  "Clear seating plan",
+                    cancelButtonText:   "Continue without clearing",
+                    closeOnConfirm:     false,
+                    closeOnCancel:      true
+                }, function(isConfirm){
+                    if (isConfirm) {
+                        window.location.replace('{{ url('class/clear') }}/' + canvasController.classId);
                     }
                 });
             }

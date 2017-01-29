@@ -30,7 +30,8 @@ Route::group(['middleware' => ['guest']], function () {
 
 // The user needs to be authenticated to perform these actions
 Route::group(['middleware' => ['auth']], function () {
-    Route::get('dashboard', 'IndexController@getDashboard');
+    Route::get('dashboard', 'IndexController@getDashboard')
+        ->name('dashboard');
 
     Route::get('dashboard/settings', 'IndexController@getWizardDashboard');
 
@@ -48,6 +49,7 @@ Route::group(['middleware' => ['auth']], function () {
 
     Route::get('logout', 'UserController@getLogout');
 
+    Route::get('class/clear/{id}', 'ClassController@clearSeatingPlan');
     Route::post('class', 'ClassController@storeClass');
     Route::delete('class', 'ClassController@deleteClass');
 });

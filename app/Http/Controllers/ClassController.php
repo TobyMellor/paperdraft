@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\SchoolClass;
 use App\CanvasItem;
+use App\CanvasHistory;
 use App\ClassStudent;
 
 use Auth;
@@ -166,6 +167,9 @@ class ClassController extends Controller
         $validation = $this->validateClassId($data);
 
         if (!$validation->fails()) {
+            CanvasHistory::where('class_id', $id)
+                ->delete();
+
             ClassStudent::where('class_id', $id)
                 ->delete();
 
@@ -194,7 +198,6 @@ class ClassController extends Controller
             'message' => $responseMessage
         ]);
     }
-
 
     /**
      * Duplicate class items from one class to another
@@ -228,6 +231,33 @@ class ClassController extends Controller
         CanvasItem::insert($canvasItemsToPaste);
 
         return $newClassId;
+    }
+
+    /**
+     * Clear the seating plan
+     *
+     * @return \Illuminate\Http\Redirect
+     */
+    public function clearSeatingPlan($id) {
+        $data = [
+            'class_id' => $id
+        ];
+
+        $validation = $this->validateClassId($data);
+
+        if (!$validation->fails()) {
+            CanvasHistory::where('class_id', $id)
+                ->delete();
+
+            CanvasItem::withTrashed()
+                ->where('class_id', $id)
+                ->forceDelete();
+
+            return redirect()
+                ->route('dashboard', ['class' => $id]);
+        }
+
+        abort(403);
     }
 
     protected function validator(array $data)
