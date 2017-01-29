@@ -2141,12 +2141,10 @@
                     classStudentId = canvasItem.student_id;
 
                     if (classStudentId !== null) {
-                        if (selectedIds.indexOf(index) === -1) {
-                            classStudent = classStudents[classStudentId];
+                        classStudent = classStudents[classStudentId];
 
-                            canvasController.view.setCanvasItemTooltip(index, classStudent.name, classStudent.gender);
-                            canvasController.view.showCanvasItemTooltip(index);
-                        }
+                        canvasController.view.setCanvasItemTooltip(index, classStudent.name, classStudent.gender);
+                        canvasController.view.showCanvasItemTooltip(index);
                     }
                 }
             }
@@ -2384,6 +2382,8 @@
                         }
                     }
                 }
+
+                canvasController.refreshSelected();
 
                 notificationController.handleNotification('Finished assigning ' + this.getSeatedStudents().length + ' student(s) to seat(s).', 'success');
                 canvasController.showCanvasItemTooltips();
