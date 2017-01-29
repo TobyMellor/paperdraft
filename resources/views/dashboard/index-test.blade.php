@@ -2560,7 +2560,7 @@
                 if (firstStudent.exemptions.length > 3) {
                     notificationController.handleNotification(firstStudent.name + ' could not be exempt because they\'re already exempt from 4 people (max).', 'error');
                 } else if (secondStudent.exemptions.length > 3) {
-                    notificationController.handleNotification(firstStudent.name + ' could not be exempt because they\'re already exempt from 4 people (max).', 'error');
+                    notificationController.handleNotification(secondStudent.name + ' could not be exempt because they\'re already exempt from 4 people (max).', 'error');
                 } else {
                     if (firstStudent.exemptions.indexOf(secondStudentId) === -1) {
                         firstStudent = firstStudent.exemptions.push(secondStudentId);
