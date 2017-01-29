@@ -255,7 +255,7 @@
                                         </li>
                                         <li class="divider"></li>
                                         <li>
-                                            <a href="javascript:void(0);" class="clear-seatingplan">Clear Seating Plan</a>
+                                            <a href="{{ url('dashboard/classes') }}/{{ $class->id }}/clear" class="clear-seatingplan">Clear Seating Plan</a>
                                         </li>
                                         <li>
                                             <a href="javascript:void(0);" class="delete-class">Delete Class</a>

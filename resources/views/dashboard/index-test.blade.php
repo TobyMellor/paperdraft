@@ -57,14 +57,10 @@
                                     </a>
                                     <ul class="dropdown-menu dropdown-menu-right">
                                         <li>
-                                            <a href="{{ url('dashboard/classes/' . $class->id . '/duplicate') }}" data-toggle="modal" data-target="#modal_form_inline">Duplicate Class Layout</a>
+                                            <a href="{{ url('dashboard/classes/' . $class->id . '/duplicate') }}">Duplicate Class Layout</a>
                                         </li>
-                                        <li class="divider"></li>
                                         <li>
                                             <a href="javascript:void(0);" class="clear-seatingplan">Clear Seating Plan</a>
-                                        </li>
-                                        <li>
-                                            <a href="javascript:void(0);" class="delete-class">Delete Class</a>
                                         </li>
                                     </ul>
                                 </div> 
@@ -582,7 +578,7 @@
             });
 
             $(document).on('click', '.clear-seatingplan', function() {
-                canvasController.view.confirmPlanDeletion();
+                canvasController.view.confirmPlanClear();
             });
 
             $(document).on('click', '#remove-seated-students', function() {
@@ -1148,7 +1144,7 @@
                 });
             }
 
-            confirmPlanDeletion() {
+            confirmPlanClear() {
                 swal({
                     title:              "Are you sure you want to clear '" + $('#class-name').text() + "'?",
                     text:               "Your changes will be lost.",
@@ -1161,7 +1157,7 @@
                     closeOnCancel:      true
                 }, function(isConfirm){
                     if (isConfirm) {
-                        window.location.replace('{{ url('class/clear') }}/' + canvasController.classId);
+                        window.location.replace('{{ url('dashboard/classes') }}/' + canvasController.classId + '/clear');
                     }
                 });
             }

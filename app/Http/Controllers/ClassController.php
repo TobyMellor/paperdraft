@@ -210,7 +210,7 @@ class ClassController extends Controller
 
         $newClassId = SchoolClass::create([
             'user_id'       => Auth::id(),
-            'class_name'    => $className === null ? substr($classToDuplicate->class_name, 0, 23) . ' (copy)' : $className,
+            'class_name'    => $className === null ? substr($classToDuplicate->class_name, 0, 22) . ' (copy)' : $className,
             'class_subject' => $classSubject,
             'class_room'    => $classRoom === null ? $classToDuplicate->class_room : $classRoom
         ])->id;
@@ -233,28 +233,34 @@ class ClassController extends Controller
         return $newClassId;
     }
 
+    public function duplicateClassThenRedirect($classId) {
+        $newClassId = $this->duplicateClass($classId);
+
+        return redirect('dashboard/classes/' . $newClassId);
+    }
+
     /**
      * Clear the seating plan
      *
      * @return \Illuminate\Http\Redirect
      */
-    public function clearSeatingPlan($id) {
+    public function clearSeatingPlan($classId) {
         $data = [
-            'class_id' => $id
+            'class_id' => $classId
         ];
 
         $validation = $this->validateClassId($data);
 
         if (!$validation->fails()) {
-            CanvasHistory::where('class_id', $id)
+            CanvasHistory::where('class_id', $classId)
                 ->delete();
 
             CanvasItem::withTrashed()
-                ->where('class_id', $id)
+                ->where('class_id', $classId)
                 ->forceDelete();
 
             return redirect()
-                ->route('dashboard', ['class' => $id]);
+                ->route('dashboard', ['class' => $classId]);
         }
 
         abort(403);

@@ -37,19 +37,14 @@ Route::group(['middleware' => ['auth']], function () {
 
     Route::get('dashboard/classes', 'IndexController@getClassesDashboard');
     Route::get('dashboard/classes/{classId}', 'IndexController@getClassDashboard');
+    Route::get('dashboard/classes/{classId}/duplicate', 'ClassController@duplicateClassThenRedirect');
+    Route::get('dashboard/classes/{classId}/clear', 'ClassController@clearSeatingPlan');
     Route::get('dashboard/classes/{classId}/create', function($classId) {
         return redirect('dashboard/classes/' . $classId)->with('create', true);
     });
 
-    Route::get('dashboard/classes/{classId}/duplicate', function(ClassController $classController, $classId) {
-        $classId = $classController->duplicateClass($classId);
-
-        return redirect('dashboard/classes/' . $classId);
-    });
-
     Route::get('logout', 'UserController@getLogout');
 
-    Route::get('class/clear/{id}', 'ClassController@clearSeatingPlan');
     Route::post('class', 'ClassController@storeClass');
     Route::delete('class', 'ClassController@deleteClass');
 });
