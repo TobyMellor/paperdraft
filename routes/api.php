@@ -18,29 +18,33 @@ Route::group(['middleware' => ['auth']], function () {
     Route::resource('canvas-item', 'CanvasItemController',
         [
             'only' => [
-                'index',  // GET    canvas-item
-                'store',  // POST   canvas-item
-                'update', // PUT    canvas-item/{canvas-item-id}
-                'destroy' // DELETE canvas-item/{canvas-item-id}
+                'index',  // GET    api/canvas-item
+                'store',  // POST   api/canvas-item
+                'update', // PUT    api/canvas-item/{canvas-item-id}
+                'destroy' // DELETE api/canvas-item/{canvas-item-id}
             ],
         ]
     );
 
-    Route::put('canvas-item', 'CanvasItemController@batchUpdate');     // PUT    canvas-item accepts array
-    Route::delete('canvas-item', 'CanvasItemController@batchDestroy'); // DELETE canvas-item accepts array
+    Route::put('canvas-item', 'CanvasItemController@batchUpdate');     // PUT    api/canvas-item accepts array
+    Route::delete('canvas-item', 'CanvasItemController@batchDestroy'); // DELETE api/canvas-item accepts array
 
-    Route::resource('canvas-history', 'CanvasHistoryController', ['only' => [
-        'index', // GET  canvas-history
-        'store'  // POST canvas-history
-    ]]);
+    Route::resource('canvas-history', 'CanvasHistoryController',
+        [
+            'only' => [
+                'index', // GET  api/canvas-history
+                'store'  // POST api/canvas-history
+            ]
+        ]
+    );
 
     Route::resource('class-student', 'ClassStudentController',
         [
             'only' => [
-                'index',  // GET    class-student
-                'store',  // POST   class-student
-                'update', // PUT    class-student/{class-student-id}
-                'destroy' // DELETE class-student/{class-student-id}
+                'index',  // GET    api/class-student
+                'store',  // POST   api/class-student
+                'update', // PUT    api/class-student/{class-student-id}
+                'destroy' // DELETE api/class-student/{class-student-id}
             ],
         ]
     );
@@ -48,10 +52,10 @@ Route::group(['middleware' => ['auth']], function () {
     Route::resource('student', 'StudentController',
         [
             'only' => [
-                'index',  // GET    student
-                'store',  // POST   student
-                'update', // PUT    student/{student-id}
-                'destroy' // DELETE student/{student-id}
+                'index',  // GET    api/student
+                'store',  // POST   api/student
+                'update', // PUT    api/student/{student-id}
+                'destroy' // DELETE api/student/{student-id}
             ],
         ]
     );
@@ -61,8 +65,8 @@ Route::group(['middleware' => ['auth']], function () {
     Route::resource('class', 'ClassController', 
         [
             'only' => [
-                'store',  // POST   class
-                'destroy' // DELETE class
+                'store',  // POST   api/class
+                'destroy' // DELETE api/class
             ], 
         ]
     );
@@ -70,8 +74,16 @@ Route::group(['middleware' => ['auth']], function () {
     Route::resource('user', 'UserController', 
         [
             'only' => [
-                'update', // PUT user
+                'update', // PUT api/user
             ], 
+        ]
+    );
+
+    Route::resource('user/setting', 'SettingController',
+        [
+            'only' => [
+                'store',  // POST api/setting
+            ],
         ]
     );
 });

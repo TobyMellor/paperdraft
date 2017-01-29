@@ -76,5 +76,10 @@ return [
         'success' => [
             'update' => 'Your user data has been successfully updated.'
         ]
+    ],
+    'setting' => [
+        'success' => [
+            'store' => 'The user preferences were successfully saved.'
+        ]
     ]
 ];

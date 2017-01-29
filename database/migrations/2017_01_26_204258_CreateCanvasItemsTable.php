@@ -17,20 +17,20 @@ class CreateCanvasItemsTable extends Migration
 
             $table->integer('item_id')->unsigned();
             $table->foreign('item_id')
-                ->references('id')
-                ->on('items');
+                  ->references('id')
+                  ->on('items');
 
             $table->integer('class_id')->unsigned();
             $table->foreign('class_id')
-                ->references('id')
-                ->on('classes');
+                  ->references('id')
+                  ->on('classes');
 
             $table->integer('student_id')
-                ->unsigned()
-                ->nullable();
+                  ->unsigned()
+                  ->nullable();
             $table->foreign('student_id')
-                ->references('id')
-                ->on('students');
+                  ->references('id')
+                  ->on('students');
 
             $table->integer('position_x');
             $table->integer('position_y');

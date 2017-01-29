@@ -17,8 +17,8 @@ class CreateClassesTable extends Migration
 
             $table->integer('user_id')->unsigned();
             $table->foreign('user_id')
-                ->references('id')
-                ->on('users');
+                  ->references('id')
+                  ->on('users');
 
             /*
             $table->integer('period_id')->unsigned();
@@ -29,11 +29,13 @@ class CreateClassesTable extends Migration
 
             $table->string('class_name');
             $table->integer('canvas_action_undo_count')
-                ->unsigned()
-                ->default(1);
+                  ->unsigned()
+                  ->default(1);
 
-            $table->string('class_subject', 30)->nullable();
-            $table->string('class_room', 30)->nullable();
+            $table->string('class_subject', 30)
+                  ->nullable();
+            $table->string('class_room', 30)
+                  ->nullable();
 
             $table->timestamps();
         });

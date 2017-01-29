@@ -32,10 +32,11 @@ class User extends Model implements AuthenticatableContract,
         'title',
         'first_name',
         'last_name',
-        'institution_name',
         'email',
         'password',
-        'confirmation_code'
+        'confirmation_code',
+        'institution_name',
+        'user_preferences'
     ];
 
     /**

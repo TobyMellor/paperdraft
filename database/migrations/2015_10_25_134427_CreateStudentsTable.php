@@ -19,10 +19,11 @@ class CreateStudentsTable extends Migration
             $table->string('gender');
             $table->boolean('pupil_premium');
 
-            $table->integer('user_id')->unsigned();
+            $table->integer('user_id')
+                  ->unsigned();
             $table->foreign('user_id')
-                ->references('id')
-                ->on('users');
+                  ->references('id')
+                  ->on('users');
 
             $table->timestamps();
         });

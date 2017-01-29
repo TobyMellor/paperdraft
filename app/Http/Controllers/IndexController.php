@@ -16,21 +16,22 @@ class IndexController extends Controller
     public function getDashboard(
         ClassController $classController,
         StudentController $studentController,
-        ItemController $itemController
+        ItemController $itemController,
+        SettingController $settingController
     )
     {
         $classes = $classController->getClasses();
         $items = $itemController->index();
 
         if ($classes->first() !== null) {
-            $recentClassId = $classController->getRecentClassId();
-            $classStudents = ClassStudent::where('class_id', $classes->first()->id)->paginate(9);
+            $recentClassId   = $classController->getRecentClassId();
+            $userPreferences = $settingController->getUserPreferences();
 
             return view('dashboard.index-test')
-                ->with('classStudents', $classStudents)
                 ->with('classes', $classes)
                 ->with('items', $items)
-                ->with('recentClassId', $recentClassId);
+                ->with('recentClassId', $recentClassId)
+                ->with('userPreferences', $userPreferences);
         }
 
         return $this->getClassesDashboard($classController);

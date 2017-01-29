@@ -17,20 +17,22 @@ class CreateCanvasHistoryTable extends Migration
 
             $table->integer('class_id')->unsigned();
             $table->foreign('class_id')
-                ->references('id')
-                ->on('classes')
-                ->onDelete('cascade');
+                  ->references('id')
+                  ->on('classes')
+                  ->onDelete('cascade');
 
             $table->integer('canvas_item_id')->unsigned();
             $table->foreign('canvas_item_id')
-                ->references('id')
-                ->on('canvas_items')
-                ->onDelete('cascade');
+                  ->references('id')
+                  ->on('canvas_items')
+                  ->onDelete('cascade');
 
             $table->string('type');
 
-            $table->integer('position_x')->nullable();
-            $table->integer('position_y')->nullable();
+            $table->integer('position_x')
+                  ->nullable();
+            $table->integer('position_y')
+                  ->nullable();
             $table->integer('previous_position_x');
             $table->integer('previous_position_y');
 

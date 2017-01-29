@@ -217,7 +217,7 @@ class UserController extends Controller
      */
     public function destroyUser($userId)
     {
-        if (Auth::user()->priviledge == 1 && $userId != Auth::user()->id) {
+        if (Auth::user()->priviledge === 1 && $userId !== Auth::id()) {
             User::destroy($userId);
         }
     }
@@ -241,11 +241,11 @@ class UserController extends Controller
             'last_name'         => $lastName,
             'institution_name'  => $institutionName
         ];
-
+        
         $validation = $this->validateUpdatedUser($data);
 
         if (!$validation->fails()) {
-            User::where('id', Auth::user()->id)
+            User::where('id', Auth::id())
                 ->update([
                     'title'             => $title,
                     'first_name'        => $firstName,

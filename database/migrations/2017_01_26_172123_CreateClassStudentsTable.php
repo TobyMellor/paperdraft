@@ -17,19 +17,19 @@ class CreateClassStudentsTable extends Migration
 
             $table->integer('student_id')->unsigned();
             $table->foreign('student_id')
-                ->references('id')
-                ->on('students');
+                  ->references('id')
+                  ->on('students');
 
             $table->integer('class_id')->unsigned();
             $table->foreign('class_id')
-                ->references('id')
-                ->on('classes');
+                  ->references('id')
+                  ->on('classes');
 
             $table->string('ability_cap');
             $table->string('current_attainment_level')
-                ->nullable();
+                  ->nullable();
             $table->string('target_attainment_level')
-                ->nullable();
+                  ->nullable();
 
             $table->timestamps();
         });
