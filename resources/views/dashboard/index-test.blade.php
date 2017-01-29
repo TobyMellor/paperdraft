@@ -343,31 +343,27 @@
                                     <option value="boy-girl">John Smith</option>
                                 </select>
 
-                                <label class="display-block text-bold second-student">Select 2nd student to separate from 'John Smith'</label>
+                                <label class="display-block text-bold second-student">Select 2nd student to be separated from the 1st</label>
                                 <select class="select" name="exemption-2">
                                     <option value="" disabled selected>Select 2nd troublesum student</option>
                                     <option value="boy-girl">John Smith</option>
                                 </select>
+
+                                <button type="button" class="btn btn-primary" id="add-exemption" disabled>
+                                    <i class="icon-plus3 position-left"></i> Add Exemption
+                                </button>
                             </div>
                             <div class="col-md-6">
-                                <label class="display-block text-bold">Students exempt from sitting with 'John Smith'</label>
-                                <table class="table table-bordered table-striped">
+                                <label class="display-block text-bold">Students exempt from sitting with eachother:</label>
+                                <table class="table table-bordered table-striped" id="exemptions-table">
                                     <thead>
                                         <tr>
-                                            <th>First Name</th>
-                                            <th>Last Name</th>
+                                            <th>First Student</th>
+                                            <th>Second Student</th>
+                                            <th>Action</th>
                                         </tr>
                                     </thead>
-                                    <tbody>
-                                        <tr>
-                                            <td>Eugene</td>
-                                            <td>Kopyov</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Victoria</td>
-                                            <td>Baker</td>
-                                        </tr>
-                                    </tbody>
+                                    <tbody id="exemptions-table-body"></tbody>
                                 </table>
                             </div>
                         </div>
@@ -496,8 +492,12 @@
             $(document).on('click', '#generate-seating-positions', function() {
                 $('#algorithm-boy-girl-settings').hide();
                 $('select[name="assignment-algorithm"]').val('').trigger('change');
-                $('#modal-assign-seating-positions').modal('show');
                 $('#auto-assign-seating-positions').prop('disabled', true);
+
+                studentController.clearExemptions();
+                canvasController.view.updateExemptionList();
+
+                $('#modal-assign-seating-positions').modal('show');
             });
 
             $(document).on('click', '#remove-seating-positions', function() {
@@ -529,6 +529,29 @@
 
                     $('#auto-assign-seating-positions').prop('disabled', false);
                 }
+            });
+
+            $(document).on('change', 'select[name="exemption-1"]', function() {
+                canvasController.view.updateExemptionList(parseInt($(this).val()));
+            });
+
+            $(document).on('change', 'select[name="exemption-2"]', function() {
+                $('#add-exemption').prop('disabled', false);
+            });
+
+            $(document).on('click', '#add-exemption', function() {
+                var firstStudentId  = parseInt($('select[name="exemption-1"]').val()),
+                    secondStudentId = parseInt($('select[name="exemption-2"]').val());
+
+                studentController.addExemption(firstStudentId, secondStudentId);
+                canvasController.view.updateExemptionList(firstStudentId);
+            });
+
+            $(document).on('click', '#remove-exemption', function() {
+                var firstStudentId  = parseInt($(this).attr('first-student-id')),
+                    secondStudentId = parseInt($(this).attr('second-student-id'));
+
+                studentController.removeExemption(firstStudentId, secondStudentId);
             });
 
             $(document).on('click', '#auto-assign-seating-positions', function() {
@@ -660,7 +683,7 @@
                         '</td>' +
                         '<td class="student-td-4">' +
                             '<button type="button" class="btn btn-danger" id="delete-student">' +
-                                'Remove' +
+                                '<i class="icon-diff-removed"></i>' +
                             '</button>' +
                         '</td>' +
                     '</tr>');
@@ -1018,9 +1041,79 @@
                     );
                 }
             }
+
+            updateExemptionList(firstStudentId = null) {
+                var classStudents = studentController.classStudents,
+                    potentialExemptions;
+
+                if (firstStudentId === null) {
+                    potentialExemptions = studentController.getPotentialExemptions();
+                } else {
+                    potentialExemptions = studentController.getPotentialExemptions(firstStudentId);
+                }
+
+                $('select[name="exemption-1"]').html('<option value="" disabled selected>Select 1st troublesum student</option>');
+
+                $.each(classStudents, function (i, classStudent) {
+                    $('select[name="exemption-1"]').append($('<option>', { 
+                        value: classStudent.student_id,
+                        text:  classStudent.name
+                    }));
+                });
+
+                $('select[name="exemption-2"]').html('<option value="" disabled selected>Select 2nd troublesum student</option>');
+
+                $.each(potentialExemptions.second_students, function (i, potentialExemption) {
+                    $('select[name="exemption-2"]').append($('<option>', { 
+                        value: potentialExemption[0],
+                        text:  potentialExemption[1]
+                    }));
+                });
+
+                $('select[name="exemption-1"]').val(potentialExemptions.first_student).select2();
+                $('select[name="exemption-2"]').val('').select2();
+
+                $('#add-exemption').prop('disabled', true);
+            }
+
+            addExemption(firstStudentId, secondStudentId) {
+                var classStudents = studentController.classStudents;
+
+                $('#exemptions-table-body').append(
+                    '<tr>' +
+                        '<td>' + classStudents[firstStudentId].name + '</td>' +
+                        '<td>' + classStudents[secondStudentId].name + '</td>' +
+                        '<td>' +
+                            '<button id="remove-exemption" class="btn btn-danger btn-sm" type="button" first-student-id="' + firstStudentId + '" second-student-id="' + secondStudentId + '">' +
+                                '<i class="icon-diff-removed"></i>' +
+                            '</button>' +
+                        '</td>' +
+                    '</tr>')
+
+                $('#exemptions-table').fadeIn();
+
+                notificationController.handleNotification('Exemption successfully added! ' + classStudents[firstStudentId].name + ' and ' + classStudents[secondStudentId].name + ' will not be seated next to eachother!', 'success');
+            }
+
+            removeExemption(firstStudentId, secondStudentId) {
+                $('button[first-student-id="' + firstStudentId + '"][second-student-id="' + secondStudentId + '"], button[first-student-id="' + secondStudentId + '"][second-student-id="' + firstStudentId + '"]')
+                    .parent()
+                    .parent()
+                    .fadeOut(300, function() {
+                        $(this).remove();
+
+                        if ($('#exemptions-table-body').find('tr').length === 0) {
+                            $('#exemptions-table').fadeOut();
+                        }
+                    });
+
+                if ($('#modal-assign-seating-positions').is(':visible')) {
+                    notificationController.handleNotification('Exemption successfully removed!', 'success');
+                }
+            }
         }
 
-        // Canvas history is the previous actions a user has taken on the canvas
+        // Canvas History is the previous actions a user has taken on the canvas
         // e.g. canvasItem 1 movement to X: 5, Y: 8
 
         // TODO: update this
@@ -1209,11 +1302,11 @@
                     @if (isset($items))
                         @foreach ($items as $item)
                             {
-                                'id':       '{{ $item->id }}',
-                                'name':     '{{ $item->name }}',
-                                'width':    '{{ $item->width }}',
-                                'height':   '{{ $item->height }}',
-                                'location': '{{ $item->location }}',
+                                id:       '{{ $item->id }}',
+                                name:     '{{ $item->name }}',
+                                width:    '{{ $item->width }}',
+                                height:   '{{ $item->height }}',
+                                location: '{{ $item->location }}',
                             },
                         @endforeach
                     @endif
@@ -2071,6 +2164,8 @@
                 this.maleSeatsAvailable   = [];
                 this.femaleSeatsAvailable = [];
 
+                this.exemptions = [];
+
                 this.classStudentsModel = new ClassStudentModel;
                 this.view               = new View;
             }
@@ -2118,7 +2213,8 @@
                     ability_cap:                classStudentRecord.ability_cap,
                     current_attainment_level:   classStudentRecord.current_attainment_level,
                     target_attainment_level:    classStudentRecord.target_attainment_level,
-                    tooltip_occupied_positions: null
+                    tooltip_occupied_positions: null,
+                    exemptions:                 [],
                 }
 
                 this.view.addClassStudent(classStudentRecord);
@@ -2238,7 +2334,7 @@
                 this.view.updateStudentButtons();
             }
 
-            assignmentAlgorithmBoyGirl() {
+            assignmentAlgorithmBoyGirl(exemptions) {
                 var selectedParent = canvasController.canvasItems[selectedCanvasItems.parent.id],
                     anchorPoint    = [selectedParent.position_x, selectedParent.position_y];
 
@@ -2404,6 +2500,82 @@
                 }
                 
                 return itemsFound;
+            }
+
+            addExemption(firstStudentId, secondStudentId) {
+                var classStudents = this.classStudents,
+                    firstStudent  = classStudents[firstStudentId],
+                    secondStudent = classStudents[secondStudentId];
+
+                if (firstStudent.exemptions.length > 3) {
+                    notificationController.handleNotification(firstStudent.name + ' could not be exempt because they\'re already exempt from 4 people (max).', 'error');
+                } else if (secondStudent.exemptions.length > 3) {
+                    notificationController.handleNotification(firstStudent.name + ' could not be exempt because they\'re already exempt from 4 people (max).', 'error');
+                } else {
+                    if (firstStudent.exemptions.indexOf(secondStudentId) === -1) {
+                        firstStudent = firstStudent.exemptions.push(secondStudentId);
+                    }
+
+                    if (secondStudent.exemptions.indexOf(firstStudentId) === -1) {
+                        secondStudent = secondStudent.exemptions.push(firstStudentId);
+                    }
+
+                    canvasController.view.addExemption(firstStudentId, secondStudentId);
+                }
+            }
+
+            removeExemption(firstStudentId, secondStudentId) {
+                var classStudents = this.classStudents,
+                    firstStudent  = classStudents[firstStudentId],
+                    secondStudent = classStudents[secondStudentId];
+
+                firstStudent.exemptions.splice(firstStudent.exemptions.indexOf(secondStudentId), 1);
+                secondStudent.exemptions.splice(secondStudent.exemptions.indexOf(firstStudentId), 1);
+
+                canvasController.view.removeExemption(firstStudentId, secondStudentId);
+            }
+
+            clearExemptions() {
+                var classStudents = this.classStudents,
+                    classStudent, exemptions;
+
+                for (var index in classStudents) {
+                    classStudent = classStudents[index];
+                    exemptions   = classStudent.exemptions;
+
+                    for (var i = 0; i < exemptions.length; i++) {
+                        this.removeExemption(parseInt(index), exemptions[i]);
+                    }
+                }
+            }
+
+            getPotentialExemptions(firstStudentId = null) {
+                var classStudents       = this.classStudents,
+                    exemptions          = this.exemptions,
+                    potentialExemptions = {
+                        first_student:   null,
+                        second_students: []
+                    };
+
+                if (Object.keys(classStudents).length === 0) {
+                    return null;
+                }
+
+                if (firstStudentId === null) {
+                    firstStudentId = parseInt(Object.keys(classStudents)[0]);
+                }
+
+                potentialExemptions.first_student = [firstStudentId, classStudents[firstStudentId].name];
+
+                for (var secondStudentId in classStudents) {
+                    var secondStudentId = parseInt(secondStudentId);
+
+                    if (secondStudentId !== firstStudentId && classStudents[secondStudentId].exemptions.indexOf(firstStudentId) === -1) {
+                        potentialExemptions.second_students.push([secondStudentId, classStudents[secondStudentId].name])
+                    }
+                }
+
+                return potentialExemptions;
             }
 
             sortByDifference(itemsFound, anchorPoint) {

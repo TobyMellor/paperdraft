@@ -122,6 +122,10 @@
     padding: 3px 6px;
 }
 
+#remove-exemption {
+    padding: 3px 6px;
+}
+
 #selected-no-items {
     display: none;
 }
@@ -269,4 +273,19 @@
 #remove-seated-students {
     padding: 3px 6px;
     margin-top: 5px;
+}
+
+#add-exemption {
+    margin-top: 10px;
+}
+
+#delete-student {
+    padding-left: 5px;
+    padding-right: 5px;
+    padding-bottom: 3px;
+    padding-top: 3px;
+}
+
+#exemptions-table {
+    display: none;
 }
