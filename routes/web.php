@@ -21,11 +21,11 @@ Route::group(['middleware' => ['guest']], function () {
     Route::get('email/confirmation', 'UserController@confirmEmail');
     Route::get('email/confirmation/send/{email}', 'UserController@sendConfirmationEmail');
 
-    Route::get('password/reset', 'PasswordController@getEmail');
-    Route::post('password/email', 'PasswordController@postEmail');
+    Route::get('password/reset', 'UserController@getForgottenPassword');
+    Route::post('password/link', 'UserController@sendPasswordResetLink');
 
-    Route::get('password/reset/{token}', 'PasswordController@getReset');
-    Route::post('password/reset', 'PasswordController@postReset');
+    Route::get('password/reset/{token}', 'UserController@getResetPassword');
+    Route::post('password/reset', 'UserController@resetPassword');
 });
 
 // The user needs to be authenticated to perform these actions
@@ -48,4 +48,3 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('class', 'ClassController@storeClass');
     Route::delete('class', 'ClassController@deleteClass');
 });
-

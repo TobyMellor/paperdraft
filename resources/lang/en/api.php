@@ -81,5 +81,14 @@ return [
         'success' => [
             'store' => 'The user preferences were successfully saved.'
         ]
+    ],
+    'institution' => [
+        'success' => [
+            'store'  => 'The institution was successfully saved.',
+            'update' => 'The institution was successfully updated.'
+        ],
+        'failure' => [
+            'update' => 'You don\'t have permission to update that institution.'
+        ]
     ]
 ];

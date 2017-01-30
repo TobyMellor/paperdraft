@@ -309,3 +309,7 @@
 #undo-button {
     margin-left: 5px;
 }
+
+#institution {
+    display: none;
+}

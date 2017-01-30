@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\User;
 use App\Institution;
+use App\PasswordReset;
 
 use Auth;
 use Validator;
@@ -54,7 +55,8 @@ class UserController extends Controller
     {
         $request->session()->put('changeSection', 'sign-in');
 
-        return view('auth.login');
+        return view('auth.login')
+            ->with('email', $request->input('email'));
     }
 
     /**
@@ -66,7 +68,8 @@ class UserController extends Controller
     {
         $request->session()->put('changeSection', 'sign-up');
 
-        return view('auth.login');
+        return view('auth.login')
+            ->with('email', $request->input('email'));
     }
 
     /**
@@ -106,21 +109,38 @@ class UserController extends Controller
      */
     public function authenticateUser(Request $request)
     {
-        if (Auth::attempt([
-            'email'    => $request->input('email'),
-            'password' => $request->input('password')
-        ], $request->input('checkbox'))) {
-            return redirect()->intended($this->redirectTo);
-        } else {
+        $email    = $request->input('email');
+        $password = $request->input('password');
+        
+        if (User::where('email', $email)->where('confirmed', 0)->count() > 0) {
             return redirect($this->redirectBackTo)
+                ->withInput()
                 ->with('response', [
                     'error'   => 1,
-                    'message' => 'The email and password you entered don\'t match.',
-                    'fields'  => [
-                        'password' => 'The email and password you entered don\'t match.'
-                    ]
+                    'message' => 'You need to confirm your email first. 
+                        <strong>
+                            <a href="' . url('email/confirmation/send/' . $email) . '" class="send-confirm">
+                                Send another email confirmation?
+                            </a>
+                        </strong>'
                 ]);
+        } else if (
+            Auth::attempt([
+                'email'    => $email,
+                'password' => $password
+            ], $request->input('checkbox'))) {
+                return redirect('dashboard');
         }
+
+        return redirect($this->redirectBackTo)
+            ->withInput()
+            ->with('response', [
+                'error'   => 1,
+                'message' => 'The email and password you entered don\'t match.',
+                'fields'  => [
+                    'password' => 'The email and password you entered don\'t match.'
+                ]
+            ]);
     }
 
     /**
@@ -157,7 +177,7 @@ class UserController extends Controller
             $user->confirmation_code = $confirmationCode;
 
             if ($data['institution_code'] !== null) {
-                $institution = Institution::where('institution_code', $data['institution_code'])->first();
+                $institution = Institution::where('institution_code', 'LIKE', $data['institution_code'])->first();
 
                 $user->institution_id = $institution->id;
             }
@@ -167,18 +187,18 @@ class UserController extends Controller
             $this->sendConfirmationEmail($email);
 
             return redirect($this->redirectBackTo)
-                ->with('successMessage', 'Success! Before you can sign in, look for the confirmation email we\'ve sent to <strong>' . $data['email'] . '</strong>. Check your spam folder too!')
-                ->withInput();
-
-            return redirect($this->redirectBackTo)
-                ->with('successMessage', 'You have successfully signed up. Sign in!');
+                ->withInput($request->except('password'))
+                ->with('response', [
+                    'error'   => 0,
+                    'message' => 'Success! Before you can sign in, look for the confirmation email we\'ve sent to <strong>' . $data['email'] . '</strong>. Check your spam folder too!'
+                ]);
         }
 
         return redirect('/register')
             ->withInput($request->except('password'))
             ->with('response', [
                 'error'   => 1,
-                'message' => 'There was a few problems with the data you supplied.',
+                'message' => 'There\'s a few problems with the data you supplied.',
                 'fields'  => $validation->errors()
             ]);
     }
@@ -190,24 +210,44 @@ class UserController extends Controller
         if ($user->count() > 0) {
             $token = User::where('email', $email)->where('confirmed', 0)->first()->confirmation_code;
 
-            Mail::send('auth.emails.confirmation', ['email' => $email, 'token' => $token], function ($m) use ($email, $token) {
-                $m->from('admin@seatingplanner.dev', 'SeatingPlanner');
+            Mail::send('auth.emails.confirmation', [
+                    'email' => $email,
+                    'token' => $token
+                ], function ($m) use ($email, $token) {
+                    $m->from('admin@paperdraft.dev', 'PaperDraft');
 
-                $m->to($email, $email)->subject('Please confirm your email!');
+                    $m->to($email, $email)->subject('Please confirm your email!');
             });
 
             return redirect($this->redirectBackTo)
-                ->with('successMessage', 'We\'ve sent another, look for the confirmation email we\'ve sent to <strong>' . $email . '</strong>. Check your spam folder too!');
-        } else {
-            return redirect($this->redirectBackTo)
-                ->with('errorMessage', 'You\'ve already confirmed your email. You can now sign in.');
+                ->with('response', [
+                    'error'   => 0,
+                    'message' => 'We\'ve sent another, look for the confirmation email we\'ve sent to <strong>' . $email . '</strong>. Check your spam folder too!'
+                ]);
         }
+
+        $user = User::where('email', $email);
+
+        if ($user->count() === 0) {
+            return redirect('/register')
+                ->with('response', [
+                    'error'   => 1,
+                    'message' => 'The email <strong>' . $email . '</strong> doesn\'t exist in our records. Try registering again.'
+                ]);
+        }
+
+        return redirect($this->redirectBackTo)
+                ->withInput()
+            ->with('response', [
+                'error'   => 0,
+                'message' => 'You\'ve already confirmed your email. You can now sign in.'
+            ]);
     }
 
     public function confirmEmail(Request $request)
     {
         $confirmationCode = $request->get('token');
-        $email = $request->get('email');
+        $email            = $request->get('email');
 
         $user = User::where('email', $email)
             ->where('confirmed', 0)
@@ -219,14 +259,31 @@ class UserController extends Controller
             $user->save();
 
             return redirect($this->redirectBackTo)
-                ->with('successMessage', 'You\'ve successfully confirmed your email. You can now sign in.');
+                ->withInput()
+                ->with('response', [
+                    'error'   => 0,
+                    'message' => 'You\'ve successfully confirmed your email. You can now sign in.'
+                ]);
         } else if (User::where('email', $email)->where('confirmed', 1)->count() > 0) {
             return redirect($this->redirectBackTo)
-                ->with('successMessage', 'You\'ve already confirmed your email. You can now sign in.');
+                ->withInput()
+                ->with('response', [
+                    'error'   => 0,
+                    'message' => 'You\'ve already confirmed your email. You can now sign in.'
+                ]);
         }
 
         return redirect($this->redirectBackTo)
-            ->with('errorMessage', 'The link was invalid. <strong><a href="' . url('email/confirmation/send/' . $email) . '"  style="text-decoration: underline; color: inherit !important;">Send another?</a></strong>');
+            ->withInput()
+            ->with('response', [
+                'error'   => 1,
+                'message' => 'The link was invalid. 
+                    <strong>
+                        <a href="' . url('email/confirmation/send/' . $email) . '" class="send-confirm">
+                            Send another?
+                        </a>
+                    </strong>'
+            ]);
     }
 
     /**
@@ -252,13 +309,11 @@ class UserController extends Controller
         $title           = $request->input('title');
         $firstName       = $request->input('first_name');
         $lastName        = $request->input('last_name');
-        $institutionName = $request->input('institution_name');
 
         $data = [
             'title'             => $title,
             'first_name'        => $firstName,
-            'last_name'         => $lastName,
-            'institution_name'  => $institutionName
+            'last_name'         => $lastName
         ];
         
         $validation = $this->validateUpdatedUser($data);
@@ -268,8 +323,7 @@ class UserController extends Controller
                 ->update([
                     'title'             => $title,
                     'first_name'        => $firstName,
-                    'last_name'         => $lastName,
-                    'institution_name'  => $institutionName
+                    'last_name'         => $lastName
                 ]);
 
             return response()->json([
@@ -292,6 +346,139 @@ class UserController extends Controller
     }
 
     /**
+     * Display the password reset page.
+     *
+     * @return \Illuminate\Http\View
+     */
+    public function getForgottenPassword()
+    {
+        return view('auth.passwords.forgotten');
+    }
+
+    /**
+     * Display the password reset page.
+     *
+     * @return \Illuminate\Http\View
+     */
+    public function getResetPassword(Request $request, $token)
+    {
+        $email = $request->input('email');
+
+        $passwordResetField = PasswordReset::where('email', $email)
+            ->where('token', $token);
+
+        if ($passwordResetField->count() > 0) {
+            return view('auth.passwords.reset')
+                ->with('token', $token);
+        }
+
+        return redirect('login')
+            ->with('response', [
+                'error'   => 1,
+                'message' => 'The password reset link was invalid. Please request another to continue.'
+            ]);
+    }
+
+    public function sendPasswordResetLink(Request $request)
+    {
+        $email = $request->input('email');
+
+        $data = [
+            'email' => $email
+        ];
+
+        $validation = $this->validatePasswordResetLink($data);
+
+        if (!$validation->fails()) {
+            $token = str_random(50);
+
+            $passwordResetField = PasswordReset::where('email', $email);
+
+            if ($passwordResetField->count() === 0) {
+                $passwordResetField = new PasswordReset;
+
+                $passwordResetField->email = $email;
+                $passwordResetField->token = $token;
+
+                $passwordResetField->save();
+            } else {
+                $passwordResetField->update([
+                    'token' => $token
+                ]);
+            }
+
+            Mail::send('auth.emails.reset', [
+                    'email' => $email,
+                    'token' => $token
+                ], function ($m) use ($email, $token) {
+                    $m->from('admin@paperdraft.dev', 'PaperDraft');
+
+                    $m->to($email, $email)->subject('Your reset link');
+            });
+
+            return redirect($this->redirectBackTo)
+                ->with('response', [
+                    'error'   => 0,
+                    'message' => 'We\'ve sent a password reset request, look for the email we\'ve sent to <strong>' . $email . '</strong>. Check your spam folder too!'
+                ]);
+        }
+
+        return redirect($this->redirectBackTo)
+                ->withInput()
+            ->with('response', [
+                'error'   => 1,
+                'message' => 'That email is invalid or doesn\'t exist in our database! Please register'
+            ]);
+    }
+
+    public function resetPassword(Request $request)
+    {
+        $token = $request->input('token');
+        $email = $request->input('email');
+        $password = $request->input('password');
+        $passwordConfirmation = $request->input('password_confirmation');
+
+        $data = [
+            'password'              => $password,
+            'password_confirmation' => $passwordConfirmation
+        ];
+
+        $passwordResetField = PasswordReset::where('email', $email)
+            ->where('token', $token);
+
+        if ($passwordResetField->count() > 0) {
+            $validation = $this->validatePasswordReset($data);
+
+            if (!$validation->fails()) {
+                $passwordResetField->delete();
+
+                $user = User::where('email', $email)
+                    ->update([
+                        'password' => bcrypt($password)
+                    ]);
+                return redirect($this->redirectBackTo)
+                    ->withInput()
+                    ->with('response', [
+                        'error'   => 0,
+                        'message' => 'The new password has been successfully set. You can now login.'
+                    ]);
+            }
+
+            return redirect($this->redirectBackTo)
+                ->with('response', [
+                    'error'   => 1,
+                    'message' => 'The passwords were invalid or they do not match.'
+                ]);
+        }
+
+        return redirect($this->redirectBackTo)
+            ->with('response', [
+                'error'   => 1,
+                'message' => 'The password reset link was invalid. Please request another to continue.'
+            ]);
+    }
+
+    /**
      * Validates an array of information.
      *
      * @return Validator
@@ -301,7 +488,31 @@ class UserController extends Controller
         return Validator::make($data, [
             'email'            => 'required|email|max:255|min:1|unique:users',
             'password'         => 'required|confirmed|min:6',
-            'institution_code' => 'nullable|size:6|alpha_num|exists:institutions,institution_code'
+            'institution_code' => 'nullable|size:8|alpha_num|exists:institutions,institution_code'
+        ]);
+    }
+
+    /**
+     * Validates an array of information.
+     *
+     * @return Validator
+     */
+    protected function validatePasswordResetLink(array $data)
+    {
+        return Validator::make($data, [
+            'email' => 'required|email|max:255|min:1|exists:users'
+        ]);
+    }
+
+    /**
+     * Validates an array of information.
+     *
+     * @return Validator
+     */
+    protected function validatePasswordReset(array $data)
+    {
+        return Validator::make($data, [
+            'password' => 'required|confirmed|min:6'
         ]);
     }
 
@@ -316,7 +527,6 @@ class UserController extends Controller
             'title'            => 'required|string|in:Mr,Mrs,Miss,Ms,Dr',
             'first_name'       => 'required|between:1,20|regex:/^[a-zA-Z0-9\s-]+$/',
             'last_name'        => 'required|between:1,20|regex:/^[a-zA-Z0-9\s-]+$/',
-            'institution_name' => 'nullable|between:1,20|regex:/^[a-zA-Z0-9\s-]+$/'
         ]);
     }
 

@@ -14,6 +14,49 @@
         </div>
         <div class="panel-body">
             <form class="steps-validation" action="javascript:void(0);">
+                @if (Auth::user()->institution_id === null || Auth::user()->priviledge === 1)
+                    <h6>Basic Institution Details</h6>
+                    <fieldset>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group has-feedback">
+                                    <label>Are you an admin of an institution?: <span class="text-danger">*</span></label>
+                                    <div class="radio">
+                                        <label>
+                                            <input type="radio" checked="checked" class="styled" name="is-institution" value="false">
+                                            I'm just an individual (stand-alone teacher)
+                                        </label>
+                                    </div>
+                                    <div class="radio">
+                                        <label>
+                                            <input type="radio" class="styled" name="is-institution" value="true">
+                                            I'm registering on behalf of an institution I'd like to become admin of
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div id="institution">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group has-feedback">
+                                        <label>Institution Name: <span class="text-danger">*</span></label>
+                                        @if (isset(Auth::user()->institution))
+                                            <input type="text" name="institution_name" placeholder="Give your institution a name" class="form-control" value="{{ Auth::user()->institution->name }}">
+                                        @else
+                                            <input type="text" name="institution_name" placeholder="Give your institution a name" class="form-control">
+                                        @endif
+                                        <div class="form-control-feedback">
+                                            <i class="icon-home text-muted"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </fieldset>
+                @endif
+
                 <h6>Personal data</h6>
                 <fieldset>
                     <div class="row">
@@ -61,14 +104,6 @@
                             <div class="form-group">
                                 <label>Your last name: <span class="text-danger">*</span></label>
                                 <input type="text" name="last_name" value="{{ Auth::user()->last_name }}" class="form-control" placeholder="Your last name">
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label>Institution Name:</label>
-                                <input type="text" name="institution_name" value="{{ Auth::user()->institution_name }}" class="form-control" placeholder="Your institutions name">
                             </div>
                         </div>
                     </div>
@@ -190,51 +225,113 @@
 
                 var requiredErrorLabel = '<label id="position-error" class="validation-error-label" for="position">This field is required.</label>';
 
-                if (currentIndex == 0) {
-                    var title     = $('select[name=title]'),
-                        firstName = $('input[name=first_name]'),
-                        lastName  = $('input[name=last_name]');
+                @if (Auth::user()->institution_id === null || Auth::user()->priviledge === 1)
+                    if (currentIndex === 0) {
+                        var institutionName = $('input[name="institution_name"]');
 
-                    if (title.val() == "" || title.val() == null) {
-                        title.parent().append(requiredErrorLabel);
-                    } else if (['Mr', 'Mrs', 'Miss', 'Ms', 'Dr'].indexOf(title.val()) == -1) {
-                        title.parent().append(requiredErrorLabel);
+                        if ($('input[name="is-institution"][value="true"]').prop('checked')) {
+                            if (institutionName.val() === "" || institutionName.val() === null) {
+                                institutionName.parent().append(requiredErrorLabel);
+                            } else if (institutionName.val().length === 0 || institutionName.val().length >= 50) {
+                                institutionName.parent().append('<label id="position-error" class="validation-error-label" for="position">The first name must be less than 50 characters.</label>');
+                            }
+
+                            if ($('.validation-error-label').length === 0) {
+                                updateInstitution();
+                            }
+                        }
                     }
 
-                    if (firstName.val() == "" || firstName.val() == null) {
-                        firstName.parent().append(requiredErrorLabel);
-                    } else if (firstName.val().length == 0 || firstName.val().length >= 20) {
-                        firstName.parent().append('<label id="position-error" class="validation-error-label" for="position">The first name must be less than 20 characters.</label>');
+                    if (currentIndex === 1 && newIndex === 2) {
+                        var title     = $('select[name=title]'),
+                            firstName = $('input[name=first_name]'),
+                            lastName  = $('input[name=last_name]');
+
+                        if (title.val() === "" || title.val() === null) {
+                            title.parent().append(requiredErrorLabel);
+                        } else if (['Mr', 'Mrs', 'Miss', 'Ms', 'Dr'].indexOf(title.val()) === -1) {
+                            title.parent().append(requiredErrorLabel);
+                        }
+
+                        if (firstName.val() === "" || firstName.val() === null) {
+                            firstName.parent().append(requiredErrorLabel);
+                        } else if (firstName.val().length === 0 || firstName.val().length >= 20) {
+                            firstName.parent().append('<label id="position-error" class="validation-error-label" for="position">The first name must be less than 20 characters.</label>');
+                        }
+
+                        if (lastName.val() === "" || lastName.val() === null) {
+                            lastName.parent().append(requiredErrorLabel);
+                        } else if (lastName.val().length === 0 || lastName.val().length >= 20) {
+                            lastName.parent().append('<label id="position-error" class="validation-error-label" for="position">The last name must be less than 20 characters.</label>');
+                        }
+
+                        if ($('.validation-error-label').length === 0) {
+                            updateUser();
+                        }
                     }
 
-                    if (lastName.val() == "" || lastName.val() == null) {
-                        lastName.parent().append(requiredErrorLabel);
-                    } else if (lastName.val().length == 0 || lastName.val().length >= 20) {
-                        lastName.parent().append('<label id="position-error" class="validation-error-label" for="position">The last name must be less than 20 characters.</label>');
+                    if (currentIndex === 2 && newIndex === 3) {
+                        if ($('tr').length > 1) {
+                            window.location.href = '{{ url('dashboard/classes') }}';
+
+                            $(".steps-validation").fadeOut();
+
+                            return true;
+                        }
+
+                        handleNotification('You need to create at least one class before continuing.', 'error');
+
+                        return false;
+                    }
+                @else
+                    if (currentIndex === 0) {
+                        var title     = $('select[name=title]'),
+                            firstName = $('input[name=first_name]'),
+                            lastName  = $('input[name=last_name]');
+
+                        if (title.val() === "" || title.val() === null) {
+                            title.parent().append(requiredErrorLabel);
+                        } else if (['Mr', 'Mrs', 'Miss', 'Ms', 'Dr'].indexOf(title.val()) === -1) {
+                            title.parent().append(requiredErrorLabel);
+                        }
+
+                        if (firstName.val() === "" || firstName.val() === null) {
+                            firstName.parent().append(requiredErrorLabel);
+                        } else if (firstName.val().length == 0 || firstName.val().length >= 20) {
+                            firstName.parent().append('<label id="position-error" class="validation-error-label" for="position">The first name must be less than 20 characters.</label>');
+                        }
+
+                        if (lastName.val() === "" || lastName.val() == null) {
+                            lastName.parent().append(requiredErrorLabel);
+                        } else if (lastName.val().length === 0 || lastName.val().length >= 20) {
+                            lastName.parent().append('<label id="position-error" class="validation-error-label" for="position">The last name must be less than 20 characters.</label>');
+                        }
+
+                        if ($('.validation-error-label').length === 0) {
+                            updateUser();
+                        }
                     }
 
-                    updateUser();
-                }
+                    if (currentIndex === 1 && newIndex === 2) {
+                        if ($('tr').length > 1) {
+                            window.location.href = '{{ url('dashboard/classes') }}';
 
-                if (currentIndex == 1 && newIndex == 2) {
-                    if ($('tr').length > 1) {
-                        window.location.href = '{{ url('dashboard/classes') }}';
+                            $(".steps-validation").fadeOut();
 
-                        $(".steps-validation").fadeOut();
+                            return true;
+                        }
 
-                        return true;
+                        handleNotification('You need to create at least one class before continuing.', 'error');
+
+                        return false;
                     }
-
-                    handleNotification('You need to create at least one class before continuing.', 'error');
-
-                    return false;
-                }
+                @endif
 
                 if ($('.validation-error-label').length > 0) {
                     return false;
                 }
 
-                // Allways allow previous action even if the current form is not valid!
+                // Always allow previous action even if the current form is not valid!
                 if (currentIndex > newIndex) {
                     return true;
                 }
@@ -309,76 +406,90 @@
                 });
             }
         });
+    
+        $(document).on('ready', function() {
+            // Select2 selects
+            $('select[name="title"]').val('{{ Auth::user()->title }}');
+            $('select').select2().trigger('change');
 
-        // Select2 selects
-        $('select[name="title"]').val('{{ Auth::user()->title }}');
-        $('select').select2().trigger('change');
+            // Styled checkboxes and radios
+            $('.styled').uniform({
+                radioClass: 'choice'
+            });
 
-        // Styled checkboxes and radios
-        $('.styled').uniform({
-            radioClass: 'choice'
+            // Styled file input
+            $('.file-styled').uniform({
+                wrapperClass: 'bg-warning',
+                fileButtonHtml: '<i class="icon-googleplus5"></i>'
+            });
+
+            $('input[name=last_name]').on('keyup', function() {
+                triggerNameChange();
+            });
+
+            $('select[name=title]').on('change', function() {
+                triggerNameChange();
+            });
+
+            $('input').on('beforeItemAdd', function(event) {
+                $(this).tagsinput('removeAll');
+            });
+
+            $('#create-class').on('click', function() {
+                var className    = $('input[name=class_name]'),
+                    classSubject = $('input[name=class_subject]'),
+                    classRoom    = $('input[name=class_room]');
+
+                $('.validation-error-label').remove();
+
+                if (className.val() == "" || className.val() == null) {
+                    className.parent().append('<label id="position-error" class="validation-error-label" for="position">This field is required.</label>');
+                } else if (className.val().length == 0 || className.val().length > 30) {
+                    className.parent().append('<label id="position-error" class="validation-error-label" for="position">The class name must be less than 30 characters.</label>');
+                }
+
+                if (classSubject.val().length > 30) {
+                    classSubject.parent().append('<label id="position-error" class="validation-error-label" for="position">The subject name must be less than 30 characters.</label>');
+                } else {
+                    $('.subject-typeahead').tagsinput('add', $('.tt-input:first').val());
+                }
+
+                if (classRoom.val().length > 30) {
+                    classRoom.parent().append('<label id="position-error" class="validation-error-label" for="position">The room name must be less than 30 characters.</label>');
+                } else {
+                    $('.room-typeahead').tagsinput('add', $('.tt-input:last').val());
+                }
+
+                if ($('.validation-error-label').length == 0) {
+                    createClass();
+                }
+            });
+
+            $(document).delegate('.delete-class', 'click', function() {
+                var classId = $(this).attr('class-id');
+
+                $(this).replaceWith('<button class="btn btn-danger" type="button" class-id="' + classId + '" disabled>Deleting <i class="icon-spinner2 spinner" style="margin-left: 5px;"></i></button>');
+
+                deleteClass(classId);
+            });
+
+            $(document).on('change', 'input[name="is-institution"]', function() {
+                if ($(this).val() === 'true') {
+                    $('#institution').fadeIn();
+                } else {
+                    $('#institution').fadeOut();
+                }
+            });
+
+            @if (Auth::user()->priviledge === 1)
+                $('input[name="is-institution"][value="true"]').click().click();
+            @endif
+
+            @if (sizeOf($classes) > 0)
+                $('#no-classes').hide();
+                $('.table-responsive').show();
+            @endif
         });
-
-        // Styled file input
-        $('.file-styled').uniform({
-            wrapperClass: 'bg-warning',
-            fileButtonHtml: '<i class="icon-googleplus5"></i>'
-        });
-
-        $('input[name=last_name]').on('keyup', function() {
-            triggerNameChange();
-        });
-
-        $('select[name=title]').on('change', function() {
-            triggerNameChange();
-        });
-
-        $('input').on('beforeItemAdd', function(event) {
-            $(this).tagsinput('removeAll');
-        });
-
-        $('#create-class').on('click', function() {
-            var className    = $('input[name=class_name]'),
-                classSubject = $('input[name=class_subject]'),
-                classRoom    = $('input[name=class_room]');
-
-            $('.validation-error-label').remove();
-
-            if (className.val() == "" || className.val() == null) {
-                className.parent().append('<label id="position-error" class="validation-error-label" for="position">This field is required.</label>');
-            } else if (className.val().length == 0 || className.val().length > 30) {
-                className.parent().append('<label id="position-error" class="validation-error-label" for="position">The class name must be less than 30 characters.</label>');
-            }
-
-            if (classSubject.val().length > 30) {
-                classSubject.parent().append('<label id="position-error" class="validation-error-label" for="position">The subject name must be less than 30 characters.</label>');
-            } else {
-                $('.subject-typeahead').tagsinput('add', $('.tt-input:first').val());
-            }
-
-            if (classRoom.val().length > 30) {
-                classRoom.parent().append('<label id="position-error" class="validation-error-label" for="position">The room name must be less than 30 characters.</label>');
-            } else {
-                $('.room-typeahead').tagsinput('add', $('.tt-input:last').val());
-            }
-
-            if ($('.validation-error-label').length == 0) {
-                createClass();
-            }
-        });
-
-        $(document).delegate('.delete-class', 'click', function() {
-            var classId = $(this).attr('class-id');
-
-            $(this).replaceWith('<button class="btn btn-danger" type="button" class-id="' + classId + '" disabled>Deleting <i class="icon-spinner2 spinner" style="margin-left: 5px;"></i></button>');
-
-            deleteClass(classId);
-        });
-
-        @if (sizeOf($classes) > 0)
-            $('#no-classes').hide();
-            $('.table-responsive').show();
-        @endif
 
         function updateUser() {
             var formData = $('.steps-validation').serializeArray().reduce(function(obj, item) {
@@ -392,8 +503,34 @@
                 data: {
                     title:            formData['title'],
                     first_name:       formData['first_name'],
-                    last_name:        formData['last_name'],
-                    institution_name: formData['institution_name'],
+                    last_name:        formData['last_name']
+                },
+                success: function(jsonResponse) {
+                    handleNotification(jsonResponse.message, 'success');
+                },
+                error: function(jsonResponse) {
+                    $(".steps-validation").steps("previous");
+                }
+            }).always(function() {
+                if (hasErrorOccured) {
+                    hasErrorOccured = false;
+
+                    $('.steps-validation').steps('previous');
+                }
+            });
+        }
+
+        function updateInstitution() {
+            var formData = $('.steps-validation').serializeArray().reduce(function(obj, item) {
+                obj[item.name] = item.value;
+                return obj;
+            }, {});
+
+            $.APIAjax({
+                url: '{{ url('api/institution') }}',
+                type: 'POST',
+                data: {
+                    institution_name: formData['institution_name']
                 },
                 success: function(jsonResponse) {
                     handleNotification(jsonResponse.message, 'success');

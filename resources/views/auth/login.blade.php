@@ -80,7 +80,7 @@
                     </div>
 
                     <div class="form-group has-feedback has-feedback-left">
-                        <input type="email" class="form-control" placeholder="Your email" name="email">
+                        <input type="email" class="form-control" placeholder="Your email" name="email" value="{{ old('email') }}">
                         <div class="form-control-feedback">
                             <i class="icon-mention text-muted"></i>
                         </div>

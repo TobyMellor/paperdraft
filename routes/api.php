@@ -79,6 +79,14 @@ Route::group(['middleware' => ['auth']], function () {
         ]
     );
 
+    Route::resource('institution', 'InstitutionController', 
+        [
+            'only' => [
+                'store', // POST api/institution
+            ], 
+        ]
+    );
+
     Route::resource('user/setting', 'SettingController',
         [
             'only' => [

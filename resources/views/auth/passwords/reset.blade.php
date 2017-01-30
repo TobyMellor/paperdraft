@@ -4,7 +4,8 @@
 @section('main')
     <form action="{{ url('/password/reset') }}" method="POST">
         <input name="_token" value="{{ csrf_token() }}" hidden/>
-        <input type="hidden" name="token" value="{{ $token }}" hidden>
+        <input name="token" value="{{ $token }}" hidden/>
+
         <div class="panel panel-body login-form">
             <div class="text-center">
                 <div class="icon-object border-slate-300 text-slate-300"><i class="icon-reading"></i></div>
@@ -38,25 +39,7 @@
             </div>
 
             <div class="content-divider text-muted form-group"><span>Just remembered your password?</span></div>
-            <a id="button-switch-to-sign-up" href="javascript:void(0);" class="btn btn-default btn-block content-group">Sign in</a>
+            <a id="button-switch-to-sign-up" href="{{ url('login') }}" class="btn btn-default btn-block content-group">Sign in</a>
         </div>
     </form>
 @stop
-
-@section('scripts')
-    <script>
-        @if($errors->all() != null)
-            var errorMessage = 'There was problems with the data entererd.';
-            @foreach ($errors->all('<li>:message</li>') as $error)
-                errorMessage += '{!! addslashes(html_entity_decode($error)) !!}';
-            @endforeach
-
-            handleNotification(errorMessage, 'error');
-        @endif
-
-        @if (session('status') != null)
-            var successMessage = '{!! addslashes(html_entity_decode(session('status'))) !!}';
-            handleNotification(successMessage, 'success');
-        @endif
-    </script>
-@endsection
