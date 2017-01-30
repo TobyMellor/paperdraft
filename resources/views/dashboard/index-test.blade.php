@@ -966,7 +966,7 @@
                 canvasItem.tooltip_occupied_positions = null;
 
                 var occupiedTooltipPositions = canvasController.getTooltipOccupiedPositions(),
-                    checkPositions = [ // TODO: Only check directly above, but still occupy all positions.
+                    checkPositions = [
                         [
                             [canvasItem.position_x,     canvasItem.position_y - 1], // directly above
                             [canvasItem.position_x - 1, canvasItem.position_y - 1],
@@ -1499,14 +1499,14 @@
 
                         this.addCanvasItem(canvasItem);
                     }
-
-                    for (var jsonSoftDeletedCanvasItem in jsonCanvasItems.canvas_items.soft_deleted_canvas_items) {
-                        var softDeletedCanvasItem = jsonCanvasItems.canvas_items.soft_deleted_canvas_items[jsonSoftDeletedCanvasItem];
-
-                        this.addSoftDeletedCanvasItem(softDeletedCanvasItem);
-                    }
                 } else {
                     this.updateSelected([]); 
+                }
+
+                for (var jsonSoftDeletedCanvasItem in jsonCanvasItems.canvas_items.soft_deleted_canvas_items) {
+                    var softDeletedCanvasItem = jsonCanvasItems.canvas_items.soft_deleted_canvas_items[jsonSoftDeletedCanvasItem];
+
+                    this.addSoftDeletedCanvasItem(softDeletedCanvasItem);
                 }
             }
 
@@ -2816,14 +2816,14 @@
                     this.canvasActionUndoCount = 1;
                 }
 
-                this.canvasHistory[this.canvasHistory.length] = {
+                this.canvasHistory.push({
                     canvas_item_id:      canvasHistoryRecord.canvas_item_id,
                     type:                canvasHistoryRecord.type,
                     previous_position_x: canvasHistoryRecord.previous_position_x,
                     previous_position_y: canvasHistoryRecord.previous_position_y,
                     position_x:          canvasHistoryRecord.position_x,
                     position_y:          canvasHistoryRecord.position_y
-                }
+                });
             }
 
             storeCanvasHistory(buttonElement = null, externalLink = null) {
