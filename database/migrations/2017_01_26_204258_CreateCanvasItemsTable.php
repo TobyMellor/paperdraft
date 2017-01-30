@@ -15,12 +15,14 @@ class CreateCanvasItemsTable extends Migration
         Schema::create('canvas_items', function (Blueprint $table) {
             $table->increments('id');
 
-            $table->integer('item_id')->unsigned();
+            $table->integer('item_id')
+                  ->unsigned();
             $table->foreign('item_id')
                   ->references('id')
                   ->on('items');
 
-            $table->integer('class_id')->unsigned();
+            $table->integer('class_id')
+                  ->unsigned();
             $table->foreign('class_id')
                   ->references('id')
                   ->on('classes');

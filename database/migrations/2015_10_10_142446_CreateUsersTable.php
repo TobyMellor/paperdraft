@@ -21,15 +21,20 @@ class CreateUsersTable extends Migration
                   ->nullable();
             $table->string('last_name', 20)
                   ->nullable();
-            $table->string('institution_name', 20)
-                  ->nullable();
 
-            $table->string('email')->unique();
-            $table->string('password', 60);
+            $table->integer('institution_id')
+                  ->unsigned()
+                  ->nullable();
+            $table->foreign('institution_id')
+                  ->references('id')
+                  ->on('institutions');
 
             $table->integer('priviledge')
                   ->unsigned()
                   ->default(0);
+
+            $table->string('email')->unique();
+            $table->string('password', 60);
                 
             $table->boolean('confirmed')
                   ->default(false);
@@ -43,9 +48,10 @@ class CreateUsersTable extends Migration
         
         DB::table('users')->insert([
             [
-                'email'     => 'tobymulberry@hotmail.com',
-                'password'  => bcrypt('Testing123'),
-                'confirmed' => 1
+                'email'          => 'tobymulberry@hotmail.com',
+                'password'       => bcrypt('Testing123'),
+                'institution_id' => 1,
+                'confirmed'      => 1,
             ]
         ]);
     }

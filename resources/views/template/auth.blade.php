@@ -20,65 +20,27 @@
 	<script type="text/javascript" src="{{ asset('assets/js/core/libraries/jquery.min.js') }}"></script>
 	<script type="text/javascript" src="{{ asset('assets/js/core/libraries/bootstrap.min.js') }}"></script>
 	<script type="text/javascript" src="{{ asset('assets/js/plugins/loaders/blockui.min.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('assets/js/plugins/notifications/noty.min.js') }}"></script>
 	<!-- /core JS files -->
 
 	<!-- Theme JS files -->
 	<script type="text/javascript" src="{{ asset('assets/js/plugins/forms/styling/uniform.min.js') }}"></script>
 
 	<script type="text/javascript" src="{{ asset('assets/js/core/app.js') }}"></script>
-	<script type="text/javascript" src="{{ asset('assets/js/pages/login.js') }}"></script>
 	<!-- /theme JS files -->
-
-	<script src="{{ asset('assets/js/plugins/notifications/noty.min.js') }}" type="text/javascript"></script>
-
 </head>
-
-<body>
-
-	<!-- Main navbar -->
-	<div class="navbar navbar-inverse">
-		<div class="navbar-header">
-			<a class="navbar-brand" href="{{ url('/') }}"><img src="{{ asset('assets/images/logo_light.png') }}" alt=""></a>
-
-			<ul class="nav navbar-nav pull-right visible-xs-block">
-				<li><a data-toggle="collapse" data-target="#navbar-mobile"><i class="icon-tree5"></i></a></li>
-			</ul>
-		</div>
-	</div>
-	<!-- /main navbar -->
-
-
-	<!-- Page container -->
-	<div class="page-container login-container">
-
-		<!-- Page content -->
+<body class="login-container login-cover">
+	<div class="page-container">
 		<div class="page-content">
-
-			<!-- Main content -->
 			<div class="content-wrapper">
-
-				<!-- Content area -->
-				<div class="content">
+				<div class="content pb-20">
 
 	                @yield('main')
 
-					<!-- Footer -->
-					<div class="footer text-muted">
-						&copy; {{ date('Y') }}. SeatingPlanner by Toby Mellor
-					</div>
-					<!-- /footer -->
-
 				</div>
-				<!-- /content area -->
-
 			</div>
-			<!-- /main content -->
-
 		</div>
-		<!-- /page content -->
-
 	</div>
-	<!-- /page container -->
 
 	<script>
 		// notificationContent is the message e.g. 'hello' (string)

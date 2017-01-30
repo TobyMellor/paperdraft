@@ -15,13 +15,15 @@ class CreateCanvasHistoryTable extends Migration
         Schema::create('canvas_history', function (Blueprint $table) {
             $table->increments('id');
 
-            $table->integer('class_id')->unsigned();
+            $table->integer('class_id')
+                  ->unsigned();
             $table->foreign('class_id')
                   ->references('id')
                   ->on('classes')
                   ->onDelete('cascade');
 
-            $table->integer('canvas_item_id')->unsigned();
+            $table->integer('canvas_item_id')
+                  ->unsigned();
             $table->foreign('canvas_item_id')
                   ->references('id')
                   ->on('canvas_items')

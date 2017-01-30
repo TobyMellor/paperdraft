@@ -52,4 +52,12 @@ class User extends Model implements AuthenticatableContract,
      * @var array
      */
     protected $dates = ['deleted_at'];
+
+    /**
+     * Get the corresponding institution
+     */
+    public function institution()
+    {
+        return $this->belongsTo(Institution::class, 'institution_id', 'id');
+    }
 }

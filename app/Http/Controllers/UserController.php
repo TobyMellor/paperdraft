@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\User;
+use App\Institution;
 
 use Auth;
 use Validator;
@@ -112,7 +113,13 @@ class UserController extends Controller
             return redirect()->intended($this->redirectTo);
         } else {
             return redirect($this->redirectBackTo)
-                ->with('errorMessage', 'The email and password you entered don\'t match.');
+                ->with('response', [
+                    'error'   => 1,
+                    'message' => 'The email and password you entered don\'t match.',
+                    'fields'  => [
+                        'password' => 'The email and password you entered don\'t match.'
+                    ]
+                ]);
         }
     }
 
@@ -127,6 +134,7 @@ class UserController extends Controller
             'email'                 => $request->input('email'),
             'password'              => $request->input('password'),
             'password_confirmation' => $request->input('password_confirmation'),
+            'institution_code'      => $request->input('institution_code')
         ];
 
         $validation = $this->validator($data);
@@ -142,11 +150,19 @@ class UserController extends Controller
             $password = bcrypt($data['password']);
             $confirmationCode = str_random(30);
 
-            User::create([
-                'email'             => $email,
-                'password'          => $password,
-                'confirmation_code' => $confirmationCode
-            ]);
+            $user = new User;
+
+            $user->email             = $email;
+            $user->password          = $password;
+            $user->confirmation_code = $confirmationCode;
+
+            if ($data['institution_code'] !== null) {
+                $institution = Institution::where('institution_code', $data['institution_code'])->first();
+
+                $user->institution_id = $institution->id;
+            }
+
+            $user->save();
             
             $this->sendConfirmationEmail($email);
 
@@ -159,9 +175,12 @@ class UserController extends Controller
         }
 
         return redirect('/register')
-            ->with('errorMessage', 'There was some issues with the data you supplied.')
             ->withInput($request->except('password'))
-            ->withErrors($validation, 'register');
+            ->with('response', [
+                'error'   => 1,
+                'message' => 'There was a few problems with the data you supplied.',
+                'fields'  => $validation->errors()
+            ]);
     }
 
     public function sendConfirmationEmail($email)
@@ -280,8 +299,9 @@ class UserController extends Controller
     protected function validator(array $data)
     {
         return Validator::make($data, [
-            'email'    => 'required|email|max:255|min:1|unique:users',
-            'password' => 'required|confirmed|min:6'
+            'email'            => 'required|email|max:255|min:1|unique:users',
+            'password'         => 'required|confirmed|min:6',
+            'institution_code' => 'nullable|size:6|alpha_num|exists:institutions,institution_code'
         ]);
     }
 
