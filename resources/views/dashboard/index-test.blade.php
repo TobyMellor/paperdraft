@@ -16,6 +16,12 @@
                     </h6>
                     <div class="heading-elements">
                         <ul class="icons-list">
+                            <li class="undo-list">
+                                Actions: <i class="icon-undo" id="undo-button"></i>
+                            </li>
+                            <li class="redo-list">
+                                <i class="icon-redo" id="redo-button"></i>
+                            </li>
                             <li>
                                 <p id="save-button">
                                     <i class="glyphicon glyphicon-floppy-save"></i> <u>Save Seating Plan</u>
@@ -417,6 +423,14 @@
                 userController.saveUserPreferences();
 
                 notificationController.handleNotification('The seating plan was saved successfully!', 'success');
+            });
+
+            $('#undo-button').click(function() {
+                historyController.undoCanvasAction();
+            });
+
+            $('#redo-button').click(function() {
+                historyController.redoCanvasAction();
             });
 
             $('.class-button').not('.class-button-create').click(function() {

@@ -289,3 +289,19 @@
 #exemptions-table {
     display: none;
 }
+
+.undo-list {
+    margin-right: 10px;
+}
+
+.redo-list {
+    margin-right: 25px;
+}
+
+#undo-button, #redo-button {
+    cursor: pointer;
+}
+
+#undo-button {
+    margin-left: 5px;
+}
