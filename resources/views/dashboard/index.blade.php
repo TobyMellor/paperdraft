@@ -2678,7 +2678,7 @@
                         [],
                         []
                     ],
-                    centerOffset, centerPoints, centerPoint, searchRadius, i;
+                    centerOffset, centerPoints, centerPoint, searchRadius, i, result;
                     
                 while (!utils.doesEveryElementHaveChildren(itemsFound)) {
                     searchRadius         = Math.floor(searchSize / 2);
@@ -2692,7 +2692,7 @@
                         [anchorPoint[0] - searchRadius, anchorPoint[1]]
                     ];
 
-                    for (i = 0; i < totalSpacesToSearch; i++) {
+                    for (i = 0; i < totalSpacesToSearch - 4; i++) {
                         if (i % 4 === 0) { // offset + 1 from center search for the next 4 iterations
                             centerOffset++;
                         }
@@ -2709,16 +2709,66 @@
                         }
                         
                         if (i % 2 === 1) { // y is the changing plane
-                            if (totalSpacesToSearch - i > 3 || itemsFound[1].length === 0) {
-                                itemsFound = this.getNonEmptyCanvasItemsGridElement(canvasItemsGrid, centerPoint[0], centerPoint[1] + centerOffset, centerOffset, searchRadius, itemsFound, i);
-                            } else if (totalSpacesToSearch - i > 3 || itemsFound[3].length === 0) {
-                                itemsFound = this.getNonEmptyCanvasItemsGridElement(canvasItemsGrid, centerPoint[0], centerPoint[1] - centerOffset, centerOffset, searchRadius, itemsFound, i);
+                            if (itemsFound[1].length === 0) {
+                                result = this.getNonEmptyCanvasItemsGridElement(canvasItemsGrid, centerPoint[0], centerPoint[1] + centerOffset, centerOffset, searchRadius, itemsFound, i);
+ 
+                                if (result !== null) {
+                                    itemsFound[1].push(result);
+                                }
+                            } else if (itemsFound[3].length === 0) {
+                                result = this.getNonEmptyCanvasItemsGridElement(canvasItemsGrid, centerPoint[0], centerPoint[1] - centerOffset, centerOffset, searchRadius, itemsFound, i);
+
+                                if (result !== null) {
+                                    itemsFound[3].push(result);
+                                }
                             }
                         } else {
-                            if (totalSpacesToSearch - i > 3 || itemsFound[0].length === 0) {
-                                itemsFound = this.getNonEmptyCanvasItemsGridElement(canvasItemsGrid, centerPoint[0] + centerOffset, centerPoint[1], centerOffset, searchRadius, itemsFound, i);
-                            } else if (totalSpacesToSearch - i > 3 || itemsFound[2].length === 0) {
-                                itemsFound = this.getNonEmptyCanvasItemsGridElement(canvasItemsGrid, centerPoint[0] - centerOffset, centerPoint[1], centerOffset, searchRadius, itemsFound, i);
+                            if (itemsFound[0].length === 0) {
+                                result = this.getNonEmptyCanvasItemsGridElement(canvasItemsGrid, centerPoint[0] + centerOffset, centerPoint[1], centerOffset, searchRadius, itemsFound, i);
+
+                                if (result !== null) {
+                                    itemsFound[0].push(result);
+                                }
+                            } else if (itemsFound[2].length === 0) {
+                                result = this.getNonEmptyCanvasItemsGridElement(canvasItemsGrid, centerPoint[0] - centerOffset, centerPoint[1], centerOffset, searchRadius, itemsFound, i);
+
+                                if (result !== null) {
+                                    itemsFound[2].push(result);
+                                }
+                            }
+                        }
+                    }
+
+                    centerOffset++;
+
+                    if (itemsFound[0].length === 0) {
+                        if (canvasController.isPositionInBounds(centerPoints[3][0], centerPoints[3][1] + centerOffset)) {
+                            if (canvasItemsGrid[centerPoints[3][0]][centerPoints[3][1] + centerOffset] !== -1) {
+                                itemsFound[0].push([centerPoints[3][0], centerPoints[3][1] + centerOffset])
+                            }
+                        }
+                    }
+
+                    if (itemsFound[1].length === 0) {
+                        if (canvasController.isPositionInBounds(centerPoints[0][0] + centerOffset, centerPoints[0][1])) {
+                            if (canvasItemsGrid[centerPoints[0][0] + centerOffset][centerPoints[0][1]] !== -1) {
+                                itemsFound[1].push([centerPoints[0][0] + centerOffset, centerPoints[0][1]])
+                            }
+                        }
+                    }
+
+                    if (itemsFound[2].length === 0) {
+                        if (canvasController.isPositionInBounds(centerPoints[1][0], centerPoints[1][1] - centerOffset)) {
+                            if (canvasItemsGrid[centerPoints[1][0]][centerPoints[1][1] - centerOffset] !== -1) {
+                                itemsFound[2].push([centerPoints[1][0], centerPoints[1][1] - centerOffset])
+                            }
+                        }
+                    }
+
+                    if (itemsFound[3].length === 0) {
+                        if (canvasController.isPositionInBounds(centerPoints[2][0] - centerOffset, centerPoints[2][1])) {
+                            if (canvasItemsGrid[centerPoints[2][0] - centerOffset][centerPoints[2][1]] !== -1) {
+                                itemsFound[3].push([centerPoints[2][0] - centerOffset, centerPoints[2][1]])
                             }
                         }
                     }
@@ -2733,12 +2783,12 @@
                 if (canvasController.isPositionInBounds(positionX, positionY)) {
                     if (canvasItemsGrid[positionX][positionY] !== -1 && (i >= 4 || itemsFound[i % 4].length === 0)) {
                         if (centerOffset !== searchRadius || (itemsFound[(i - 1) % 4].length === 0 && itemsFound[(i + 1) % 4].length === 0)) {
-                            itemsFound[i % 4].push([positionX, positionY]);
+                            return [positionX, positionY];
                         }
                     }
                 }
                 
-                return itemsFound;
+                return null;
             }
 
             addExemption(firstStudentId, secondStudentId) {
