@@ -172,11 +172,9 @@
                 });
             });
 
-
             @if (session('response') != null)
                 var response = {!! json_encode(session('response')) !!};
 
-                console.log(response);
                 if (response.error === 1) {
                     handleNotification(response.message, 'error');
                 } else {

@@ -74,10 +74,12 @@ Route::group(['middleware' => ['auth']], function () {
     Route::resource('user', 'UserController', 
         [
             'only' => [
-                'update', // PUT api/user
+                'update', // PUT  api/user
             ], 
         ]
     );
+
+    Route::post('user', 'UserController@inviteUser');
 
     Route::resource('institution', 'InstitutionController', 
         [

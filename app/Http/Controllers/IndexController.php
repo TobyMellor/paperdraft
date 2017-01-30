@@ -6,7 +6,9 @@ use App\ClassStudent;
 
 class IndexController extends Controller
 {
-    public function __construct() {}
+    public function __construct() {
+        $this->middleware('should_reset_password');
+    }
 
     /**
      * Display the appropriate dashboard.

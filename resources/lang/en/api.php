@@ -74,7 +74,15 @@ return [
     ],
     'user' => [
         'success' => [
+            'store'  => 'The user has successfully been invited!',
             'update' => 'Your user data has been successfully updated.'
+        ],
+        'failure' => [
+            'store' => [
+                'too-many-users' => 'You can\'t invite any more users! You\'ve reached your max! (100)',
+                'no-priviledge'  => 'You don\'t have the correct permissions to do that!',
+                'invalid-email'  => 'The email entered was invalid or it already exists in the system!'
+            ]
         ]
     ],
     'setting' => [

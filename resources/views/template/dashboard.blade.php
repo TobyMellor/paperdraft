@@ -106,8 +106,8 @@
                                         <span class="media-heading text-semibold username">@if (isset(Auth::user()->last_name)){{ Auth::user()->title }}. {{ Auth::user()->last_name }}@else{{ current(explode("@", Auth::user()->email, 2)) }}@endif</span>
                                         <div class="text-size-mini text-muted">
                                             <i class="icon-pin text-size-small"></i>
-                                            @if (isset(Auth::user()->institution_name))
-                                                {{ Auth::user()->institution_name }}
+                                            @if (Auth::user()->institution_id !== null)
+                                                {{ Auth::user()->institution->name }}
                                             @else
                                                 PaperDraft
                                             @endif
@@ -152,7 +152,7 @@
                                             @endif
                                         </a>
                                     </li>
-                                    <li @if (strpos(app('url')->current(), url('dashboard/classes'))) class="active" @endif>
+                                    <li @if (strpos(app('url')->current(), 'classes')) class="active" @endif>
                                         <a id="classes-href" href="{{ url('dashboard/classes') }}">
                                             <i class="icon-design"></i>
                                             @if (Auth::user()->priviledge === 1)

@@ -38,6 +38,8 @@ class CreateUsersTable extends Migration
                 
             $table->boolean('confirmed')
                   ->default(false);
+            $table->boolean('should_change_password')
+                  ->default(false);
             $table->string('confirmation_code')
                   ->nullable();
 
@@ -52,6 +54,7 @@ class CreateUsersTable extends Migration
                 'password'       => bcrypt('Testing123'),
                 'institution_id' => 1,
                 'confirmed'      => 1,
+                'priviledge'     => 1
             ]
         ]);
     }

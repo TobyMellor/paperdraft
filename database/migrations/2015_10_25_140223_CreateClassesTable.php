@@ -20,6 +20,13 @@ class CreateClassesTable extends Migration
                   ->references('id')
                   ->on('users');
 
+            $table->integer('class_room_id')
+                  ->unsigned()
+                  ->nullable();
+            $table->foreign('class_room_id')
+                  ->references('id')
+                  ->on('class_rooms');
+
             /*
             $table->integer('period_id')->unsigned();
             $table->foreign('period_id')
@@ -34,8 +41,6 @@ class CreateClassesTable extends Migration
 
             $table->string('class_subject', 30)
                   ->nullable();
-            $table->string('class_room', 30)
-                  ->nullable();
 
             $table->timestamps();
         });
@@ -44,20 +49,17 @@ class CreateClassesTable extends Migration
             [
                 'user_id'       => 1,
                 'class_name'    => 'Year 11',
-                'class_subject' => 'Mathematics',
-                'class_room'    => 'Room 101'
+                'class_subject' => 'Mathematics'
             ],
             [
                 'user_id'       => 1,
                 'class_name'    => 'Year 12',
-                'class_subject' => 'Mathematics',
-                'class_room'    => 'Room 102'
+                'class_subject' => 'Mathematics'
             ],
             [
                 'user_id'       => 1,
                 'class_name'    => 'Year 13',
-                'class_subject' => 'ICT',
-                'class_room'    => 'Room 101'
+                'class_subject' => 'ICT'
             ]
         ]);
     }

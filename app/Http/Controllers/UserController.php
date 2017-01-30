@@ -25,7 +25,7 @@ class UserController extends Controller
      *
      * @var string
      */
-    private $redirectTo = '/dashboard';
+    private $redirectTo     = '/dashboard';
     private $redirectBackTo = '/login';
 
     public function __construct(Request $request)
@@ -306,14 +306,14 @@ class UserController extends Controller
      */
     public function update(Request $request)
     {
-        $title           = $request->input('title');
-        $firstName       = $request->input('first_name');
-        $lastName        = $request->input('last_name');
+        $title     = $request->input('title');
+        $firstName = $request->input('first_name');
+        $lastName  = $request->input('last_name');
 
         $data = [
-            'title'             => $title,
-            'first_name'        => $firstName,
-            'last_name'         => $lastName
+            'title'      => $title,
+            'first_name' => $firstName,
+            'last_name'  => $lastName
         ];
         
         $validation = $this->validateUpdatedUser($data);
@@ -321,9 +321,9 @@ class UserController extends Controller
         if (!$validation->fails()) {
             User::where('id', Auth::id())
                 ->update([
-                    'title'             => $title,
-                    'first_name'        => $firstName,
-                    'last_name'         => $lastName
+                    'title'      => $title,
+                    'first_name' => $firstName,
+                    'last_name'  => $lastName
                 ]);
 
             return response()->json([
@@ -387,7 +387,7 @@ class UserController extends Controller
             'email' => $email
         ];
 
-        $validation = $this->validatePasswordResetLink($data);
+        $validation = $this->validateResetLink($data);
 
         if (!$validation->fails()) {
             $token = str_random(50);
@@ -433,9 +433,9 @@ class UserController extends Controller
 
     public function resetPassword(Request $request)
     {
-        $token = $request->input('token');
-        $email = $request->input('email');
-        $password = $request->input('password');
+        $token                = $request->input('token');
+        $email                = $request->input('email');
+        $password             = $request->input('password');
         $passwordConfirmation = $request->input('password_confirmation');
 
         $data = [
@@ -478,6 +478,108 @@ class UserController extends Controller
             ]);
     }
 
+    public function inviteUser(Request $request)
+    {
+        $email    = $request->input('email');
+        $password = strtolower(str_random(6));
+
+        $data = [
+            'email'                 => $email,
+            'password'              => $password,
+            'password_confirmation' => $password
+        ];
+
+        $validation = $this->validator($data);
+
+        if (!$validation->fails()) {
+            if (Auth::user()->priviledge === 1) {
+                if (Auth::user()->institution->users->count() <= 100) {
+                    $schoolAdmin = Auth::user()->title . '. ' . Auth::user()->last_name;
+
+                    $user = new User;
+
+                    $user->email                  = $email;
+                    $user->should_change_password = true;
+                    $user->confirmed              = true;
+                    $user->institution_id         = Auth::user()->institution_id;
+                    $user->password               = bcrypt($password);
+
+                    $user->save();
+
+                    Mail::send('auth.emails.invitation', [
+                            'email'       => $email,
+                            'password'    => $password,
+                            'schoolAdmin' => $schoolAdmin
+                        ], function ($m) use ($email, $password, $schoolAdmin) {
+                            $m->from('admin@paperdraft.dev', 'PaperDraft');
+
+                            $m->to($email, $email)->subject('You\'ve been invited by an admin in your School to join PaperDraft.');
+                    });
+
+                    return response()->json([
+                        'error'   => 0,
+                        'message' => trans('api.user.success.store')
+                    ]);
+                }
+
+                return response()->json([
+                    'error'   => 1,
+                    'message' => trans('api.user.failure.store.too-many-users')
+                ]);
+            }
+
+            return response()->json([
+                'error'   => 1,
+                'message' => trans('api.user.failure.store.no-priviledge')
+            ]);
+        }
+
+        return response()->json([
+            'error'   => 1,
+            'message' => trans('api.user.failure.store.invalid-email')
+        ]);
+    }
+
+    public function forcePasswordReset(Request $request)
+    {
+        $response = $request->input('response');
+
+        return view('auth.passwords.force_password_reset')
+            ->with('response', $response);
+    }
+
+    public function changePassword(Request $request)
+    {
+        $password = $request->input('password');
+        $passwordConfirmation = $request->input('password_confirmation');
+
+        $data = [
+            'password'              => $password,
+            'password_confirmation' => $passwordConfirmation
+        ];
+
+        $validation = $this->validatePasswordReset($data);
+
+        if (!$validation->fails()) {
+            $user = User::where('id', Auth::id())
+                ->update([
+                    'should_change_password' => false,
+                    'password'               => bcrypt($password)
+                ]);
+
+            Auth::attempt(['email' => Auth::user()->email, 'password' => $password]);
+
+            return redirect('/dashboard');
+        }
+
+        return redirect('/force_password_reset')
+            ->with('response', [
+                'error'   => 1,
+                'message' => 'There\'s a few problems with the data you supplied.',
+                'fields'  => $validation->errors()
+            ]);
+    }
+
     /**
      * Validates an array of information.
      *
@@ -497,7 +599,7 @@ class UserController extends Controller
      *
      * @return Validator
      */
-    protected function validatePasswordResetLink(array $data)
+    protected function validateResetLink(array $data)
     {
         return Validator::make($data, [
             'email' => 'required|email|max:255|min:1|exists:users'

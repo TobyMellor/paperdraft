@@ -49,4 +49,7 @@ Route::group(['middleware' => ['auth']], function () {
 
     Route::post('class', 'ClassController@storeClass');
     Route::delete('class', 'ClassController@deleteClass');
+
+    Route::get('force_password_reset', 'UserController@forcePasswordReset');
+    Route::post('force_password_reset', 'UserController@changePassword');
 });
