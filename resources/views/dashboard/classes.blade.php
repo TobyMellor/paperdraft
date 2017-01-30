@@ -65,10 +65,20 @@
                                     <td>
                                         <div class="gender" style="display: none;">{{ $classStudent->student->gender }}</div>
                                         <div class="btn-group">
-                                            <button type="button" class="btn btn-danger dropdown-toggle" data-toggle="dropdown">Options <span class="caret"></span></button>
+                                            <button type="button" class="btn btn-danger dropdown-toggle" data-toggle="dropdown">
+                                                Options <span class="caret"></span>
+                                            </button>
                                             <ul class="dropdown-menu dropdown-menu-right">
-                                                <li><a class="delete-student"><i class="icon-user-minus"></i> Delete</a></li>
-                                                <li><a class="edit-student"><i class="icon-pencil"></i> Edit</a></li>
+                                                <li>
+                                                    <a class="delete-student">
+                                                        <i class="icon-user-minus"></i> Delete
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="edit-student">
+                                                        <i class="icon-pencil"></i> Edit
+                                                    </a>
+                                                </li>
                                             </ul>
                                         </div>
                                     </td>

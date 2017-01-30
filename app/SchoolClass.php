@@ -24,4 +24,12 @@ class SchoolClass extends Model
         'class_subject',
         'class_room'
     ];
+
+    /**
+     * Get the class students in a given class
+     */
+    public function classStudents()
+    {
+        return $this->hasMany(ClassStudent::class, 'class_id', 'id');
+    }
 }

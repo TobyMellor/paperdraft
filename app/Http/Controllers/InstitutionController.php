@@ -57,6 +57,11 @@ class InstitutionController extends Controller
         ]);
     }
 
+    public function getAdminPanel()
+    {
+        return view('dashboard.admin');
+    }
+
     public function generateNewRandomCode()
     {
         $randomCode = strtoupper(str_random(8));

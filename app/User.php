@@ -60,4 +60,12 @@ class User extends Model implements AuthenticatableContract,
     {
         return $this->belongsTo(Institution::class, 'institution_id', 'id');
     }
+
+    /**
+     * Get the corresponding classes
+     */
+    public function schoolClasses()
+    {
+        return $this->hasMany(SchoolClass::class, 'user_id', 'id');
+    }
 }

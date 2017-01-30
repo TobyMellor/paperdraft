@@ -128,19 +128,38 @@
                             <div class="category-content no-padding">
                                 <ul class="navigation navigation-main navigation-accordion">
                                     <li class="navigation-header">
+                                        <span>Administration</span>
+                                        <i class="icon-vcard" title="Administration"></i>
+                                    </li>
+
+                                    <li @if (strpos(app('url')->current(), 'admin')) class="active" @endif>
+                                        <a id="planner-href" href="{{ url('dashboard/admin') }}">
+                                            <i class="icon-user-tie"></i>
+                                            <span>Institution Admin Panel</span>
+                                        </a>
+                                    </li>
+                                    <li class="navigation-header">
                                         <span>Main Menu</span>
                                         <i class="icon-menu" title="Main pages"></i>
                                     </li>
-                                    <li @if (app('url')->current() == url('dashboard')) class="active" @endif>
+                                    <li @if (app('url')->current() === url('dashboard')) class="active" @endif>
                                         <a id="planner-href" href="{{ url('dashboard') }}">
                                             <i class="icon-home4"></i>
-                                            <span>Seating Plans</span>
+                                            @if (Auth::user()->priviledge === 1)
+                                                <span>My Own Seating Plans</span>
+                                            @else
+                                                <span>Seating Plans</span>
+                                            @endif
                                         </a>
                                     </li>
-                                    <li @if (strpos(app('url')->current(), url('dashboard/classes')) !== false) class="active" @endif>
+                                    <li @if (strpos(app('url')->current(), url('dashboard/classes'))) class="active" @endif>
                                         <a id="classes-href" href="{{ url('dashboard/classes') }}">
                                             <i class="icon-design"></i>
-                                            <span>Manage Classes</span>
+                                            @if (Auth::user()->priviledge === 1)
+                                                <span>Manage My Classes</span>
+                                            @else
+                                                <span>Manage Classes</span>
+                                            @endif
                                         </a>
                                     </li>
                                 </ul>
@@ -160,6 +179,15 @@
                                 </li>
                                 <li class="active">@yield('title')</li>
                             </ul>
+                            @if (Auth::user()->institution_id !== null)
+                                <ul class="breadcrumb-elements">
+                                    <li>
+                                        <a href="javascript:void(0);">
+                                            <i class="icon-code position-left"></i> Institution Code: <strong>{{ Auth::user()->institution->institution_code }}</strong>
+                                        </a>
+                                    </li>
+                                </ul>
+                            @endif
                         </div>
                     </div>
 
