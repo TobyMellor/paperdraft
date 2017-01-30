@@ -270,9 +270,13 @@
     padding-left: 0 !important;
 }
 
-#remove-seated-students {
+#copy-selected, #paste-selected, #remove-seated-students {
     padding: 3px 6px;
     margin-top: 5px;
+}
+
+#paste-selected {
+    display: none;
 }
 
 #add-exemption {

@@ -141,12 +141,20 @@
                                                 Delete
                                                 <i class="icon-database-remove position-right"></i>
                                             </button>
-                                            
-                                            <br />
 
                                             <button id="remove-seated-students" class="btn btn-danger btn-sm" type="button">
                                                 Remove Seated
                                                 <i class="icon-diff-removed position-right"></i>
+                                            </button>
+
+                                            <button id="copy-selected" class="btn btn-success btn-sm" type="button">
+                                                Copy Selected
+                                                <i class="icon-copy3 position-right"></i>
+                                            </button>
+
+                                            <button id="paste-selected" class="btn btn-success btn-sm" type="button">
+                                                Paste Selected
+                                                <i class="icon-paste2 position-right"></i>
                                             </button>
                                         </td>
                                     </tr>
@@ -433,6 +441,16 @@
                 historyController.redoCanvasAction();
             });
 
+            $('#copy-selected').click(function() {
+                canvasController.copyCanvasItems();
+
+                $('#paste-selected').fadeIn();
+            });
+
+            $('#paste-selected').click(function() {
+                canvasController.pasteCanvasItems();
+            });
+
             $('.class-button').not('.class-button-create').click(function() {
                 if (hasUserMadeChanges) {
                     canvasController.view.confirmPageLeave($(this));
@@ -455,13 +473,13 @@
                     } else if (e.which === 89) { // The 'y' key (combined with ctrl or cmd)
                         historyController.redoCanvasAction();
                     }
-                }/* else if ((e.ctrlKey && e.keyCode == 0x56) || (e.metaKey && e.keyCode == 0x56)) {
-                    pasteActiveItem();
-                }*/
+                }
             }).bind('copy', function() {
-                //copyActiveItem(false);
+                canvasController.copyCanvasItems();
             }).bind('cut', function() {
-                //copyActiveItem(true);
+                canvasController.copyCanvasItems(true);
+            }).bind('paste', function() {
+                canvasController.pasteCanvasItems();
             });
 
             $(document).on('click', 'a', function(event) {
@@ -1476,6 +1494,7 @@
                 this.canvasItems            = {}, // e.g. Table is stored at X: 5, Y: 8 in the grid
                 this.items                  = {}, // e.g. A Table desk.png, A Teachers Desk teachers_desk.png
                 this.canvasItemsGrid        = [], // e.g. Grid of all possible locations to store items
+                this.copyClipboard          = [],
                 this.softDeletedCanvasItems = {};
 
                 this.classId  = classId,
@@ -1538,10 +1557,10 @@
 
             // A pseudo canvasItem is only stored locally, and will be stored to the database on-save 
             createPseudoCanvasItem(itemId) {
-                this.createCanvasItem(itemId, true);
+                this.createCanvasItem(itemId);
             }
 
-            createCanvasItem(itemId, isPseudoCanvasItem = false) {
+            createCanvasItem(itemId, positionX = null, positionY = null) {
                 var canvasItems     = this.canvasItems,
                     canvasItemModel = this.canvasItemModel,
                     classId         = this.classId;
@@ -1554,28 +1573,27 @@
 
                 hasUserMadeChanges = true;
 
-                if (isPseudoCanvasItem) {
-                    canvasItem.id = 'Pseudo-' + Math.floor(Math.random() * 99999) + 1;
-                }
+                canvasItem.id = 'Pseudo-' + Math.floor(Math.random() * 99999) + 1;
 
-                if (!$.isEmptyObject(selectedCanvasItems.parent)) {
+                if (positionX !== null && positionY !== null) {
+                    canvasItem.position_x = positionX;
+                    canvasItem.position_y = positionY;
+                } else if (!$.isEmptyObject(selectedCanvasItems.parent)) {
                     var parentCanvasItemPositionX = canvasItems[selectedCanvasItems.parent.id].position_x,
                         parentCanvasItemPositionY = canvasItems[selectedCanvasItems.parent.id].position_y;
 
                     var nearestEmptySpace = this.getNearestEmpty(parentCanvasItemPositionX, parentCanvasItemPositionY, 5, 5);
 
-                    if (nearestEmptySpace != -1) {
+                    if (nearestEmptySpace !== -1) {
                         canvasItem.position_x = nearestEmptySpace[0];
                         canvasItem.position_y = nearestEmptySpace[1];
-
-                        return isPseudoCanvasItem ? this.addCanvasItem(canvasItem, true) : canvasItemModel.create(classId, canvasItem);
                     }
+                } else {
+                    canvasItem.position_x = 0;
+                    canvasItem.position_y = 0;
                 }
 
-                canvasItem.position_x = 0;
-                canvasItem.position_y = 0;
-
-                return isPseudoCanvasItem ? this.addCanvasItem(canvasItem, true) : canvasItemModel.create(classId, canvasItem);
+                return this.addCanvasItem(canvasItem, true);
             }
 
             // Stores the canvasItem locally and adds it to the view (canvas)
@@ -2272,6 +2290,51 @@
                         canvasController.view.setCanvasItemTooltip(index, classStudent.name, classStudent.gender);
                         canvasController.view.showCanvasItemTooltip(index);
                     }
+                }
+            }
+
+            copyCanvasItems(isCut = false) {
+                var selectedIds   = this.getSelectedIds(),
+                    canvasItems   = this.canvasItems;
+
+                this.copyClipboard = [];
+
+                for (let i = 0; i < selectedIds.length; i++) {
+                    this.copyClipboard.push(canvasItems[selectedIds[i]]);
+
+                    if (isCut) {
+                        this.removeCanvasItem(selectedIds[i]);
+                    }
+                }
+            }
+
+            pasteCanvasItems() {
+                var copyClipboard = this.copyClipboard;
+
+                for (var i = 0; i < copyClipboard.length; i++) {
+                    var copiedCanvasItemPositionX = copyClipboard[i].position_x,
+                        copiedCanvasItemPositionY = copyClipboard[i].position_y,
+                        pastedCanvasItemPositionX, pastedCanvasItemPositionY, nearestEmptySpace;
+
+                    if (this.canvasItemsGrid[copiedCanvasItemPositionX + 1][copiedCanvasItemPositionY + 1] != -1) {
+                        nearestEmptySpace = this.getNearestEmpty(copyClipboard[i].position_x, copyClipboard[i].position_y, 5, 5);
+
+                        if (nearestEmptySpace == -1) {
+                            alert('There is no space to paste the object at ' + copiedCanvasItemPositionX + ', ' + copiedCanvasItemPositionY);
+
+                            break;
+                        }
+
+                        pastedCanvasItemPositionX = nearestEmptySpace[0];
+                        pastedCanvasItemPositionY = nearestEmptySpace[1];
+                    } else {
+                        pastedCanvasItemPositionX = copiedCanvasItemPositionX + 1;
+                        pastedCanvasItemPositionY = copiedCanvasItemPositionY + 1;
+                    }
+
+                    this.createCanvasItem(copyClipboard[i].item_id, pastedCanvasItemPositionX, pastedCanvasItemPositionY);
+
+                    copyClipboard[i] = this.canvasItems[Object.keys(this.canvasItems)[Object.keys(this.canvasItems).length - 1]]
                 }
             }
         }
