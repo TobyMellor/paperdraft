@@ -27,7 +27,7 @@ class IndexController extends Controller
             $recentClassId   = $classController->getRecentClassId();
             $userPreferences = $settingController->getUserPreferences();
 
-            return view('dashboard.index-test')
+            return view('dashboard.index')
                 ->with('classes', $classes)
                 ->with('items', $items)
                 ->with('recentClassId', $recentClassId)
