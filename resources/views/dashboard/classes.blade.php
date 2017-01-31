@@ -98,14 +98,14 @@
                                     <div class="tabbable tab-content-bordered">
                                         <ul class="nav nav-tabs nav-tabs-highlight">
                                             <li class="active">
-                                                <a data-toggle="tab" href="#icon-only-tab1" title="" data-popup="tooltip" data-original-title="Information">
+                                                <a data-toggle="tab" href="#icon-only-tab1" data-popup="tooltip" title="Information">
                                                     <i class="icon-cog52"></i>
                                                     <span class="visible-xs-inline-block position-right">Information</span>
                                                 </a>
                                             </li>
 
                                             <li>
-                                                <a data-toggle="tab" href="#icon-only-tab2" title="" data-popup="tooltip" data-original-title="Picture">
+                                                <a data-toggle="tab" href="#icon-only-tab2" data-popup="tooltip" title="Picture">
                                                     <i class="icon-stack-picture"></i>
                                                     <span class="visible-xs-inline-block position-right">Picture</span>
                                                 </a>
@@ -116,40 +116,54 @@
                                             <div id="icon-only-tab1" class="tab-pane has-padding active">
                                                 <div class="row">
                                                     <div class="col-md-6">
-                                                        <label class="display-block text-bold">Basic Information <span class="text-danger">*</span></label>
-                                                        <input data-original-title="Enter the students name" class="form-control" data-popup="tooltip" title="" placeholder="Students Name" type="text" name="student_name" autocomplete="off" required id="student-name">
-                                                        <br />
-                                                        <div class="col-md-6" style="padding-left: 0;">
-                                                            <label class="display-block text-bold">
-                                                                Gender <span class="text-danger">*</span>
-                                                                <span class="text-muted" style="padding-left: 6px;">
-                                                                    <small class="selected-name" id="guessing-text" style="display: none;">
-                                                                        Guessing gender...
-                                                                    </small>
-                                                                </span>
+                                                        <label class="display-block text-bold">
+                                                            Basic Information <span class="text-danger">*</span>
+                                                        </label>
+                                                        <input title="Enter the students name" class="form-control" data-popup="tooltip" placeholder="Students Name" type="text" name="student_name" autocomplete="off" required id="student-name">
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <label class="display-block text-bold">
+                                                            Use institutions students?
+                                                        </label>
+                                                        <div class="radio">
+                                                            <label>
+                                                                <input type="radio" checked="checked" class="styled" name="gender" value="male">
+                                                                Use students
                                                             </label>
-                                                            <div class="radio">
-                                                                <label>
-                                                                    <input type="radio" checked="checked" class="styled" name="gender" value="male">
-                                                                    Male
-                                                                </label>
-                                                            </div>
-                                                            <div class="radio">
-                                                                <label>
-                                                                    <input type="radio" class="styled" name="gender" value="female">
-                                                                    Female
-                                                                </label>
-                                                            </div>
                                                         </div>
-                                                        <div class="col-md-6">
-                                                            <label class="display-block text-bold">Additional Information</label>
-                                                            <label class="checkbox-inline">
-                                                                <input type="checkbox" class="styled" name="pupil_premium">
-                                                                Pupil Premium
+                                                        <div class="radio">
+                                                            <label>
+                                                                <input type="radio" class="styled" name="gender" value="female">
+                                                                Make my own
                                                             </label>
                                                         </div>
                                                     </div>
-                                                    <div class="col-md-6">
+                                                </div>
+                                                     
+                                                <div class="row">
+                                                    <div class="col-md-3">
+                                                        <label class="display-block text-bold">
+                                                            Gender <span class="text-danger">*</span>
+                                                            <span class="text-muted" style="padding-left: 6px;">
+                                                                <small class="selected-name" id="guessing-text" style="display: none;">
+                                                                    Guessing gender...
+                                                                </small>
+                                                            </span>
+                                                        </label>
+                                                        <div class="radio">
+                                                            <label>
+                                                                <input type="radio" checked="checked" class="styled" name="gender" value="male">
+                                                                Male
+                                                            </label>
+                                                        </div>
+                                                        <div class="radio">
+                                                            <label>
+                                                                <input type="radio" class="styled" name="gender" value="female">
+                                                                Female
+                                                            </label>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-3">
                                                         <label class="display-block text-bold">Student Ability Tier</label>
                                                         <div class="radio">
                                                             <label>
@@ -169,6 +183,13 @@
                                                                 Low
                                                             </label>
                                                         </div>
+                                                    </div>
+                                                    <div class="col-md-3">
+                                                        <label class="display-block text-bold">Additional Information</label>
+                                                        <label class="checkbox-inline">
+                                                            <input type="checkbox" class="styled" name="pupil_premium">
+                                                            Pupil Premium
+                                                        </label>
                                                     </div>
                                                 </div>
 
@@ -585,7 +606,7 @@
                         $('tr[student-id=' + jsonResponse.student.id + ']').fadeIn();
 
                         $('#create-student').trigger('reset');
-                        $('a[data-original-title="Information"]').tab('show');
+                        $('a[title="Information"]').tab('show');
 
                         $('select').select2();
                         $('.styled').uniform({
