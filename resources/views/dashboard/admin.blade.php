@@ -155,7 +155,7 @@
                             @foreach ($classes as $class)
                                 @if ($class->institution_id !== null)
                                     <tr class-id="{{ $class->id }}">
-                                        <td>
+                                        <td class="class-name">
                                             {{ $class->class_name }}
                                         </td>
                                         <td>
@@ -163,9 +163,21 @@
                                         </td>
                                         <td>
                                             <div class="btn-group">
-                                                <button type="button" class="btn btn-danger dropdown-toggle">
+                                                <button type="button" data-toggle="dropdown" class="btn btn-danger dropdown-toggle">
                                                     Options <span class="caret"></span>
                                                 </button>
+                                                <ul class="dropdown-menu dropdown-menu-right">
+                                                    <li>
+                                                        <a id="delete-room">
+                                                            <i class="icon-minus3"></i> Delete Room
+                                                        </a>
+                                                    </li>
+                                                    <li>
+                                                        <a id="edit-room">
+                                                            <i class="icon-pencil"></i> Edit Room
+                                                        </a>
+                                                    </li>
+                                                </ul>
                                             </div>
                                         </td>
                                     </tr>
@@ -209,8 +221,8 @@
                                                     <div class="col-md-6">
                                                         <label class="display-block text-bold">Duplicate Seat Layout From</label>
                                                         <div class="form-group">
-                                                            <select name="target_attainment_level">
-                                                                <optgroup label="Target Level">
+                                                            <select name="copied_class_id">
+                                                                <optgroup label="Seating Plans">
                                                                     <option value="" selected>Select a plan to duplicate</option>
                                                                     @foreach ($classes as $class)
                                                                         <option value="{{ $class->id }}">{{ $class->class_name }}</option>
@@ -239,6 +251,39 @@
     </div>
 @stop
 
+@section('modals')
+    <div id="modal_edit_room" class="modal fade">
+        <div class="modal-dialog modal-xs">
+            <div class="modal-content text-center">
+                <div class="modal-header bg-primary">
+                    <h5 class="modal-title">Edit the Room information</h5>
+                </div>
+
+                <form action="javascript:void(0);" class="form-inline" id="edit-room-form">
+                    <input type="text" id="edit-room-id" name="class-id" hidden disabled>
+                    <div class="modal-body">
+                        <label class="display-block text-bold">
+                            What's the rooms name? <span class="text-danger">*</span>
+                        </label>
+                        <div class="form-group has-feedback">
+                            <input type="text" placeholder="Room name" class="form-control" name="class_name">
+                            <div class="form-control-feedback">
+                                <i class="icon-book text-muted"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer text-center">
+                        <button class="btn btn-primary" id="edit-room-button">
+                            Update Room <i class="icon-pencil"></i>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+@stop
+
 @section('scripts')
     <script>
         var token = '{{ csrf_token() }}';
@@ -249,35 +294,51 @@
             });
 
             $(document).delegate('#resend-invitation', 'click', function() {
-                var userId = $(this)
-                    .parent()
-                    .parent()
-                    .parent()
-                    .parent()
-                    .parent()
-                    .attr('user-id');
+                var userId = getAttributeFromTr($(this), 'user-id');
                 
                 registerUser(userId);
             });
 
             $(document).delegate('#remove-from-institution', 'click', function() {
-                var userId = $(this)
-                    .parent()
-                    .parent()
-                    .parent()
-                    .parent()
-                    .parent()
-                    .attr('user-id');
+                var userId = getAttributeFromTr($(this), 'user-id');
 
                 deleteUser(userId);
+            });
+
+            $(document).delegate('#edit-room', 'click', function() {
+                var classId = getAttributeFromTr($(this), 'class-id');
+
+                $('#edit-room-id').val(classId);
+
+                $('#modal_edit_room').modal('show');
+            });
+
+            $(document).delegate('#delete-room', 'click', function() {
+                var classId = getAttributeFromTr($(this), 'class-id');
+
+                deleteRoom(classId);
             });
 
             $('#create-room').click(function() {
                 createRoom();
             });
 
+            $('#edit-room-button').click(function() {
+                editRoom($('#edit-room-id').val());
+            });
+
             $('select').select2();
         });
+
+        function getAttributeFromTr(element, attribute) {
+            return element
+                .parent()
+                .parent()
+                .parent()
+                .parent()
+                .parent()
+                .attr(attribute);
+        }
 
         function registerUser(userId = null) {
             $('#register-user').prop('disabled', true);
@@ -374,23 +435,96 @@
 
                     $('#create-class-tbody').append(
                         '<tr class-id="' + jsonResponse.class.id + '">' +
-                            '<td>' +
+                            '<td class="class-name">' +
                                 formData['class_name'] +
                             '</td>' +
                             '<td>' +
+                                '0' +
+                            '</td>' +
+                            '<td>' +
                                 '<div class="btn-group">' +
-                                    '<button type="button" class="btn btn-danger dropdown-toggle">' +
+                                    '<button type="button" data-toggle="dropdown" class="btn btn-danger dropdown-toggle">' +
                                         'Options <span class="caret"></span>' +
                                     '</button>' +
+                                    '<ul class="dropdown-menu dropdown-menu-right">' +
+                                        '<li>' +
+                                            '<a id="delete-room">' +
+                                                '<i class="icon-minus3"></i> Delete Room' +
+                                            '</a>' +
+                                        '</li>' +
+                                        '<li>' +
+                                            '<a id="edit-room">' +
+                                                '<i class="icon-pencil"></i> Edit Room' +
+                                            '</a>' +
+                                        '</li>' +
+                                    '</ul>' +
                                 '</div>' +
                             '</td>' +
                         '</tr>'
                     );
+
+                    $.APIAjax({
+                        url: '{{ url('api/class/duplicate') }}',
+                        type: 'POST',
+                        data: {
+                            new_class_id: jsonResponse.class.id,
+                            copied_class_id: formData['copied_class_id']
+                        },
+                        success: function(jsonResponse) {
+                            handleNotification(jsonResponse.message, 'success');
+                        },
+                        error: function(jsonResponse) {}
+                    });
                 },
                 error: function(jsonResponse) {}
             }).always(function() {
                 $('#create-room').prop('disabled', false);
                 $('#create-room').html('Create Room <i class="icon-plus3 position-right"></i>');
+            });
+        }
+
+        function editRoom(classId) {
+            $('#edit-room-button').prop('disabled', true);
+            $('#edit-room-button').html('Updating room <i class="icon-spinner2 spinner position-right"></i>');
+
+            var formData = $('#edit-room-form').serializeArray().reduce(function(obj, item) {
+                obj[item.name] = item.value;
+
+                return obj;
+            }, {});
+
+            $.APIAjax({
+                url: '{{ url('api/class') }}/' + classId,
+                type: 'PUT',
+                data: {
+                    class_name: formData['class_name']
+                },
+                success: function(jsonResponse) {
+                    handleNotification(jsonResponse.message, 'success');
+
+                    $('tr[class-id="' + classId + '"]').find('.class-name').html(formData['class_name']);
+                },
+                error: function(jsonResponse) {}
+            }).always(function() {
+                $('#edit-room-button').prop('disabled', false);
+                $('#edit-room-button').html('Update Room <i class="icon-plus3 position-right"></i>');
+                $('#edit-room-form').trigger('reset');
+                $('#modal_edit_room').modal('hide');
+            });
+        }
+
+        function deleteRoom(classId) {
+            $.APIAjax({
+                url: '{{ url('api/class') }}/' + classId,
+                type: 'DELETE',
+                success: function(jsonResponse) {
+                    handleNotification(jsonResponse.message, 'success');
+
+                    $('tr[class-id="' + classId + '"]').fadeOut(300, function() {
+                        $(this).remove();
+                    });
+                },
+                error: function(jsonResponse) {}
             });
         }
 

@@ -49,15 +49,6 @@ Route::group(['middleware' => ['auth']], function () {
         ]
     );
 
-    Route::resource('class-room', 'ClassRoomController',
-        [
-            'only' => [
-                'store',  // POST api/class-room
-                'update', // PUT  api/class-room/{room-id}
-            ],
-        ]
-    );
-
     Route::resource('student', 'StudentController',
         [
             'only' => [
@@ -75,10 +66,13 @@ Route::group(['middleware' => ['auth']], function () {
         [
             'only' => [
                 'store',  // POST   api/class
-                'destroy' // DELETE api/class
+                'update', // PUT    api/class/{id}
+                'destroy' // DELETE api/class/{id}
             ], 
         ]
     );
+
+    Route::post('class/duplicate', 'ClassController@duplicateClassRoom');
 
     Route::resource('user', 'UserController', 
         [

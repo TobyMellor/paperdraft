@@ -117,6 +117,58 @@ class ClassController extends Controller
     }
 
     /**
+     * Update a given class.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function update(Request $request, $id)
+    {
+        $className = $request->input('class_name');
+
+        $data = [
+            'class_name' => $className
+        ];
+
+        $validation = $this->validateClass($data);
+
+        if (!$validation->fails()) {
+            $updatedClass = SchoolClass::where('id', $id)
+                ->where('user_id', Auth::id());
+
+            if ($updatedClass->count() > 0) {
+                $updatedClass->update([
+                    'class_name' => $className      
+                ]);
+
+                return response()->json([
+                    'class'   => $updatedClass,
+                    'error'   => 0,
+                    'message' => trans('api.class-room.success.update')
+                ]);
+            }
+
+            return response()->json([
+                'class'   => $updatedClass,
+                'error'   => 1,
+                'message' => trans('api.class-room.failure.update')
+            ]);
+        }
+
+        $errorMessages = $validation->errors()->all();
+        $responseMessage = '';
+
+        foreach ($errorMessages as $errorMessage) {
+            $responseMessage .= $errorMessage;
+        }
+        
+        return response()->json([
+            'error'   => 1,
+            'message' => $responseMessage
+        ]);
+    }
+
+    /**
      * Get all classes of a teacher
      *
      * @return \Illuminate\Http\Redirect
@@ -239,6 +291,42 @@ class ClassController extends Controller
         CanvasItem::insert($canvasItemsToPaste);
 
         return $newClassId;
+    }
+
+    public function duplicateClassRoom(Request $request)
+    {
+        $newClassId    = $request->input('new_class_id');
+        $copiedClassId = $request->input('copied_class_id');
+
+        $validator = $this->validateClassId(['class_id' => $newClassId]);
+        $validator2 = $this->validateClassId(['class_id' => $copiedClassId]);
+
+        if (!$validator->fails() && !$validator2->fails()) {
+            $canvasItemsToCopy = CanvasItem::where('class_id', $copiedClassId)->get();
+
+            $canvasItemsToPaste = [];
+
+            foreach ($canvasItemsToCopy as $canvasItemToCopy) {
+                array_push($canvasItemsToPaste, [
+                    'item_id'    => $canvasItemToCopy->item_id,
+                    'class_id'   => $newClassId,
+                    'position_x' => $canvasItemToCopy->position_x,
+                    'position_y' => $canvasItemToCopy->position_y,
+                ]);
+            }
+
+            CanvasItem::insert($canvasItemsToPaste);
+
+            return response()->json([
+                'error'   => 0,
+                'message' => 'Successfully duplicated class layout'
+            ]);
+        }
+
+        return response()->json([
+            'error'   => 1,
+            'message' => 'There was an error with the data provided.'
+        ]);
     }
 
     public function duplicateClassThenRedirect($classId) {

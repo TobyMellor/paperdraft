@@ -106,9 +106,6 @@
                                         </a>
                                         <ul class="dropdown-menu dropdown-menu-right">
                                             <li>
-                                                <a href="{{ url('dashboard/classes/' . $class->id . '/duplicate') }}">Duplicate Class Layout</a>
-                                            </li>
-                                            <li>
                                                 <a href="javascript:void(0);" class="clear-seatingplan">Clear Seating Plan</a>
                                             </li>
                                         </ul>

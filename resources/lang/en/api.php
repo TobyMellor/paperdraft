@@ -69,7 +69,13 @@ return [
     'class' => [
         'success' => [
             'store'   => 'The class was successfully stored.',
+            'store'   => 'The class was successfully updated.',
             'destroy' => 'The class was successfully deleted.'
+        ],
+        'failure' => [
+            'store'   => 'An error occured while storing the class.',
+            'update'  => 'An error occured while updating the class.',
+            'destroy' => 'An error occured while deleting the class.',
         ]
     ],
     'user' => [

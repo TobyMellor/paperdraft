@@ -293,7 +293,9 @@
                     <div class="modal-body">
                         <div class="row">
                             <div class="col-md-6">
-                                <label class="display-block text-bold">What's the classes name? <span class="text-danger">*</span></label>
+                                <label class="display-block text-bold">
+                                    What's the classes name? <span class="text-danger">*</span>
+                                </label>
                                 <div class="form-group has-feedback" style="width: 100%;">
                                     <input type="text" placeholder="Class name" style="width: 100%;" class="form-control" name="class_name">
                                     <div class="form-control-feedback">
