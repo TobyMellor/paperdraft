@@ -23,13 +23,13 @@ return [
             'batch-destroy' => 'All of the canvas-items were successfully deleted.'
         ],
         'failure' => [
-            'index'            => 'An error occured while returning all of the canvas-items.',
-            'store'            => 'An error occured while storing the canvas-items.',
-            'show'             => 'An error occured while returning the canvas-items.',
-            'update'           => 'An error occured while updating the canvas-items.',
-            'batch-update'     => 'An error occured while updating all of the canvas-items.',
-            'destroy'          => 'An error occured while deleting the canvas-items.',
-            'batch-destroy'    => 'An error occured while deleting all of the canvas-items.'
+            'index'         => 'An error occured while returning all of the canvas-items.',
+            'store'         => 'An error occured while storing the canvas-items.',
+            'show'          => 'An error occured while returning the canvas-items.',
+            'update'        => 'An error occured while updating the canvas-items.',
+            'batch-update'  => 'An error occured while updating all of the canvas-items.',
+            'destroy'       => 'An error occured while deleting the canvas-items.',
+            'batch-destroy' => 'An error occured while deleting all of the canvas-items.'
         ]
     ],
     'item' => [
@@ -96,7 +96,18 @@ return [
             'update' => 'The institution was successfully updated.'
         ],
         'failure' => [
+            'store'  => 'The institution name needs to be less than 50 characters.',
             'update' => 'You don\'t have permission to update that institution.'
+        ]
+    ],
+    'class-room' => [
+        'success' => [
+            'store'   => 'The class room was successfully saved.',
+            'update'  => 'The class room was successfully updated.'
+        ],
+        'failure' => [
+            'store'   => 'The room name needs to be less than 30 characters or you don\'t have permission.',
+            'update'  => 'The room name needs to be less than 30 characters or you don\'t have permission.'
         ]
     ]
 ];

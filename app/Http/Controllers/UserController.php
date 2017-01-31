@@ -480,8 +480,10 @@ class UserController extends Controller
 
     public function inviteUser(Request $request)
     {
-        $email    = $request->input('email');
+        $email = $request->input('email');
         $password = strtolower(str_random(6));
+
+        $userId = $request->input('user_id');
 
         $data = [
             'email'                 => $email,
@@ -489,11 +491,24 @@ class UserController extends Controller
             'password_confirmation' => $password
         ];
 
-        $validation = $this->validator($data);
+        if ($userId !== null) {
+            $validation = $this->validator($data);
+        }
 
-        if (!$validation->fails()) {
+        if ($userId !== null || !$validation->fails()) {
             if (Auth::user()->priviledge === 1) {
                 if (Auth::user()->institution->users->count() <= 100) {
+                    if ($userId !== null) {
+                        $user = User::where('id', $userId)
+                            ->where('institution_id', Auth::user()->institution_id)
+                            ->where('should_change_password', true)
+                            ->where('first_name', null);
+
+                        $email = $user->first()->email;
+
+                        $user->delete();
+                    }
+
                     $schoolAdmin = Auth::user()->title . '. ' . Auth::user()->last_name;
 
                     $user = new User;
@@ -517,6 +532,7 @@ class UserController extends Controller
                     });
 
                     return response()->json([
+                        'user'    => $user,
                         'error'   => 0,
                         'message' => trans('api.user.success.store')
                     ]);
@@ -537,6 +553,27 @@ class UserController extends Controller
         return response()->json([
             'error'   => 1,
             'message' => trans('api.user.failure.store.invalid-email')
+        ]);
+    }
+
+    public function deleteUserOfInstitution(Request $request, $id)
+    {
+        if (Auth::user()->institution_id !== null && Auth::user()->priviledge === 1) {
+            User::where('id', $id)
+                ->where('id', '!=', Auth::id())
+                ->where('institution_id', Auth::user()->institution_id)
+                ->where('priviledge', 0)
+                ->delete();
+
+            return response()->json([
+                'error'   => 0,
+                'message' => 'The user was successfully removed from your institution.'
+            ]);
+        }
+
+        return response()->json([
+            'error'   => 1,
+            'message' => 'You don\'t have permission to remove that user.'
         ]);
     }
 

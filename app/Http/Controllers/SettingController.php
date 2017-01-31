@@ -31,25 +31,28 @@ class SettingController extends Controller
     public function store(Request $request)
     {
         $userPreferences = $request->input('user_preferences');
-        $settingNames    = array_keys($userPreferences);
-        $settingIds      = Setting::whereIn('setting_name', $settingNames)->pluck('id');
 
-        foreach ($settingIds as $key => $id) {
-            $currentSettingValue = SettingValue::where('user_id', Auth::id())
-                ->where('setting_id', $id);
+        if ($userPreferences !== null) {
+            $settingNames = array_keys($userPreferences);
+            $settingIds   = Setting::whereIn('setting_name', $settingNames)->pluck('id');
 
-            if ($currentSettingValue->count() > 0) {
-                $currentSettingValue->update([
-                        'setting_value' => $userPreferences[$settingNames[$key]]
-                ]);
-            } else {
-                $settingValue = new SettingValue;
+            foreach ($settingIds as $key => $id) {
+                $currentSettingValue = SettingValue::where('user_id', Auth::id())
+                    ->where('setting_id', $id);
 
-                $settingValue->user_id       = Auth::id();
-                $settingValue->setting_id    = $id;
-                $settingValue->setting_value = $userPreferences[$settingNames[$key]];
+                if ($currentSettingValue->count() > 0) {
+                    $currentSettingValue->update([
+                            'setting_value' => $userPreferences[$settingNames[$key]]
+                    ]);
+                } else {
+                    $settingValue = new SettingValue;
 
-                $settingValue->save();
+                    $settingValue->user_id       = Auth::id();
+                    $settingValue->setting_id    = $id;
+                    $settingValue->setting_value = $userPreferences[$settingNames[$key]];
+
+                    $settingValue->save();
+                }
             }
         }
 

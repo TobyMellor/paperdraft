@@ -688,6 +688,7 @@
                             if (responseJson.error == 0) {
                                 successCallback(responseJson); // Continue to function
                             } else {
+                                hasErrorOccured = true;
                                 handleNotification(responseJson.message, 'error');
                             }
                         } else {

@@ -215,17 +215,6 @@
                                                     </div>
                                                 </div>
                                             </div>
-
-                                            <div id="icon-only-tab2" class="tab-pane has-padding">
-                                                <div class="row">
-                                                    <label class="display-block text-bold" style="margin-left: 10px;">Student Image</label>
-                                                    <div class="col-md-6">
-                                                        <div class="form-group">
-                                                            <input type="file" class="file-input" accept="image/*" name="student_image">
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
                                         </div>
                                     </div>
                                 </fieldset>
@@ -244,35 +233,37 @@
                 <ul class="nav nav-pills nav-pills-bordered nav-stacked">
                     @if (isset($classes))
                         @foreach ($classes as $key => $class)
-                            <li>
-                                <a href="/dashboard/classes/{{ $class->id }}" class="class-button @if ($selectedClass->id == $class->id) class-button-active @endif" class-id="{{ $class->id }}">
-                                    {{ $class->class_name }} <span class="text-muted"><small>{{ $class->class_room or '' }}</small></span>
-                                    
-                                    @if ($class->class_subject !== null)
-                                        <span class="label label-primary pull-right" style="margin-right: 60px;">
-                                            {{ $class->class_subject }}
-                                        </span>
-                                    @endif
-                                </a>
-                                <div class="btn-group">
-                                    <a href="javascript:void(0);" class="btn btn-primary btn-icon dropdown-toggle @if ($selectedClass->id == $class->id) class-options-active @else class-options @endif" data-toggle="dropdown" class-id="{{ $class->id }}">
-                                        <i class="icon-menu7"></i>
-                                        <span class="caret"></span>
+                            @if ($class->institution_id === null)
+                                <li>
+                                    <a href="/dashboard/classes/{{ $class->id }}" class="class-button @if ($selectedClass->id === $class->id) class-button-active @endif" class-id="{{ $class->id }}">
+                                        {{ $class->class_name }} <span class="text-muted"><small>{{ $class->class_room or '' }}</small></span>
+                                        
+                                        @if ($class->class_subject !== null)
+                                            <span class="label label-primary pull-right" style="margin-right: 60px;">
+                                                {{ $class->class_subject }}
+                                            </span>
+                                        @endif
                                     </a>
-                                    <ul class="dropdown-menu dropdown-menu-right">
-                                        <li>
-                                            <a href="{{ url('dashboard/classes/' . $class->id . '/duplicate') }}">Duplicate Class Layout</a>
-                                        </li>
-                                        <li class="divider"></li>
-                                        <li>
-                                            <a href="{{ url('dashboard/classes') }}/{{ $class->id }}/clear" class="clear-seatingplan">Clear Seating Plan</a>
-                                        </li>
-                                        <li>
-                                            <a href="javascript:void(0);" class="delete-class">Delete Class</a>
-                                        </li>
-                                    </ul>
-                                </div> 
-                            </li>
+                                    <div class="btn-group">
+                                        <a href="javascript:void(0);" class="btn btn-primary btn-icon dropdown-toggle @if ($selectedClass->id == $class->id) class-options-active @else class-options @endif" data-toggle="dropdown" class-id="{{ $class->id }}">
+                                            <i class="icon-menu7"></i>
+                                            <span class="caret"></span>
+                                        </a>
+                                        <ul class="dropdown-menu dropdown-menu-right">
+                                            <li>
+                                                <a href="{{ url('dashboard/classes/' . $class->id . '/duplicate') }}">Duplicate Class Layout</a>
+                                            </li>
+                                            <li class="divider"></li>
+                                            <li>
+                                                <a href="{{ url('dashboard/classes') }}/{{ $class->id }}/clear" class="clear-seatingplan">Clear Seating Plan</a>
+                                            </li>
+                                            <li>
+                                                <a href="javascript:void(0);" class="delete-class">Delete Class</a>
+                                            </li>
+                                        </ul>
+                                    </div> 
+                                </li>
+                            @endif
                         @endforeach
                         <li>
                         <br />

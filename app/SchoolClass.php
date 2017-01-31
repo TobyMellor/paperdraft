@@ -32,4 +32,12 @@ class SchoolClass extends Model
     {
         return $this->hasMany(ClassStudent::class, 'class_id', 'id');
     }
+
+    /**
+     * Get the class students in a given class
+     */
+    public function canvasItems()
+    {
+        return $this->hasMany(CanvasItem::class, 'class_id', 'id');
+    }
 }

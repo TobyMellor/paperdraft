@@ -49,6 +49,15 @@ Route::group(['middleware' => ['auth']], function () {
         ]
     );
 
+    Route::resource('class-room', 'ClassRoomController',
+        [
+            'only' => [
+                'store',  // POST api/class-room
+                'update', // PUT  api/class-room/{room-id}
+            ],
+        ]
+    );
+
     Route::resource('student', 'StudentController',
         [
             'only' => [
@@ -80,6 +89,7 @@ Route::group(['middleware' => ['auth']], function () {
     );
 
     Route::post('user', 'UserController@inviteUser');
+    Route::delete('user/{id}', 'UserController@deleteUserOfInstitution');
 
     Route::resource('institution', 'InstitutionController', 
         [

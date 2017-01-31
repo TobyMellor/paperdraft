@@ -6,6 +6,7 @@ use App\Institution;
 use App\User;
 
 use Auth;
+use Validator;
 
 use Illuminate\Http\Request;
 
@@ -20,46 +21,50 @@ class InstitutionController extends Controller
     {
         $institutionName = $request->input('institution_name');
 
-        if (Auth::user()->institution_id === null) {
-            $institution = new Institution;
+        $validation = $this->validator(['name' => $institutionName]);
 
-            $institution->name             = $institutionName;
-            $institution->institution_code = $this->generateNewRandomCode();
+        if (!$validation->fails()) {
+            if (Auth::user()->institution_id === null) {
+                $institution = new Institution;
 
-            $institution->save();
+                $institution->name             = $institutionName;
+                $institution->institution_code = $this->generateNewRandomCode();
 
-            $user = User::where('id', Auth::id())
-                ->update([
-                    'institution_id' => $institution->id
+                $institution->save();
+
+                $user = User::where('id', Auth::id())
+                    ->update([
+                        'institution_id' => $institution->id
+                    ]);
+
+                return response()->json([
+                    'error'   => 0,
+                    'message' => trans('api.institution.success.store')
                 ]);
+            }
+
+            if (Auth::user()->priviledge === 1) {
+                Institution::where('id', Auth::user()->institution_id)
+                    ->update([
+                        'name' => $institutionName
+                    ]);
+
+                return response()->json([
+                    'error'   => 0,
+                    'message' => trans('api.institution.success.update')
+                ]);
+            }
 
             return response()->json([
-                'error'   => 0,
-                'message' => trans('api.institution.success.store')
-            ]);
-        }
-
-        if (Auth::user()->priviledge === 1) {
-            Institution::where('id', Auth::user()->institution_id)
-                ->update([
-                    'name' => $institutionName
-                ]);
-
-            return response()->json([
-                'error'   => 0,
-                'message' => trans('api.institution.success.update')
+                'error'   => 1,
+                'message' => trans('api.institution.failure.update')
             ]);
         }
 
         return response()->json([
             'error'   => 1,
-            'message' => trans('api.institution.failure.update')
+            'message' => trans('api.institution.failure.store')
         ]);
-    }
-
-    public function getAdminPanel()
-    {
-        return view('dashboard.admin');
     }
 
     public function generateNewRandomCode()

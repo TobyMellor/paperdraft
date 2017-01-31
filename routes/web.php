@@ -30,7 +30,7 @@ Route::group(['middleware' => ['guest']], function () {
 
 // The user needs to be authenticated to perform these actions
 Route::group(['middleware' => ['auth']], function () {
-    Route::get('dashboard/admin', 'InstitutionController@getAdminPanel');
+    Route::get('dashboard/admin', 'IndexController@getAdminDashboard');
 
     Route::get('dashboard', 'IndexController@getDashboard')
         ->name('dashboard');

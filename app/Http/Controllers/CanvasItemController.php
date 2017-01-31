@@ -86,7 +86,7 @@ class CanvasItemController extends Controller
     public function update(Request $request, $id)
     {
         $canvasItem = $request->input('canvas_item');
-        $classId = $request->input('class_id');
+        $classId    = $request->input('class_id');
 
         if ($canvasItem['soft_deleted'] != null && $canvasItem['soft_deleted']) {
             $storedCanvasItem = CanvasItem::withTrashed()
@@ -185,13 +185,6 @@ class CanvasItemController extends Controller
         return response()->json([
             'error'   => 1,
             'message' => trans('api.canvas-item.failure.batch-destroy')
-        ]);
-    }
-
-    protected function classIdValidator(array $data)
-    {
-        return Validator::make($data, [
-            'class_id' => 'required|integer|ownsclass'
         ]);
     }
 }

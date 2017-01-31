@@ -3,6 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\ClassStudent;
+use App\SchoolClass;
+
+use Auth;
 
 class IndexController extends Controller
 {
@@ -25,15 +28,22 @@ class IndexController extends Controller
         $classes = $classController->getClasses();
         $items = $itemController->index();
 
-        if ($classes->first() !== null) {
+        if ($classes->first() !== null && Auth::user()->first_name !== null) {
             $recentClassId   = $classController->getRecentClassId();
             $userPreferences = $settingController->getUserPreferences();
+            $classRooms      = null;
+
+            if (Auth::user()->institution_id !== null && Auth::user()->priviledge === 1) {
+                $classRooms = SchoolClass::where('institution_id', Auth::user()->institution_id)
+                    ->get();
+            }
 
             return view('dashboard.index')
                 ->with('classes', $classes)
                 ->with('items', $items)
                 ->with('recentClassId', $recentClassId)
-                ->with('userPreferences', $userPreferences);
+                ->with('userPreferences', $userPreferences)
+                ->with('classRooms', $classRooms);
         }
 
         return $this->getClassesDashboard($classController);
@@ -56,7 +66,7 @@ class IndexController extends Controller
     {
         $classes = $classController->getClasses();
 
-        if ($classes->first() !== null) {
+        if ($classes->first() !== null && Auth::user()->first_name !== null) {
             return redirect('/dashboard/classes/' . $classes->first()->id);
         }
         
@@ -83,5 +93,24 @@ class IndexController extends Controller
             ->with('classes', $classes)
             ->with('selectedClass', $selectedClass)
             ->with('classId', $classId);
+    }
+
+    /**
+     * Display the admin dashboard.
+     *
+     * @return \Illuminate\Http\View
+     */
+    public function getAdminDashboard(
+        ClassController $classController
+    )
+    {
+        $classes = $classController->getClasses();
+
+        if ($classes->first() !== null && Auth::user()->first_name !== null) {
+            return view('dashboard.admin')
+                ->with('classes', $classes);
+        }
+        
+        return $this->getWizardDashboard($classController);
     }
 }

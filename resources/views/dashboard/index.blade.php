@@ -43,34 +43,36 @@
                 <ul class="nav nav-pills nav-pills-bordered nav-stacked">
                     @if (isset($classes))
                         @foreach ($classes as $key => $class)
-                            <li>
-                                <a href="javascript:void(0);" class="class-button" class-id="{{ $class->id }}">
-                                    <span class="sidebar-class-name">{{ $class->class_name }}</span>
-                                    <span class="text-muted">
-                                        <small>{{ $class->class_room or '' }}</small>
-                                    </span>
-                                    
-                                    @if ($class->class_subject !== null)
-                                        <span class="label label-primary pull-right sidebar-label">
-                                            {{ $class->class_subject }}
+                            @if ($class->institution_id === null)
+                                <li>
+                                    <a href="javascript:void(0);" class="class-button" class-id="{{ $class->id }}" type="seating-plan">
+                                        <span class="sidebar-class-name">{{ $class->class_name }}</span>
+                                        <span class="text-muted">
+                                            <small>{{ $class->class_room or '' }}</small>
                                         </span>
-                                    @endif
-                                </a>
-                                <div class="btn-group">
-                                    <a href="javascript:void(0);" class="btn btn-primary btn-icon dropdown-toggle class-options" data-toggle="dropdown" class-id="{{ $class->id }}">
-                                        <i class="icon-menu7"></i>
-                                        <span class="caret"></span>
+                                        
+                                        @if ($class->class_subject !== null)
+                                            <span class="label label-primary pull-right sidebar-label">
+                                                {{ $class->class_subject }}
+                                            </span>
+                                        @endif
                                     </a>
-                                    <ul class="dropdown-menu dropdown-menu-right">
-                                        <li>
-                                            <a href="{{ url('dashboard/classes/' . $class->id . '/duplicate') }}">Duplicate Class Layout</a>
-                                        </li>
-                                        <li>
-                                            <a href="javascript:void(0);" class="clear-seatingplan">Clear Seating Plan</a>
-                                        </li>
-                                    </ul>
-                                </div> 
-                            </li>
+                                    <div class="btn-group">
+                                        <a href="javascript:void(0);" class="btn btn-primary btn-icon dropdown-toggle class-options" data-toggle="dropdown" class-id="{{ $class->id }}">
+                                            <i class="icon-menu7"></i>
+                                            <span class="caret"></span>
+                                        </a>
+                                        <ul class="dropdown-menu dropdown-menu-right">
+                                            <li>
+                                                <a href="{{ url('dashboard/classes/' . $class->id . '/duplicate') }}">Duplicate Class Layout</a>
+                                            </li>
+                                            <li>
+                                                <a href="javascript:void(0);" class="clear-seatingplan">Clear Seating Plan</a>
+                                            </li>
+                                        </ul>
+                                    </div> 
+                                </li>
+                            @endif
                         @endforeach
                         <li class="class-create-list-item">
                     @else
@@ -81,6 +83,41 @@
                         </a>
                     </li>
                 </ul>
+                
+                @if ($classRooms !== null)
+                    @if (sizeOf($classRooms) > 0)
+                        <span class="text-muted">
+                            <small>{{ Auth::user()->institution->name }}'s Room Templates<small>
+                        </span>
+                        <ul class="nav nav-pills nav-pills-bordered nav-stacked">
+                            @foreach ($classRooms as $key => $class)
+                                <li>
+                                    <a href="javascript:void(0);" class="class-button" class-id="{{ $class->id }}" type="room-plan">
+                                        <span class="sidebar-class-name">{{ $class->class_name }}</span>
+                                        
+                                        <span class="label label-danger pull-right sidebar-label">
+                                            Room Template
+                                        </span>
+                                    </a>
+                                    <div class="btn-group">
+                                        <a href="javascript:void(0);" class="btn btn-primary btn-icon dropdown-toggle class-options" data-toggle="dropdown" class-id="{{ $class->id }}">
+                                            <i class="icon-menu7"></i>
+                                            <span class="caret"></span>
+                                        </a>
+                                        <ul class="dropdown-menu dropdown-menu-right">
+                                            <li>
+                                                <a href="{{ url('dashboard/classes/' . $class->id . '/duplicate') }}">Duplicate Class Layout</a>
+                                            </li>
+                                            <li>
+                                                <a href="javascript:void(0);" class="clear-seatingplan">Clear Seating Plan</a>
+                                            </li>
+                                        </ul>
+                                    </div> 
+                                </li>
+                            @endforeach
+                        </ul>
+                    @endif
+                @endif
             </div>
 
             <div class="panels">
@@ -128,7 +165,7 @@
                                             <strong>X:</strong> 1, <strong>Y:</strong> 6<br />
                                         </td>
                                     </tr>
-                                    <tr>
+                                    <tr id="students-list">
                                         <td>Student(s)</td>
                                         <td id="selected-students">
                                             No student is assigned to this desk.
@@ -917,7 +954,8 @@
 
                 $('#class-students').html('');
 
-                var classId = parseInt(buttonElement.attr('class-id'));
+                var classId   = parseInt(buttonElement.attr('class-id'));
+                var classType = buttonElement.attr('type');
 
                 canvasController.view.setActiveClass(classId);
 
@@ -927,6 +965,14 @@
                 canvasController.loadCanvasItems();
                 studentController.loadClassStudents();
                 historyController.loadCanvasHistory();
+
+                if (classType === 'seating-plan') {
+                    $('.panel[name="student_panel"]').fadeIn();
+                    $('#students-list').fadeIn();
+                } else {
+                    $('.panel[name="student_panel"]').fadeOut();
+                    $('#students-list').fadeOut();
+                }
             }
 
             updateStudentButtons() {
@@ -3170,6 +3216,13 @@
                 if (utils.isInt(queryParameters.class) && $('.class-button[class-id=' + queryParameters.class + ']').length > 0) {
                     classId = queryParameters.class;
                 }
+            }
+
+            var classType = $('a[class-id="' + classId + '"]').attr('type');
+
+            if (classType !== 'seating-plan') {
+                $('.panel[name="student_panel"]').fadeOut();
+                $('#students-list').fadeOut();
             }
 
             var view = new View;

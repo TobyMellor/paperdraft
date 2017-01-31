@@ -22,31 +22,43 @@ class ClassController extends Controller
      */
     public function store(Request $request)
     {
-        $className    = $request->input('class_name');
-        $classSubject = $request->input('class_subject');
-        $classRoom    = $request->input('class_room');
+        $className      = $request->input('class_name');
+        $classSubject   = $request->input('class_subject');
+        $forInstitution = $request->input('for_institution');
 
         $data = [
             'class_name'    => $className,
-            'class_subject' => $classSubject,
-            'class_room'    => $classRoom,
+            'class_subject' => $classSubject
         ];
 
         $validation = $this->validateClass($data);
 
         if (!$validation->fails()) {
-            $storedClass = SchoolClass::create([
-                'user_id'       => Auth::id(),
-                'class_name'    => $className,
-                'class_subject' => $classSubject,
-                'class_room'    => $classRoom,
-            ]);
+            $storedClass = new SchoolClass;
 
-            return response()->json([
-                'class'   => $storedClass,
-                'error'   => 0,
-                'message' => trans('api.class.success.store')
-            ]);
+            $storedClass->user_id = Auth::id();
+            $storedClass->class_name = $className;
+            $storedClass->class_subject = $classSubject;
+
+            if ($forInstitution == 'true') {
+                $storedClass->institution_id = Auth::user()->institution_id;
+
+                $storedClass->save();
+
+                return response()->json([
+                    'class'   => $storedClass,
+                    'error'   => 0,
+                    'message' => trans('api.class-room.success.store')
+                ]);
+            } else {
+                $storedClass->save();
+
+                return response()->json([
+                    'class'   => $storedClass,
+                    'error'   => 0,
+                    'message' => trans('api.class.success.store')
+                ]);
+            }
         }
 
         $errorMessages = $validation->errors()->all();
@@ -71,14 +83,12 @@ class ClassController extends Controller
     {
         $className       = $request->input('class_name');
         $classSubject    = $request->input('class_subject');
-        $classRoom       = $request->input('class_room');
         $classTemplateId = $request->input('class_template_id');
 
         $data = [
             'class_name'    => $className,
             'class_id'      => $classTemplateId,
-            'class_subject' => $classSubject,
-            'class_room'    => $classRoom
+            'class_subject' => $classSubject
         ];
 
         $validation = $this->validator($data);
@@ -90,8 +100,7 @@ class ClassController extends Controller
                 $classId = SchoolClass::create([
                     'user_id'       => Auth::id(),
                     'class_name'    => $className,
-                    'class_subject' => $classSubject,
-                    'class_room'    => $classRoom
+                    'class_subject' => $classSubject
                 ])->id;
             }
 
@@ -211,8 +220,7 @@ class ClassController extends Controller
         $newClassId = SchoolClass::create([
             'user_id'       => Auth::id(),
             'class_name'    => $className === null ? substr($classToDuplicate->class_name, 0, 22) . ' (copy)' : $className,
-            'class_subject' => $classSubject,
-            'class_room'    => $classRoom === null ? $classToDuplicate->class_room : $classRoom
+            'class_subject' => $classSubject
         ])->id;
 
         $canvasItemsToCopy = CanvasItem::where('class_id', $classId)->get();
@@ -271,7 +279,6 @@ class ClassController extends Controller
         return Validator::make($data, [
             'class_name'        => 'required|between:1,30',
             'class_subject'     => 'nullable|string|between:1,30',
-            'class_room'        => 'nullable|string|between:1,30',
             'class_template_id' => 'nullable|integer|exists:classes,id,user_id,' . Auth::id(),
         ]);
     }
@@ -281,7 +288,6 @@ class ClassController extends Controller
         return Validator::make($data, [
             'class_name'    => 'required|between:1,30',
             'class_subject' => 'nullable|string|between:1,30',
-            'class_room'    => 'nullable|string|between:1,30'
         ]);
     }
 

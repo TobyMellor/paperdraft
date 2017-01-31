@@ -23,7 +23,8 @@ class CreateStudentsTable extends Migration
                   ->unsigned();
             $table->foreign('user_id')
                   ->references('id')
-                  ->on('users');
+                  ->on('users')
+                  ->onDelete('cascade');
 
             $table->timestamps();
         });

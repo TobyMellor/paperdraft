@@ -131,9 +131,8 @@
                                         <span>Administration</span>
                                         <i class="icon-vcard" title="Administration"></i>
                                     </li>
-
                                     <li @if (strpos(app('url')->current(), 'admin')) class="active" @endif>
-                                        <a id="planner-href" href="{{ url('dashboard/admin') }}">
+                                        <a href="{{ url('dashboard/admin') }}">
                                             <i class="icon-user-tie"></i>
                                             <span>Institution Admin Panel</span>
                                         </a>
@@ -145,18 +144,14 @@
                                     <li @if (app('url')->current() === url('dashboard')) class="active" @endif>
                                         <a id="planner-href" href="{{ url('dashboard') }}">
                                             <i class="icon-home4"></i>
-                                            @if (Auth::user()->priviledge === 1)
-                                                <span>My Own Seating Plans</span>
-                                            @else
-                                                <span>Seating Plans</span>
-                                            @endif
+                                            <span>Seating Plans</span>
                                         </a>
                                     </li>
                                     <li @if (strpos(app('url')->current(), 'classes')) class="active" @endif>
                                         <a id="classes-href" href="{{ url('dashboard/classes') }}">
                                             <i class="icon-design"></i>
                                             @if (Auth::user()->priviledge === 1)
-                                                <span>Manage My Classes</span>
+                                                <span>Manage Personal Classes</span>
                                             @else
                                                 <span>Manage Classes</span>
                                             @endif

@@ -18,14 +18,15 @@ class CreateClassesTable extends Migration
             $table->integer('user_id')->unsigned();
             $table->foreign('user_id')
                   ->references('id')
-                  ->on('users');
+                  ->on('users')
+                  ->onDelete('cascade');
 
-            $table->integer('class_room_id')
+            $table->integer('institution_id')
                   ->unsigned()
                   ->nullable();
-            $table->foreign('class_room_id')
+            $table->foreign('institution_id')
                   ->references('id')
-                  ->on('class_rooms');
+                  ->on('institutions');
 
             /*
             $table->integer('period_id')->unsigned();

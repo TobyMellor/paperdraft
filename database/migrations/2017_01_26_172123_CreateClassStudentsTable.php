@@ -18,12 +18,14 @@ class CreateClassStudentsTable extends Migration
             $table->integer('student_id')->unsigned();
             $table->foreign('student_id')
                   ->references('id')
-                  ->on('students');
+                  ->on('students')
+                  ->onDelete('cascade');
 
             $table->integer('class_id')->unsigned();
             $table->foreign('class_id')
                   ->references('id')
-                  ->on('classes');
+                  ->on('classes')
+                  ->onDelete('cascade');
 
             $table->string('ability_cap');
             $table->string('current_attainment_level')
