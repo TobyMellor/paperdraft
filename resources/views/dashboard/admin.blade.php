@@ -249,6 +249,160 @@
             </div>
         </div>
     </div>
+    <div class="row row-sortable">
+        <div class="col-md-6">
+            <div class="panel panel-primary panel-bordered">
+                <div class="panel-heading">
+                    <h6 class="panel-title">
+                        <span class="text-semibold">Students</span>
+                        <span class="text-muted text-muted-light">
+                            <small id="class-name"> Users in your institution will be able to add these students to their class rooms<small>
+                        </span>
+                    </h6>
+                <a class="heading-elements-toggle"><i class="icon-menu"></i></a></div>
+                <table class="table text-nowrap">
+                    <thead>
+                        <tr>
+                            <th style="width: 300px;">Student</th>
+                            <th>Gender</th>
+                            <th>PP</th>
+                            <th style="width: 20px;" class="text-center"><i class="icon-arrow-down12"></i></th>
+                        </tr>
+                    </thead>
+                    <tbody id="create-student-tbody">
+                        @if (isset($students))
+                            @foreach ($students as $student)
+                                <tr student-id="{{ $student->id }}">
+                                    <td>
+                                        <div class="media-left media-middle">
+                                            <a class="btn bg-teal-400 @if ($student->gender === 'male') tooltip-blue @else tooltip-pink @endif btn-rounded btn-icon btn-xs" href="javascript:void(0);">
+                                                <div class="letter-icon">
+                                                    {{ strtoupper($student->name[0]) }}
+                                                </div>
+                                            </a>
+                                        </div>
+
+                                        <div class="media-body media-middle">
+                                            <h6 class="display-inline-block text-default text-semibold letter-icon-title student-name" href="javascript:void(0);">{{ $student->name }}</h6>
+                                        </div>
+                                    </td>
+                                    <td class="gender">
+                                        {{ $student->gender }}
+                                    </td>
+                                    <td class="pupil-premium">
+                                        <span>
+                                            <i class="@if ($student->pupil_premium) icon-checkmark3 text-success @else icon-cross2 text-danger-400 @endif"></i>
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <div class="btn-group">
+                                            <button type="button" class="btn btn-danger dropdown-toggle" data-toggle="dropdown">
+                                                Options <span class="caret"></span>
+                                            </button>
+                                            <ul class="dropdown-menu dropdown-menu-right">
+                                                <li>
+                                                    <a class="delete-student">
+                                                        <i class="icon-user-minus"></i> Delete
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a class="edit-student">
+                                                        <i class="icon-pencil"></i> Edit
+                                                    </a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        @endif
+                    </tbody>
+                </table>
+                <form action="javascript:void(0);" method="POST" id="create-student">
+                    <input name="class_id" value="" hidden>
+                    <div class="content" style="padding-bottom: 20px;">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <fieldset class="text-semibold">
+                                    <legend>
+                                        <i class="icon-user-plus position-left"></i> Add Student
+                                    </legend>
+                                    <div class="tabbable tab-content-bordered">
+                                        <ul class="nav nav-tabs nav-tabs-highlight">
+                                            <li class="active">
+                                                <a data-toggle="tab" href="#icon-only-tab1" title="Information" data-popup="tooltip">
+                                                    <i class="icon-cog52"></i>
+                                                    <span class="visible-xs-inline-block position-right">
+                                                        Information
+                                                    </span>
+                                                </a>
+                                            </li>
+
+                                            <li>
+                                                <a data-toggle="tab" href="#icon-only-tab2" title="Picture" data-popup="tooltip">
+                                                    <i class="icon-stack-picture"></i>
+                                                    <span class="visible-xs-inline-block position-right">
+                                                        Picture
+                                                    </span>
+                                                </a>
+                                            </li>
+                                        </ul>
+
+                                        <div class="tab-content">
+                                            <div id="icon-only-tab1" class="tab-pane has-padding active">
+                                                <div class="row">
+                                                    <div class="col-md-6">
+                                                        <label class="display-block text-bold">Basic Information <span class="text-danger">*</span></label>
+                                                        <input title="Enter the students name" class="form-control" data-popup="tooltip" placeholder="Students Name" type="text" name="student_name" autocomplete="off" required id="student-name">
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <label class="display-block text-bold">Additional Information</label>
+                                                        <label class="checkbox-inline">
+                                                            <input type="checkbox" class="styled" name="pupil_premium">
+                                                            Pupil Premium
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <br />
+                                                    <div class="col-md-6">
+                                                        <label class="display-block text-bold">
+                                                            Gender <span class="text-danger">*</span>
+                                                            <span class="text-muted" style="padding-left: 6px;">
+                                                                <small class="selected-name" id="guessing-text" style="display: none;">
+                                                                    Guessing gender...
+                                                                </small>
+                                                            </span>
+                                                        </label>
+                                                        <div class="radio">
+                                                            <label>
+                                                                <input type="radio" checked="checked" class="styled" name="gender" value="male">
+                                                                Male
+                                                            </label>
+                                                        </div>
+                                                        <div class="radio">
+                                                            <label>
+                                                                <input type="radio" class="styled" name="gender" value="female">
+                                                                Female
+                                                            </label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </fieldset>
+                                <br />
+                                <div class="text-right">
+                                    <button type="submit" class="btn btn-primary">Add Student<i class="icon-arrow-right14 position-right"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 @stop
 
 @section('modals')
@@ -277,6 +431,63 @@
                         <button class="btn btn-primary" id="edit-room-button">
                             Update Room <i class="icon-pencil"></i>
                         </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div id="modal_update_student" class="modal fade in">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-center">
+                    <h5 class="modal-title">Update Student Information</h5>
+                </div>
+
+                <form action="javascript:void(0);" method="PUT" id="update-student">
+                    <input name="student_id" value="" hidden>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-sm-8">
+                                    <label class="display-block text-bold">Students Name <span class="text-danger">*</span></label>
+                                    <input type="text" placeholder="Students Name" class="form-control" name="student_name">
+                                </div>
+                                <div class="col-sm-4">
+                                    <label class="display-block text-bold">Pupil Premium</label>
+                                    <label class="checkbox-inline">
+                                        <input type="checkbox" class="styled" name="pupil_premium">
+                                        Pupil Premium
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <label class="display-block text-bold">
+                                        Gender <span class="text-danger">*</span>
+                                    </label>
+                                    <div class="radio">
+                                        <label>
+                                            <input type="radio" checked="checked" class="styled" name="gender" value="male">
+                                            Male
+                                        </label>
+                                    </div>
+                                    <div class="radio">
+                                        <label>
+                                            <input type="radio" class="styled" name="gender" value="female">
+                                            Female
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button data-dismiss="modal" class="btn btn-link" type="button">Close</button>
+                        <button class="btn btn-primary" type="submit">Update Student</button>
                     </div>
                 </form>
             </div>
@@ -327,7 +538,174 @@
                 editRoom($('#edit-room-id').val());
             });
 
+            $('#create-student').submit(function(event) {
+                $('#guessing-text').fadeOut();
+
+                event.preventDefault();
+
+                var formData = $('#create-student').serializeArray().reduce(function(obj, item) {
+                    obj[item.name] = item.value;
+                    return obj;
+                }, {});
+
+                if (formData['pupil_premium'] === 'on') {
+                    formData['pupil_premium'] = true;
+                } else {
+                    formData['pupil_premium'] = false;
+                }
+
+                $.APIAjax({
+                    url: '{{ url('api/student') }}',
+                    type: 'POST',
+                    data: {
+                        student_name:             formData['student_name'],
+                        gender:                   formData['gender'],
+                        pupil_premium:            formData['pupil_premium'],
+                        class_id:                 formData['class_id']
+                    },
+                    success: function(jsonResponse) {
+                        handleNotification(jsonResponse.message, 'success');
+
+                        $('#create-student-tbody').append(
+                            '<tr student-id="' + jsonResponse.student.id + '">' +
+                                '<td>' +
+                                    '<div class="media-left media-middle">' +
+                                        '<a class="btn bg-teal-400 ' + (formData['gender'] === 'male' ? 'tooltip-blue' : 'tooltip-pink') + ' btn-rounded btn-icon btn-xs" href="javascript:void(0);">' +
+                                            '<div class="letter-icon">' +
+                                                formData['student_name'].charAt(0).toUpperCase() +
+                                            '</div>' +
+                                        '</a>' +
+                                    '</div>' +
+                                    '<div class="media-body media-middle">' +
+                                        '<h6 class="display-inline-block text-default text-semibold letter-icon-title" href="javascript:void(0);">' +
+                                            formData['student_name'] +
+                                        '</h6>' +
+                                    '</div>' +
+                                '</td>' +
+                                '<td>' +
+                                    formData['gender'] +
+                                '</td>' +
+                                '<td>' +
+                                    '<span>' +
+                                        '<i class="' + (formData['pupil_premium'] ? "icon-checkmark3 text-success" : "icon-cross2 text-danger-400") + '"></i>' +
+                                    '</span>' +
+                                '</td>' +
+                                '<td>' +
+                                    '<div class="btn-group">' +
+                                        '<button type="button" class="btn btn-danger dropdown-toggle" data-toggle="dropdown">' +
+                                            'Options <span class="caret"></span>' +
+                                        '</button>' +
+                                        '<ul class="dropdown-menu dropdown-menu-right">' +
+                                            '<li>' +
+                                                '<a class="delete-student">' +
+                                                    '<i class="icon-user-minus"></i> Delete' +
+                                                '</a>' +
+                                            '</li>' +
+                                            '<li>' +
+                                                '<a class="edit-student">' +
+                                                    '<i class="icon-pencil"></i> Edit' +
+                                                '</a>' +
+                                            '</li>' +
+                                        '</ul>' +
+                                    '</div>' +
+                                '</td>' +
+                            '</tr>'
+                        );
+
+                        $('tr[student-id=' + jsonResponse.student.id + ']').fadeIn();
+
+                        $('#create-student').trigger('reset');
+                        $('a[title="Information"]').tab('show');
+
+                        $('select').select2();
+                        $('.styled').uniform({
+                            radioClass: 'choice'
+                        });
+                    },
+                    error: function(jsonResponse) {}
+                });
+            });
+
+            $('#update-student').submit(function(event) {
+                event.preventDefault();
+
+                updateStudent($(this));
+            });
+
+            var timer,
+                genderAJAXRequest;
+
+            $('#student-name').on('keyup', function() {
+                if (genderAJAXRequest) { genderAJAXRequest.abort() }
+                clearTimeout(timer); // Clear the timer so we don't end up with dupes.
+
+                timer = setTimeout(function() {
+                    var studentName = $('#student-name').val(),
+                        guessingText = $('#guessing-text');
+
+                    if (studentName.length >= 2) {
+                        guessingText.fadeIn();
+                        guessingText.text('Guessing gender...');
+
+                        genderAJAXRequest = $.APIAjax({
+                            url: '{{ url('api/student/gender') }}',
+                            type: 'GET',
+                            data: {
+                                student_name: studentName.split(" ", 2)[0]
+                            },
+                            success: function(jsonResponse) {
+                                if (jsonResponse.gender === 'male' || jsonResponse.gender === 'female') {
+                                    var gender = jsonResponse.gender;
+
+                                    guessingText.text('Guessing ' + gender + ' (' + (jsonResponse.probability) + '% sure)');
+
+                                        $('input[value=' + gender + ']').prop('checked', true);
+                                        $.uniform.update();
+                                } else {
+                                    guessingText.text('Could not guess gender.');
+                                }
+                            },
+                            error: function(jsonResponse) {}
+                        });
+                    } else {
+                        guessingText.fadeOut();
+                    }
+                }, 250);
+            });
+
+
+            $(document).delegate('.delete-student', 'click', function() {
+                deleteStudent(getAttributeFromTr($(this), 'student-id'));
+            });
+
+            $(document).delegate('.edit-student', 'click', function() {
+                var classStudent = $(this).closest('tr'),
+                    studentId    = classStudent.attr('student-id');
+
+                var studentName  = classStudent.find('.student-name').text(),
+                    gender       = classStudent.find('.gender').text(),
+                    pupilPremium = classStudent.find('.pupil-premium').html();
+
+                if (pupilPremium.indexOf('icon-cross2') > -1) {
+                    pupilPremium = false;
+                } else {
+                    pupilPremium = true;
+                }
+
+                $('#update-student input[name=student_id]').val(studentId);
+                $('#update-student input[name=student_name]').val(studentName);
+                $('#update-student input[name=pupil_premium]').prop('checked', pupilPremium);
+                $('#update-student input[value=' + gender + ']').prop('checked', true);
+
+                $.uniform.update();
+                $('select').select2().trigger('change');
+                $('#modal_update_student').modal('show');
+            });
+
             $('select').select2();
+            $('.styled').uniform({
+                radioClass: 'choice'
+            });
         });
 
         function getAttributeFromTr(element, attribute) {
@@ -538,6 +916,65 @@
                     $('tr[user-id="' + userId + '"]').fadeOut(300, function() {
                         $(this).remove();
                     });
+                },
+                error: function(jsonResponse) {}
+            });
+        }
+
+
+        function updateStudent(form) {
+            var formData = form.serializeArray().reduce(function(obj, item) {
+                obj[item.name] = item.value;
+
+                return obj;
+            }, {});
+
+            if (formData['pupil_premium'] == 'on') {
+                formData['pupil_premium'] = true;
+            } else {
+                formData['pupil_premium'] = false;
+            }
+
+            $.APIAjax({
+                url: '{{ url('api/student') }}/' + formData['student_id'],
+                type: 'PUT',
+                data: {
+                    student_name:  formData['student_name'],
+                    gender:        formData['gender'],
+                    pupil_premium: formData['pupil_premium']
+                },
+                success: function(jsonResponse) {
+                    var classStudent = $('tr[student-id=' + formData['student_id'] + ']').closest('tr');
+
+                    if (formData['pupil_premium']) {
+                        formData['pupil_premium'] = '<i class="icon-checkmark3 text-success"></i>';
+                    } else {
+                        formData['pupil_premium'] = '<i class="icon-cross2 text-danger-400"></i>';
+                    }
+
+                    var studentName            = classStudent.find('.student-name').html(formData['student_name']),
+                        gender                 = classStudent.find('.gender').html(formData['gender']),
+                        pupilPremium           = classStudent.find('.pupil-premium').html(formData['pupil_premium']);
+
+                    handleNotification(jsonResponse.message, 'success');
+
+                    $('#modal_update_student').modal('hide');
+                    $('#update-student').trigger('reset');
+                },
+                error: function(jsonResponse) {}
+            });
+        }
+
+        function deleteStudent(studentId) {
+            $.APIAjax({
+                url: '{{ url('api/student') }}/' + studentId,
+                type: 'DELETE',
+                success: function(jsonResponse) {
+                    $('tr[student-id=' + studentId + ']').fadeOut(300, function() {
+                        $(this).remove();
+                    });
+
+                    handleNotification(jsonResponse.message, 'success');
                 },
                 error: function(jsonResponse) {}
             });

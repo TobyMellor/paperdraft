@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Student;
 use App\ClassStudent;
 use App\SchoolClass;
 
@@ -20,7 +21,6 @@ class IndexController extends Controller
      */
     public function getDashboard(
         ClassController $classController,
-        StudentController $studentController,
         ItemController $itemController,
         SettingController $settingController
     )
@@ -80,8 +80,7 @@ class IndexController extends Controller
      */
     public function getClassDashboard(
         $classId,
-        ClassController $classController,
-        StudentController $studentController
+        ClassController $classController
     )
     {
         $classes = $classController->getClasses();
@@ -100,15 +99,15 @@ class IndexController extends Controller
      *
      * @return \Illuminate\Http\View
      */
-    public function getAdminDashboard(
-        ClassController $classController
-    )
+    public function getAdminDashboard(ClassController $classController)
     {
-        $classes = $classController->getClasses();
+        $classes  = $classController->getClasses();
+        $students = Student::where('user_id', Auth::id())->get(); // TODO: may need to change to institution_id in future
 
         if ($classes->first() !== null && Auth::user()->first_name !== null) {
             return view('dashboard.admin')
-                ->with('classes', $classes);
+                ->with('classes', $classes)
+                ->with('students', $students);
         }
         
         return $this->getWizardDashboard($classController);

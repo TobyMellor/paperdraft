@@ -72,13 +72,17 @@ class StudentController extends Controller
                 'user_id'       => Auth::user()->id
             ]);
 
-            $storedClassStudent = ClassStudent::create([
-                'student_id'               => $storedStudent->id,
-                'class_id'                 => $classId,
-                'ability_cap'              => $abilityCap,
-                'current_attainment_level' => $currentAttainmentLevel,
-                'target_attainment_level'  => $targetAttainmentLevel,
-            ]);
+            $storedClassStudent = null;
+
+            if ($classId !== null) {
+                $storedClassStudent = ClassStudent::create([
+                    'student_id'               => $storedStudent->id,
+                    'class_id'                 => $classId,
+                    'ability_cap'              => $abilityCap,
+                    'current_attainment_level' => $currentAttainmentLevel,
+                    'target_attainment_level'  => $targetAttainmentLevel,
+                ]);
+            }
 
             return response()->json([
                 'student'       => $storedStudent,
@@ -140,13 +144,15 @@ class StudentController extends Controller
                     'pupil_premium' => $pupilPremium == 'true' ? true : false
                 ]);
 
-            ClassStudent::where('class_id', $classId)
-                ->where('student_id', $id)
-                ->update([
-                    'ability_cap'              => $abilityCap,
-                    'current_attainment_level' => $currentAttainmentLevel,
-                    'target_attainment_level'  => $targetAttainmentLevel
-                ]);
+            if ($classId !== null) {
+                ClassStudent::where('class_id', $classId)
+                    ->where('student_id', $id)
+                    ->update([
+                        'ability_cap'              => $abilityCap,
+                        'current_attainment_level' => $currentAttainmentLevel,
+                        'target_attainment_level'  => $targetAttainmentLevel
+                    ]);
+            }
 
             return response()->json([
                 'error'   => 0,
@@ -176,7 +182,14 @@ class StudentController extends Controller
      */
     public function destroy(Request $request, $id)
     {
-        //
+        Student::where('user_id', Auth::id())
+            ->where('id', $id)
+            ->delete();
+
+        return response()->json([
+            'error'   => 0,
+            'message' => trans('api.student.success.destroy')
+        ]);
     }
 
     public function guessGender(Request $request)
