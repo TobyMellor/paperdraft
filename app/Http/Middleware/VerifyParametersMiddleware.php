@@ -39,18 +39,20 @@ class VerifyParametersMiddleware
         $validation = $this->validator($data);
 
         $validation->after(function($validation) use ($data) {
-            $class = SchoolClass::where('id', $data['class_id'])
-                ->where(function($query) {
-                    if (Auth::user()->institution_id !== null) {
-                        $query->where('user_id', Auth::id())
-                              ->orWhere('institution_id', Auth::user()->institution_id);
-                    } else {
-                        $query->where('user_id', Auth::id());
-                    }
-                });
+            if ($data['class_id'] !== null) {
+                $class = SchoolClass::where('id', $data['class_id'])
+                    ->where(function($query) use ($data) {
+                        if ($query->where('id', $data['class_id'])->first()->institution_id !== null) {
+                            $query->where('user_id', Auth::id())
+                                  ->orWhere('institution_id', Auth::user()->institution_id);
+                        } else {
+                            $query->where('user_id', Auth::id());
+                        }
+                    });
 
-            if ($class->count() === 0) {
-                $validation->errors()->add('checkbox', 'You do not have permission to modify that class. Try refreshing if the issue persists.');
+                if ($class->count() === 0) {
+                    $validation->errors()->add('checkbox', 'You do not have permission to modify that class. Try refreshing if the issue persists.');
+                }
             }
         });
 
