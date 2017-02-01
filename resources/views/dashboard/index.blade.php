@@ -2359,11 +2359,12 @@
                         copiedCanvasItemPositionY = copyClipboard[i].position_y,
                         pastedCanvasItemPositionX, pastedCanvasItemPositionY, nearestEmptySpace;
 
-                    if (this.canvasItemsGrid[copiedCanvasItemPositionX + 1][copiedCanvasItemPositionY + 1] != -1) {
+
+                    if (this.canvasItemsGrid[copiedCanvasItemPositionX + 1][copiedCanvasItemPositionY + 1] !== -1 || !this.isPositionInBounds(copiedCanvasItemPositionX + 1, copiedCanvasItemPositionY + 1)) {
                         nearestEmptySpace = this.getNearestEmpty(copyClipboard[i].position_x, copyClipboard[i].position_y, 5, 5);
 
                         if (nearestEmptySpace == -1) {
-                            alert('There is no space to paste the object at ' + copiedCanvasItemPositionX + ', ' + copiedCanvasItemPositionY);
+                            alert('There is no space to paste the item at ' + copiedCanvasItemPositionX + ', ' + copiedCanvasItemPositionY);
 
                             break;
                         }
