@@ -149,6 +149,11 @@
                                             @endforeach
                                         </optgroup>
                                     </select>
+                                    <span class="text-muted">
+                                        <small>
+                                            Choosing a class room will load a template plan of this room.
+                                        </small>
+                                    </span>
                                 </div>
                             @endif
 

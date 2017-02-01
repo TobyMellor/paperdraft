@@ -9,7 +9,9 @@
                     <h6 class="panel-title">
                         <span class="text-semibold">Manage Class</span>
                         <span class="text-muted text-muted-light">
-                            <small id="class-name"> {{ $selectedClass->class_name }}<small>
+                            <small id="class-name">
+                                {{ $selectedClass->class_name }}
+                            </small>
                         </span>
                     </h6>
                     <div class="heading-elements">
