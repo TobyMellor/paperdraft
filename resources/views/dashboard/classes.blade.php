@@ -335,6 +335,7 @@
                 </div>
 
                 <form action="{{ url('/class') }}" method="POST" class="form-inline">
+                    {{ csrf_field() }}
                     <div class="modal-body">
                         <div class="row">
                             <div class="col-md-6">
@@ -358,25 +359,25 @@
                                 </div>
                                 <br />
                                 <br />
-                                <label class="display-block text-bold">What's the room name?</label>
-                                <div class="form-group has-feedback" style="width: 100%;">
-                                    <input type="text" placeholder="Room name" style="width: 100%;" class="form-control" name="class_room">
-                                    <div class="form-control-feedback">
-                                        <i class="icon-home text-muted"></i>
+                                @if ($classRooms !== null)
+                                    <div class="form-group">
+                                        <label class="display-block text-bold">
+                                            Class Room:
+                                        </label>
+                                        <select class="form-control" name="class_id">
+                                            <optgroup label="Class Rooms Available">
+                                                <option value="" disabled selected>Select a room to duplicate</option>
+                                                @foreach ($classRooms as $room)
+                                                    <option value="{{ $room->id }}">{{ $room->class_name }}</option>
+                                                @endforeach
+                                            </optgroup>
+                                        </select>
+                                        <span class="text-muted">
+                                            <small>
+                                                Choosing a class room will load a template plan of this room.
+                                            </small>
+                                        </span>
                                     </div>
-                                </div>
-                                @if (isset($classes))
-                                    <br />
-                                    <br />
-                                    <label class="display-block text-bold">Should we use a seating template?</label>
-                                    <select name="class_template_id" id="template-picker">
-                                        <optgroup label="Available class templates">
-                                            <option value="" selected>Select a class template to copy</option>
-                                            @foreach ($classes as $class)
-                                                <option value="{{ $class->id }}">{{ $class->class_name }}</option>
-                                            @endforeach
-                                        </optgroup>
-                                    </select>
                                 @endif
                             </div>
                         </div>

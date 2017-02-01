@@ -89,11 +89,10 @@ class ClassController extends Controller
     {
         $className       = $request->input('class_name');
         $classSubject    = $request->input('class_subject');
-        $classTemplateId = $request->input('class_template_id');
+        $classTemplateId = $request->input('class_id');
 
         $data = [
             'class_name'    => $className,
-            'class_id'      => $classTemplateId,
             'class_subject' => $classSubject
         ];
 
@@ -101,7 +100,7 @@ class ClassController extends Controller
 
         if (!$validation->fails()) {
             if ($classTemplateId !== null) {
-                $class = $this->duplicateClass($classTemplateId, $className, $classSubject);
+                $class = $this->duplicateClass($classTemplateId, $className, $classSubject, true);
             } else {
                 $class = SchoolClass::create([
                     'user_id'       => Auth::id(),

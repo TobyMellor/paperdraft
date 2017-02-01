@@ -97,9 +97,12 @@ class IndexController extends Controller
         $userPreferences = $settingController->getUserPreferences();
 
         $institutionStudents = null;
+        $classRooms          = null;
 
         if (Auth::user()->institution_id !== null) {
             $institutionStudents = Student::where('user_id', Auth::id())->get();
+            $classRooms          = SchoolClass::where('institution_id', Auth::user()->institution_id)
+                ->get();
         }
 
         return view('dashboard.classes')
@@ -108,7 +111,8 @@ class IndexController extends Controller
             ->with('selectedClass', $selectedClass)
             ->with('classId', $classId)
             ->with('institutionStudents', $institutionStudents)
-            ->with('userPreferences', $userPreferences);
+            ->with('userPreferences', $userPreferences)
+            ->with('classRooms', $classRooms);
     }
 
     /**
