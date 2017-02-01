@@ -589,12 +589,14 @@
 
                 var formData = parseFormData($(this));
 
-                if (formData['use_institution_data'] == 'true') {
-                    formData['student_id'] = formData['institution_student_id'];
+                if (formData['student_name'] !== '' && formData['gender'] !== '' && formData['pupil_premium'] !== '') {
+                    if (formData['use_institution_data'] == 'true') {
+                        formData['student_id'] = formData['institution_student_id'];
 
-                    createClassStudent(formData);
-                } else {
-                    createStudent(formData);
+                        createClassStudent(formData);
+                    } else {
+                        createStudent(formData);
+                    }
                 }
 
                 disabled.attr('disabled','disabled');

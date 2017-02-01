@@ -83,7 +83,7 @@ class ClassStudentController extends Controller
 
         $validation->after(function($validation) use ($student) {
             if ($student->count() === 0) {
-                $validation->errors()->add('student', trans('api.class-student.failure.no-access'));
+                $validation->errors()->add('student', trans('api.class-student.failure.store.no-access'));
             }
         });
 
@@ -92,7 +92,7 @@ class ClassStudentController extends Controller
                 ->where('student_id', $studentId);
 
             if ($potentialClassStudent->count() > 0) {
-                $validation->errors()->add('class-student', trans('api.class-student.failure.already-exists'));
+                $validation->errors()->add('class-student', trans('api.class-student.failure.store.already-exists'));
             }
         });
 
