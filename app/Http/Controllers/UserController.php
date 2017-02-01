@@ -495,7 +495,7 @@ class UserController extends Controller
             $validation = $this->validator($data);
         }
 
-        if ($userId !== null || !$validation->fails()) {
+        if ($userId === null || !$validation->fails()) {
             if (Auth::user()->priviledge === 1) {
                 if (Auth::user()->institution->users->count() <= 100) {
                     if ($userId !== null) {

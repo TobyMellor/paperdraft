@@ -4,6 +4,8 @@ namespace App\Http\Middleware;
 
 use App\Http\Controllers\CanvasHistoryController;
 
+use App\SchoolClass;
+
 use Closure;
 use Validator;
 use Auth;
@@ -36,6 +38,22 @@ class VerifyParametersMiddleware
 
         $validation = $this->validator($data);
 
+        $validation->after(function($validation) use ($data) {
+            $class = SchoolClass::where('id', $data['class_id'])
+                ->where(function($query) {
+                    if (Auth::user()->institution_id !== null) {
+                        $query->where('user_id', Auth::id())
+                              ->orWhere('institution_id', Auth::user()->institution_id);
+                    } else {
+                        $query->where('user_id', Auth::id());
+                    }
+                });
+
+            if ($class->count() === 0) {
+                $validation->errors()->add('checkbox', 'You do not have permission to modify that class. Try refreshing if the issue persists.');
+            }
+        });
+
         if ($validation->fails()) {
             $errorMessage = '';
             
@@ -62,7 +80,6 @@ class VerifyParametersMiddleware
         $canvasHistoryCount = $this->canvasHistoryController->getCanvasHistoryCount();
 
         return Validator::make($data, [
-            'class_id'                 => 'nullable|integer|exists:classes,id,user_id,' . Auth::id(),
             'canvas_item'              => 'nullable|array',
             'canvas_history'           => 'nullable|array|max:' . $canvasHistoryCount,
             'canvas_action_undo_count' => 'nullable|integer|max:' . $canvasHistoryCount
