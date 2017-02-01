@@ -55,7 +55,10 @@ return [
             'guess-gender' => 'The students gender was successfully guessed.'
         ],
         'failure' => [
-            'guess-gender' => 'The students gender could not be guessed.'
+            'guess-gender' => 'The students gender could not be guessed.',
+            'store'        => [
+                'no-access' => 'You don\'t have access create that student.',
+            ]
         ]
     ],
     'class-student' => [
@@ -64,6 +67,12 @@ return [
             'store'   => 'The class student was successfully stored.',
             'update'  => 'The class student was successfully updated.',
             'destroy' => 'The class student was successfully deleted.'
+        ],
+        'failure' => [
+            'store' => [
+                'no-access'      => 'You don\'t have access to that student or they doesn\'t exist.',
+                'already-exists' => 'You already have that student in your class.'
+            ]
         ]
     ],
     'class' => [

@@ -41,67 +41,49 @@ class StudentController extends Controller
      * @param  \Illuminate\Http\Request $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function store(Request $request, ClassStudentController $classStudentController)
+    public function store(Request $request)
     {
-        $studentName            = $request->input('student_name');
-        $gender                 = $request->input('gender');
-        $pupilPremium           = $request->input('pupil_premium');
-        $abilityCap             = $request->input('ability_cap');
-        $currentAttainmentLevel = $request->input('current_attainment_level');
-        $targetAttainmentLevel  = $request->input('target_attainment_level');
-        $studentImage           = $request->input('student_image');
-
-        $classId = $request->input('class_id');
+        $studentName    = $request->input('student_name');
+        $gender         = $request->input('gender');
+        $pupilPremium   = $request->input('pupil_premium');
+        $forInstitution = $request->input('use_institution_data') == 'true' ? true : false;
 
         $data = [
-            'student_name'             => $studentName,
-            'gender'                   => $gender,
-            'pupil_premium'            => $pupilPremium,
-            'ability_cap'              => $abilityCap,
-            'current_attainment_level' => $currentAttainmentLevel,
-            'target_attainment_level'  => $targetAttainmentLevel
+            'student_name'  => $studentName,
+            'gender'        => $gender,
+            'pupil_premium' => $pupilPremium
         ];
 
         $validation = $this->validator($data);
 
+        if ($forInstitution) {
+            $validation->after(function($validation) {
+                if (Auth::user()->institution_id === null || Auth::user()->priviledge === 0) {
+                    $validation->errors()->add('student', trans('api.student.failure.no-access'));
+                }
+            });
+        }
+
         if (!$validation->fails()) {
-            $storedStudent = Student::create([
-                'name'          => $studentName,
-                'gender'        => $gender,
-                'pupil_premium' => $pupilPremium == 'true' ? true : false,
-                'user_id'       => Auth::user()->id
-            ]);
+            $student = new Student;
 
-            $storedClassStudent = null;
+            $student->name          = $studentName;
+            $student->gender        = $gender;
+            $student->pupil_premium = $pupilPremium;
+            $student->user_id       = Auth::id();
 
-            if ($classId !== null) {
-                $storedClassStudent = ClassStudent::create([
-                    'student_id'               => $storedStudent->id,
-                    'class_id'                 => $classId,
-                    'ability_cap'              => $abilityCap,
-                    'current_attainment_level' => $currentAttainmentLevel,
-                    'target_attainment_level'  => $targetAttainmentLevel,
-                ]);
-            }
+            $student->save();
 
             return response()->json([
-                'student'       => $storedStudent,
-                'class_student' => $storedClassStudent,
+                'student'       => $student,
                 'error'         => 0,
                 'message'       => trans('api.student.success.store')
             ]);
         }
-
-        $errorMessages = $validation->errors()->all();
-        $responseMessage = '';
-
-        foreach ($errorMessages as $errorMessage) {
-            $responseMessage .= $errorMessage;
-        }
         
         return response()->json([
             'error'   => 1,
-            'message' => $responseMessage
+            'message' => $this->parseErrorMessages($validation)
         ]);
     }
 
@@ -114,45 +96,44 @@ class StudentController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $studentName            = $request->input('student_name');
-        $gender                 = $request->input('gender');
-        $pupilPremium           = $request->input('pupil_premium');
-        $abilityCap             = $request->input('ability_cap');
-        $currentAttainmentLevel = $request->input('current_attainment_level');
-        $targetAttainmentLevel  = $request->input('target_attainment_level');
-        $studentImage           = $request->input('student_image');
-
-        $classId = $request->input('class_id');
+        $studentName  = $request->input('student_name');
+        $gender       = $request->input('gender');
+        $pupilPremium = $request->input('pupil_premium');
 
         $data = [
-            'student_name'             => $studentName,
-            'gender'                   => $gender,
-            'pupil_premium'            => $pupilPremium,
-            'ability_cap'              => $abilityCap,
-            'current_attainment_level' => $currentAttainmentLevel,
-            'target_attainment_level'  => $targetAttainmentLevel
+            'student_name'  => $studentName,
+            'gender'        => $gender,
+            'pupil_premium' => $pupilPremium,
         ];
+
+        $student = Student::where('id', $id);
 
         $validation = $this->validator($data);
 
-        if (!$validation->fails()) {
-            Student::where('user_id', Auth::user()->id)
-                ->where('id', $id)
-                ->update([
-                    'name'          => $studentName,
-                    'gender'        => $gender,
-                    'pupil_premium' => $pupilPremium == 'true' ? true : false
-                ]);
-
-            if ($classId !== null) {
-                ClassStudent::where('class_id', $classId)
-                    ->where('student_id', $id)
-                    ->update([
-                        'ability_cap'              => $abilityCap,
-                        'current_attainment_level' => $currentAttainmentLevel,
-                        'target_attainment_level'  => $targetAttainmentLevel
-                    ]);
+        $validation->after(function($validation) {
+            if (Auth::user()->institution_id === null || Auth::user()->priviledge === 0) {
+                $validation->errors()->add('student', trans('api.student.failure.no-access'));
             }
+        });
+
+        $validation->after(function($validation) use ($student) {
+            $student = $student->first();
+            
+            if ($student->institution_id !== null) {
+                if ($student->institution_id !== Auth::user()->institution_id) {
+                    $validation->errors()->add('student', trans('api.student.failure.no-access'));
+                }
+            } else if ($student->user_id !== Auth::id()) {
+                $validation->errors()->add('student', trans('api.student.failure.no-access'));
+            }
+        });
+
+        if (!$validation->fails()) {
+            $student->update([
+                'name'          => $studentName,
+                'gender'        => $gender,
+                'pupil_premium' => $pupilPremium
+            ]);
 
             return response()->json([
                 'error'   => 0,
@@ -160,16 +141,9 @@ class StudentController extends Controller
             ]);
         }
 
-        $errorMessages = $validation->errors()->all();
-        $responseMessage = '';
-
-        foreach ($errorMessages as $errorMessage) {
-            $responseMessage .= $errorMessage;
-        }
-
         return response()->json([
             'error'   => 1,
-            'message' => $responseMessage
+            'message' => $this->parseErrorMessages($validation)
         ]);
     }
 
@@ -182,9 +156,15 @@ class StudentController extends Controller
      */
     public function destroy(Request $request, $id)
     {
-        Student::where('user_id', Auth::id())
-            ->where('id', $id)
-            ->delete();
+        Student::where('id', $id)
+            ->where(function($query) {
+                if (Auth::user()->institution_id !== null && Auth::user()->priviledge === 1) {
+                    $query->where('user_id', Auth::id())
+                          ->orWhere('institution_id', Auth::user()->institution_id);
+                } else {
+                    $query->where('user_id', Auth::id());
+                }
+            })->delete();
 
         return response()->json([
             'error'   => 0,
@@ -219,7 +199,18 @@ class StudentController extends Controller
             'gender' => 'N/A',
             'message' => trans('api.student.failure.guess-gender')
         ]);
-        
+    }
+
+    protected function parseErrorMessages($validation)
+    {
+        $errorMessages = $validation->errors()->all();
+        $responseMessage = '';
+
+        foreach ($errorMessages as $errorMessage) {
+            $responseMessage .= $errorMessage;
+        }
+
+        return $responseMessage;
     }
 
     protected function validator(array $data)
@@ -227,10 +218,7 @@ class StudentController extends Controller
         return Validator::make($data, [
             'student_name'             => 'required|between:2,30|regex:/^[a-zA-Z0-9\s-]+$/',
             'gender'                   => 'required|in:male,female',
-            'pupil_premium'            => 'nullable|in:true,false',
-            'ability_cap'              => 'nullable|in:H,M,L',
-            'current_attainment_level' => 'nullable|in:A*,A,B,C,D,E,F,G,U',
-            'target_attainment_level'  => 'nullable|in:A*,A,B,C,D,E,F,G,U'
+            'pupil_premium'            => 'nullable|boolean'
         ]);
     }
 }

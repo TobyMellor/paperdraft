@@ -28,6 +28,9 @@ class CreateSettingsTable extends Migration
             [
                 'setting_name' => 'panel_positions'
             ],
+            [
+                'setting_name' => 'should_use_institution_students'
+            ],
         ]);
     }
 

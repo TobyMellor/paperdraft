@@ -36,7 +36,7 @@
                     <tbody>
                         @if (isset($classStudents))
                             @foreach ($classStudents as $classStudent)
-                                <tr student-id="{{ $classStudent->student_id }}">
+                                <tr class-student-id="{{ $classStudent->id }}" student-id="{{ $classStudent->student->id }}" use-institution="{{ $classStudent->student->institution_id === null ? 'false' : 'true' }}">
                                     <td>
                                         <div class="media-left media-middle">
                                             <a class="btn bg-teal-400 @if ($classStudent->student->gender === 'male') tooltip-blue @else tooltip-pink @endif btn-rounded btn-icon btn-xs" href="javascript:void(0);">
@@ -88,7 +88,6 @@
                     </tbody>
                 </table>
                 <form action="javascript:void(0);" method="POST" id="create-student">
-                    <input name="_token" value="{{ csrf_token() }}" hidden>
                     <input name="class_id" value="{{ $classId }}" hidden>
                     <div class="content" style="padding-bottom: 20px;">
                         <div class="row">
@@ -119,29 +118,53 @@
                                                         <label class="display-block text-bold">
                                                             Basic Information <span class="text-danger">*</span>
                                                         </label>
-                                                        <input title="Enter the students name" class="form-control" data-popup="tooltip" placeholder="Students Name" type="text" name="student_name" autocomplete="off" required id="student-name">
+                                                        <input title="Enter the students name" class="form-control manual-fields" data-popup="tooltip" placeholder="Students Name" type="text" name="student_name" autocomplete="off" required id="student-name">
                                                     </div>
-                                                    <div class="col-md-6">
-                                                        <label class="display-block text-bold">
-                                                            Use institutions students?
-                                                        </label>
-                                                        <div class="radio">
-                                                            <label>
-                                                                <input type="radio" checked="checked" class="styled" name="gender" value="male">
-                                                                Use students
-                                                            </label>
+                                                    @if (Auth::user()->institution_id !== null)
+                                                        <div id="institution-section">
+                                                            <div class="col-md-4" id="institution-students">
+                                                                <label class="display-block text-bold">Students from Institution</label>
+                                                                <div class="form-group">
+                                                                    <select name="institution_student_id" id="institution-students-select">
+                                                                        <optgroup label="Students">
+                                                                            <option value="" selected>Choose students from your institution</option>
+                                                                            @if ($institutionStudents !== null)
+                                                                                @php
+                                                                                    $classStudentIds = array_values($classStudents->pluck('student_id')->all());
+                                                                                @endphp
+                                                                                @foreach ($institutionStudents as $student)
+                                                                                    @if (!in_array($student->id, $classStudentIds))
+                                                                                        <option value="{{ $student->id }}" gender="{{ $student->gender }}" pupil_premium="{{ $student->pupil_premium }}">{{ $student->name }}</option>
+                                                                                    @endif
+                                                                                @endforeach
+                                                                            @endif
+                                                                        </optgroup>
+                                                                    </select>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-2">
+                                                                <label class="display-block text-bold">
+                                                                    Use students on record?
+                                                                </label>
+                                                                <div class="radio">
+                                                                    <label>
+                                                                        <input type="radio" checked="checked" class="styled" name="use_institution_data" value="true">
+                                                                        Use students
+                                                                    </label>
+                                                                </div>
+                                                                <div class="radio">
+                                                                    <label>
+                                                                        <input type="radio" class="styled" name="use_institution_data" value="false">
+                                                                        Make my own
+                                                                    </label>
+                                                                </div>
+                                                            </div>
                                                         </div>
-                                                        <div class="radio">
-                                                            <label>
-                                                                <input type="radio" class="styled" name="gender" value="female">
-                                                                Make my own
-                                                            </label>
-                                                        </div>
-                                                    </div>
+                                                    @endif
                                                 </div>
                                                      
                                                 <div class="row">
-                                                    <div class="col-md-3">
+                                                    <div class="col-md-3 manual-fields">
                                                         <label class="display-block text-bold">
                                                             Gender <span class="text-danger">*</span>
                                                             <span class="text-muted" style="padding-left: 6px;">
@@ -152,16 +175,23 @@
                                                         </label>
                                                         <div class="radio">
                                                             <label>
-                                                                <input type="radio" checked="checked" class="styled" name="gender" value="male">
+                                                                <input type="radio" checked="checked" class="styled manual-fields" name="gender" value="male">
                                                                 Male
                                                             </label>
                                                         </div>
                                                         <div class="radio">
                                                             <label>
-                                                                <input type="radio" class="styled" name="gender" value="female">
+                                                                <input type="radio" class="styled manual-fields" name="gender" value="female">
                                                                 Female
                                                             </label>
                                                         </div>
+                                                    </div>
+                                                    <div class="col-md-3 manual-fields">
+                                                        <label class="display-block text-bold">Additional Information</label>
+                                                        <label class="checkbox-inline">
+                                                            <input type="checkbox" class="styled manual-fields" name="pupil_premium">
+                                                            Pupil Premium
+                                                        </label>
                                                     </div>
                                                     <div class="col-md-3">
                                                         <label class="display-block text-bold">Student Ability Tier</label>
@@ -183,13 +213,6 @@
                                                                 Low
                                                             </label>
                                                         </div>
-                                                    </div>
-                                                    <div class="col-md-3">
-                                                        <label class="display-block text-bold">Additional Information</label>
-                                                        <label class="checkbox-inline">
-                                                            <input type="checkbox" class="styled" name="pupil_premium">
-                                                            Pupil Premium
-                                                        </label>
                                                     </div>
                                                 </div>
 
@@ -310,7 +333,6 @@
                 </div>
 
                 <form action="{{ url('/class') }}" method="POST" class="form-inline">
-                    <input name="_token" value="{{ csrf_token() }}" hidden>
                     <div class="modal-body">
                         <div class="row">
                             <div class="col-md-6">
@@ -374,6 +396,8 @@
 
                 <form action="javascript:void(0);" method="PUT" id="update-student">
                     <input name="student_id" value="" hidden>
+                    <input name="class_student_id" value="" hidden>
+                    <input name="use_institution_data" value="" hidden>
                     <div class="modal-body">
                         <div class="form-group">
                             <div class="row">
@@ -382,6 +406,11 @@
                                     <input type="text" placeholder="Students Name" class="form-control" name="student_name">
                                 </div>
                             </div>
+                            <span class="text-muted" id="institution-only-message">
+                                <small>
+                                    Some of the data on this page can only be edited by your institution.
+                                </small>
+                            </span>
                         </div>
 
                         <div class="form-group">
@@ -532,99 +561,54 @@
                     .attr('class-id');
             });
 
+            $('input[name="use_institution_data"]').on('change', function() {
+                changeCreationPreference(JSON.parse($(this).val()));
+            });
+
+            $('#institution-students-select').on('change', function() {
+                var selected = $(this).find(":selected");
+
+                if ($(this).prop('selectedIndex') !== 0) {
+                    $('#student-name').val(selected.text());
+                }
+
+                $('input[name="gender"][value="' + selected.attr('gender') + '"]').prop('checked', true);
+                $('input[name="pupil_premium"]').prop('checked', selected.attr('pupil_premium') == 1 ? true : false);
+
+                $.uniform.update();
+            });
+
             $('#create-student').submit(function(event) {
                 $('#guessing-text').fadeOut();
 
                 event.preventDefault();
 
-                var formData = $('#create-student').serializeArray().reduce(function(obj, item) {
-                    obj[item.name] = item.value;
-                    return obj;
-                }, {});
+                disabled = $(this).find(':input:disabled, select:disabled').removeAttr('disabled');
 
-                if (formData['pupil_premium'] == 'on') {
-                    formData['pupil_premium'] = true;
+                var formData = parseFormData($(this));
+
+                if (formData['use_institution_data'] == 'true') {
+                    formData['student_id'] = formData['institution_student_id'];
+
+                    createClassStudent(formData);
                 } else {
-                    formData['pupil_premium'] = false;
+                    createStudent(formData);
                 }
 
-                $.APIAjax({
-                    url: '{{ url('api/student') }}',
-                    type: 'POST',
-                    data: {
-                        student_name:             formData['student_name'],
-                        gender:                   formData['gender'],
-                        pupil_premium:            formData['pupil_premium'],
-                        class_id:                 formData['class_id'],
-                        ability_cap:              formData['ability_cap'],
-                        current_attainment_level: formData['current_attainment_level'],
-                        target_attainment_level:  formData['target_attainment_level']
-                    },
-                    success: function(jsonResponse) {
-                        handleNotification(formData['student_name'] + ' has been added to the class!', 'success');
-
-                        var html = '<tr student-id="' + jsonResponse.student.id + '" style="display: none;">' +
-                            '<td>' +
-                                '<div class="media-left media-middle">' +
-                                    '<a class="btn bg-teal-400 ' + (formData['gender'] === 'male' ? 'tooltip-blue' : 'tooltip-pink') + ' btn-rounded btn-icon btn-xs" href="javascript:void(0);">' +
-                                        '<span class="letter-icon">' + formData['student_name'].charAt(0).toUpperCase() + '</span>' +
-                                    '</a>' +
-                                '</div>' +
-                                '<div class="media-body media-middle">' +
-                                    '<h6 class="display-inline-block text-default text-semibold letter-icon-title student-name" href="javascript:void(0);" style="margin-bottom: 3px; margin-top: 3px;">' + formData['student_name'] + '</h6>' +
-                                '</div>' +
-                            '</td>' +
-                            '<td>' +
-                                '<h6 class="no-margin current-attainment-level">' + ((formData['current_attainment_level'] === "") ? 'N/A' : formData['current_attainment_level']) + '</h6>' +
-                            '</td>' +
-                            '<td>' +
-                                '<h6 class="no-margin target-attainment-level">' + ((formData['target_attainment_level'] === "") ? 'N/A' : formData['target_attainment_level']) + '</h6>' +
-                            '</td>' +
-                            '<td>' +
-                                '<span class="pupil-premium"><i class="' + (formData['pupil_premium'] ? "icon-checkmark3 text-success" : "icon-cross2 text-danger-400") + '"></i></span>' +
-                            '</td>' +
-                            '<td>' +
-                                '<h6 class="no-margin ability-cap">' + formData['ability_cap'] + '</h6>' +
-                            '</td>' +
-                            '<td>' +
-                                '<div class="gender" style="display: none;">' + formData['gender'] + '</div>' +
-                                '<div class="btn-group">' + 
-                                    '<button type="button" class="btn btn-danger dropdown-toggle" data-toggle="dropdown">Options <span class="caret"></span></button>' +
-                                    '<ul class="dropdown-menu dropdown-menu-right">' +
-                                        '<li><a class="delete-student"><i class="icon-user-minus"></i> Delete</a></li>' +
-                                        '<li><a class="edit-student"><i class="icon-pencil"></i> Edit</a></li>' +
-                                    '</ul>' +
-                                '</div>' +
-                            '</td>' +
-                        '</tr>';
-
-                        if ($('#no-students').is(":visible")) {
-                            $('#no-students').fadeOut();
-                        }
-
-                        $('tbody').append(html);
-                        $('tr[student-id=' + jsonResponse.student.id + ']').fadeIn();
-
-                        $('#create-student').trigger('reset');
-                        $('a[title="Information"]').tab('show');
-
-                        $('select').select2();
-                        $('.styled').uniform({
-                            radioClass: 'choice'
-                        });
-                    },
-                    error: function(jsonResponse) {}
-                });
+                disabled.attr('disabled','disabled');
             });
 
             $('#update-student').submit(function(event) {
                 event.preventDefault();
 
-                updateClassStudent($(this));
-            });
+                var formData = parseFormData($(this));
 
-            var timer,
-                genderAJAXRequest;
+                if (formData['use_institution_data'] != 'true') {
+                    updateStudent(formData);
+                } else {
+                    updateClassStudent(formData);
+                }
+            });
 
             $('#student-name').on('keyup', function() {
                 if (genderAJAXRequest) { genderAJAXRequest.abort() }
@@ -665,12 +649,17 @@
             });
 
             $(document).delegate('.delete-student', 'click', function() {
-                deleteClassStudent($(this).closest('tr').attr('student-id'));
+                var tableRow = $(this).closest('tr');
+
+                deleteStudent(tableRow.attr('student-id'));
+                deleteClassStudent(tableRow.attr('class-student-id'));
             });
 
             $(document).delegate('.edit-student', 'click', function() {
-                var classStudent = $(this).closest('tr'),
-                    studentId = classStudent.attr('student-id');
+                var classStudent             = $(this).closest('tr'),
+                    classStudentId           = classStudent.attr('class-student-id'),
+                    studentId                = classStudent.attr('student-id'),
+                    shouldUseInstitutionData = JSON.parse(classStudent.attr('use-institution'));
 
                 var studentName            = classStudent.find('.student-name').text(),
                     gender                 = classStudent.find('.gender').text(),
@@ -686,6 +675,8 @@
                 }
 
                 $('#update-student input[name=student_id]').val(studentId);
+                $('#update-student input[name=class_student_id]').val(classStudentId);
+                $('#update-student input[name=use_institution_data]').val(shouldUseInstitutionData);
                 $('#update-student input[name=student_name]').val(studentName);
                 $('#update-student input[name=pupil_premium]').prop('checked', pupilPremium);
                 $('#update-student input[value=' + gender + ']').prop('checked', true);
@@ -693,10 +684,43 @@
                 $('#update-student select[name=current_attainment_level]').val(currentAttainmentLevel === 'N/A' ? '' : currentAttainmentLevel);
                 $('#update-student select[name=target_attainment_level]').val(targetAttainmentLevel === 'N/A' ? '' : targetAttainmentLevel);
 
+                $('#update-student input[name="student_name"]').prop('disabled', shouldUseInstitutionData);
+                $('#update-student input[name="pupil_premium"]').prop('disabled', shouldUseInstitutionData);
+                $('#update-student input[name="gender"]').prop('disabled', shouldUseInstitutionData);
+
+                if (shouldUseInstitutionData) {
+                    $('#institution-only-message').fadeIn();
+                } else {
+                    $('#institution-only-message').fadeOut();
+                }
+
                 $.uniform.update();
                 $('select').select2().trigger('change');
                 $('#modal_update_student').modal('show');
             });
+
+            @if (sizeOf($userPreferences) > 0 && Auth::user()->institution_id !== null)
+                var userPreferences = {!! json_encode($userPreferences) !!};
+
+                for (var i = 0; i < userPreferences.length; i++) {
+                    var userPreference = userPreferences[i];
+
+                    if (userPreference.setting_id === 3) { // should use students on record
+                        if (userPreference.setting_value == 'true') {
+                            $('input[name="use_institution_data"][value="true"]').prop('checked', true);
+                            changeCreationPreference(true);
+                        } else {
+                            $('input[name="use_institution_data"][value="false"]').prop('checked', true);
+                            changeCreationPreference(false);
+                        }
+
+                        break;
+                    }
+                }
+            @elseif (Auth::user()->institution_id !== null)
+                $('input[name="use_institution_data"][value="true"]').prop('checked', true);
+                changeCreationPreference(true);
+            @endif
 
             $('select').select2();
             $('.styled').uniform({
@@ -705,7 +729,9 @@
         });
 
         var classId = {{ $classId }},
-            token = '{{ csrf_token() }}';
+            token = '{{ csrf_token() }}',
+            timer,
+            genderAJAXRequest;
 
         $('tbody').prepend('<tr id="no-students" @if (isset($classStudents) && sizeOf($classStudents) > 0) style="display: none;" @endif></tr>');
         $('#no-students').html(
@@ -722,33 +748,153 @@
             $('#modal_create_class').modal('show');
         @endif
 
-        function updateClassStudent(form) {
-            var formData = form.serializeArray().reduce(function(obj, item) {
-                obj[item.name] = item.value;
+        function createStudent(formData) {
+            formData['pupil_premium'] = formData['pupil_premium'] == 'on' ? 1 : 0;
 
-                return obj;
-            }, {});
+            $.APIAjax({
+                url: '{{ url('api/student') }}',
+                type: 'POST',
+                data: {
+                    student_name:             formData['student_name'],
+                    gender:                   formData['gender'],
+                    pupil_premium:            formData['pupil_premium'],
+                },
+                success: function(jsonResponse) {
+                    handleNotification(formData['student_name'] + ' has been added to the class!', 'success');
 
-            if (formData['pupil_premium'] == 'on') {
-                formData['pupil_premium'] = true;
-            } else {
-                formData['pupil_premium'] = false;
-            }
+                    formData['student_id'] = jsonResponse.student.id;
+                    createClassStudent(formData);
+                },
+                error: function(jsonResponse) {}
+            });
+        }
+
+        function updateStudent(formData) {
+            formData['pupil_premium'] = formData['pupil_premium'] == 'on' ? 1 : 0;
 
             $.APIAjax({
                 url: '{{ url('api/student') }}/' + formData['student_id'],
                 type: 'PUT',
                 data: {
-                    student_name:             formData['student_name'],
-                    gender:                   formData['gender'],
-                    pupil_premium:            formData['pupil_premium'],
+                    student_name:  formData['student_name'],
+                    gender:        formData['gender'],
+                    pupil_premium: formData['pupil_premium'],
+                },
+                success: function(jsonResponse) {
+                    updateClassStudent(formData);
+                },
+                error: function(jsonResponse) {}
+            });
+        }
+
+        function deleteStudent(studentId) {
+            $.APIAjax({
+                url: '{{ url('api/student') }}/' + studentId,
+                type: 'DELETE',
+                success: function(jsonResponse) {
+                    handleNotification(jsonResponse.message, 'success');
+                },
+                error: function(jsonResponse) {}
+            });
+        }
+
+        function createClassStudent(formData) {
+            $.APIAjax({
+                url: '{{ url('api/class-student') }}',
+                type: 'POST',
+                data: {
                     class_id:                 classId,
+                    student_id:               formData['student_id'],
                     ability_cap:              formData['ability_cap'],
                     current_attainment_level: formData['current_attainment_level'],
                     target_attainment_level:  formData['target_attainment_level']
                 },
                 success: function(jsonResponse) {
-                    var classStudent = $('tr[student-id=' + formData['student_id'] + ']').closest('tr');
+                    handleNotification(formData['student_name'] + ' has been added to the class!', 'success');
+
+                    $('tbody').append(
+                        '<tr class-student-id="' + jsonResponse.class_student.id + '" student-id="' + jsonResponse.student.id + '" use-institution="' + formData['use_institution_data'] + '" style="display: none;">' +
+                            '<td>' +
+                                '<div class="media-left media-middle">' +
+                                    '<a class="btn bg-teal-400 ' + (formData['gender'] === 'male' ? 'tooltip-blue' : 'tooltip-pink') + ' btn-rounded btn-icon btn-xs" href="javascript:void(0);">' +
+                                        '<span class="letter-icon">' + formData['student_name'].charAt(0).toUpperCase() + '</span>' +
+                                    '</a>' +
+                                '</div>' +
+                                '<div class="media-body media-middle">' +
+                                    '<h6 class="display-inline-block text-default text-semibold letter-icon-title student-name" href="javascript:void(0);" style="margin-bottom: 3px; margin-top: 3px;">' + formData['student_name'] + '</h6>' +
+                                '</div>' +
+                            '</td>' +
+                            '<td>' +
+                                '<h6 class="no-margin current-attainment-level">' + ((formData['current_attainment_level'] === "") ? 'N/A' : formData['current_attainment_level']) + '</h6>' +
+                            '</td>' +
+                            '<td>' +
+                                '<h6 class="no-margin target-attainment-level">' + ((formData['target_attainment_level'] === "") ? 'N/A' : formData['target_attainment_level']) + '</h6>' +
+                            '</td>' +
+                            '<td>' +
+                                '<span class="pupil-premium"><i class="' + (formData['pupil_premium'] ? "icon-checkmark3 text-success" : "icon-cross2 text-danger-400") + '"></i></span>' +
+                            '</td>' +
+                            '<td>' +
+                                '<h6 class="no-margin ability-cap">' + formData['ability_cap'] + '</h6>' +
+                            '</td>' +
+                            '<td>' +
+                                '<div class="gender" style="display: none;">' + formData['gender'] + '</div>' +
+                                '<div class="btn-group">' + 
+                                    '<button type="button" class="btn btn-danger dropdown-toggle" data-toggle="dropdown">Options <span class="caret"></span></button>' +
+                                    '<ul class="dropdown-menu dropdown-menu-right">' +
+                                        '<li>' +
+                                            '<a class="delete-student">' +
+                                                '<i class="icon-user-minus"></i> Delete' +
+                                            '</a>' +
+                                        '</li>' +
+                                        '<li>' +
+                                            '<a class="edit-student">' +
+                                                '<i class="icon-pencil"></i> Edit' +
+                                            '</a>' +
+                                        '</li>' +
+                                    '</ul>' +
+                                '</div>' +
+                            '</td>' +
+                        '</tr>'
+                    );
+
+                    if (formData['use_institution_data']) {
+                        $('#institution-students-select option[value="' + jsonResponse.student.id + '"]').remove();
+                    }
+
+                    if ($('#no-students').is(":visible")) {
+                        $('#no-students').fadeOut();
+                    }
+
+                    $('tr[student-id=' + jsonResponse.student.id + ']').fadeIn();
+
+                    var creationPreference = JSON.parse($('input[name="use_institution_data"][value="true"]').prop('checked'));
+
+                    $('#create-student').trigger('reset');
+                    
+                    $('input[name="use_institution_data"][value="' + creationPreference + '"]').prop('checked', true);
+                    changeCreationPreference(creationPreference);
+
+                    $('a[title="Information"]').tab('show');
+
+                    $('select').select2();
+                    $.uniform.update();
+                },
+                error: function(jsonResponse) {}
+            });
+        }
+
+        function updateClassStudent(formData) {
+            $.APIAjax({
+                url: '{{ url('api/class-student') }}/' + formData['class_student_id'],
+                type: 'PUT',
+                data: {
+                    class_id:                 classId,
+                    ability_cap:              formData['ability_cap'],
+                    current_attainment_level: formData['current_attainment_level'],
+                    target_attainment_level:  formData['target_attainment_level'],
+                },
+                success: function(jsonResponse) {
+                    var classStudent = $('tr[class-student-id=' + formData['class_student_id'] + ']').closest('tr');
 
                     if (formData['pupil_premium']) {
                         formData['pupil_premium'] = '<i class="icon-checkmark3 text-success"></i>';
@@ -772,15 +918,15 @@
             });
         }
 
-        function deleteClassStudent(studentId) {
+        function deleteClassStudent(classStudentId) {
             $.APIAjax({
-                url: '{{ url('api/class-student') }}/' + studentId,
+                url: '{{ url('api/class-student') }}/' + classStudentId,
                 type: 'DELETE',
                 data: {
                     class_id: classId
                 },
                 success: function(jsonResponse) {
-                    $('tr[student-id=' + studentId + ']').fadeOut(300, function() {
+                    $('tr[class-student-id=' + classStudentId + ']').fadeOut(300, function() {
                         $(this).remove();
 
                         if ($('tbody').children().length == 1) {
@@ -817,6 +963,19 @@
             $('#planner-href').attr('href', '{{ url('dashboard') }}?class=' + classId);
         }
 
+        function changeCreationPreference(shouldUseInstitutionData) {
+            $('.manual-fields').prop('disabled', shouldUseInstitutionData);
+            $('#institution-students-select').val('').trigger('change');
+
+            if (shouldUseInstitutionData) {
+                $('#institution-students').fadeIn();
+            } else {
+                $('#institution-students').fadeOut();
+            }
+
+            $.uniform.update();
+        }
+
         // notificationContent is the message e.g. 'hello' (string)
         // type is the display type e.g. 'error' or 'success' (string)
         function handleNotification(notificationContent, type, timeout = 5000) {
@@ -833,6 +992,14 @@
 
         function isValidJson(jsonResponse) {
             return $.isPlainObject(jsonResponse);
+        }
+
+        function parseFormData(form) {
+            return form.serializeArray().reduce(function(obj, item) {
+                obj[item.name] = item.value;
+
+                return obj;
+            }, {});
         }
 
         $.ajaxSetup({

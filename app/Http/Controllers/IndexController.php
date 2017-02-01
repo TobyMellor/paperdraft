@@ -80,18 +80,28 @@ class IndexController extends Controller
      */
     public function getClassDashboard(
         $classId,
-        ClassController $classController
+        ClassController $classController,
+        SettingController $settingController
     )
     {
         $classes = $classController->getClasses();
         $selectedClass = $classController->getClass($classId);
         $classStudents = ClassStudent::where('class_id', $classId)->get();
+        $userPreferences = $settingController->getUserPreferences();
+
+        $institutionStudents = null;
+
+        if (Auth::user()->institution_id !== null) {
+            $institutionStudents = Student::where('user_id', Auth::id())->get();
+        }
 
         return view('dashboard.classes')
             ->with('classStudents', $classStudents)
             ->with('classes', $classes)
             ->with('selectedClass', $selectedClass)
-            ->with('classId', $classId);
+            ->with('classId', $classId)
+            ->with('institutionStudents', $institutionStudents)
+            ->with('userPreferences', $userPreferences);
     }
 
     /**
