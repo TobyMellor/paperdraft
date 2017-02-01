@@ -180,7 +180,8 @@ class ClassController extends Controller
      */
     public function getClasses()
     {   
-        $classes = SchoolClass::where('user_id', Auth::id())->get();
+        $classes = SchoolClass::where('user_id', Auth::id())
+            ->get();
 
         return $classes;
     }
@@ -207,7 +208,8 @@ class ClassController extends Controller
     public function getRecentClassId()
     {   
         $canvasItem = CanvasItem::whereHas('SchoolClass', function($query){                           
-            $query->where('classes.user_id', Auth::id());                             
+            $query->where('classes.user_id', Auth::id())
+                  ->where('classes.institution_id', null);                             
         })->orderBy('created_at', 'desc')->first();
 
         if ($canvasItem != null) {

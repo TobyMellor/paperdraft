@@ -91,9 +91,9 @@ class IndexController extends Controller
         SettingController $settingController
     )
     {
-        $classes = $classController->getClasses();
-        $selectedClass = $classController->getClass($classId);
-        $classStudents = ClassStudent::where('class_id', $classId)->get();
+        $classes         = $classController->getClasses();
+        $selectedClass   = $classController->getClass($classId);
+        $classStudents   = ClassStudent::where('class_id', $classId)->get();
         $userPreferences = $settingController->getUserPreferences();
 
         $institutionStudents = null;
