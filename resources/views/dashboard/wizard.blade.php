@@ -20,7 +20,9 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group has-feedback">
-                                    <label>Are you an admin of an institution?: <span class="text-danger">*</span></label>
+                                    <label class="display-block text-bold">
+                                        Are you an admin of an institution?: <span class="text-danger">*</span>
+                                    </label>
                                     <div class="radio">
                                         <label>
                                             <input type="radio" checked="checked" class="styled" name="is-institution" value="false">
@@ -41,7 +43,9 @@
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-group has-feedback">
-                                        <label>Institution Name: <span class="text-danger">*</span></label>
+                                        <label class="display-block text-bold">
+                                            Institution Name: <span class="text-danger">*</span>
+                                        </label>
                                         @if (isset(Auth::user()->institution))
                                             <input type="text" name="institution_name" placeholder="Give your institution a name" class="form-control" value="{{ Auth::user()->institution->name }}">
                                         @else
@@ -62,7 +66,9 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group has-feedback">
-                                <label>Email address: <span class="text-danger">*</span></label>
+                                <label class="display-block text-bold">
+                                    Email address: <span class="text-danger">*</span>
+                                </label>
                                 <input type="email" class="form-control" value="{{ Auth::user()->email }}" disabled>
                                 <div class="form-control-feedback">
                                     <i class="icon-vcard text-muted"></i>
@@ -72,7 +78,7 @@
                         </div>
                         <div class="col-md-6">
                             <div class="form-group has-feedback">
-                                <label>Password: <span class="text-danger">*</span></label>
+                                <label class="display-block text-bold">Password: <span class="text-danger">*</span></label>
                                 <input type="text" class="form-control" value="****" disabled>
                                 <div class="form-control-feedback">
                                     <i class="icon-user-lock text-muted"></i>
@@ -84,7 +90,7 @@
                     <div class="row" style="margin-top: 20px;">
                         <div class="col-md-2">
                             <div class="form-group">
-                                <label>Your title: <span class="text-danger">*</span></label>
+                                <label class="display-block text-bold">Your title: <span class="text-danger">*</span></label>
                                 <select name="title" data-placeholder="Select your title" class="select">
                                     <option value="Mr">Mr</option>
                                     <option value="Mrs">Mrs</option>
@@ -96,13 +102,13 @@
                         </div>
                         <div class="col-md-5">
                             <div class="form-group">
-                                <label>Your first name: <span class="text-danger">*</span></label>
+                                <label class="display-block text-bold">Your first name: <span class="text-danger">*</span></label>
                                 <input type="text" name="first_name" value="{{ Auth::user()->first_name }}" class="form-control" placeholder="Your first name">
                             </div>
                         </div>
                         <div class="col-md-5">
                             <div class="form-group">
-                                <label>Your last name: <span class="text-danger">*</span></label>
+                                <label class="display-block text-bold">Your last name: <span class="text-danger">*</span></label>
                                 <input type="text" name="last_name" value="{{ Auth::user()->last_name }}" class="form-control" placeholder="Your last name">
                             </div>
                         </div>
@@ -114,7 +120,9 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group has-feedback">
-                                <label>Class Name: <span class="text-danger">*</span></label>
+                                <label class="display-block text-bold">
+                                    Class Name: <span class="text-danger">*</span>
+                                </label>
                                 <input type="text" name="class_name" placeholder="Class name" class="form-control required">
                                 <div class="form-control-feedback">
                                     <i class="icon-book text-muted"></i>
@@ -122,43 +130,58 @@
                             </div>
 
                             <div class="form-group">
-                                <label>Subject:</label>
-                                <input type="text" name="class_subject" placeholder="Subject name" value="" data-role="tagsinput" class="form-control subject-typeahead">
+                                <label class="display-block text-bold">
+                                    Subject:
+                                </label>
+                                <input type="text" name="class_subject" placeholder="Subject name" value="" class="form-control">
                             </div>
-
-                            <div class="form-group">
-                                <label>Room:</label>
-                                <input type="text" name="class_room" placeholder="Room name" value="" data-role="tagsinput" class="room-typeahead form-control">
-                            </div>
+                            
+                            @if ($classRooms !== null)
+                                <div class="form-group">
+                                    <label class="display-block text-bold">
+                                        Class Room:
+                                    </label>
+                                    <select class="form-control" name="class_id">
+                                        <optgroup label="Class Rooms Available">
+                                            <option value="" disabled selected>Select a room to duplicate</option>
+                                            @foreach ($classRooms as $room)
+                                                <option value="{{ $room->id }}">{{ $room->class_name }}</option>
+                                            @endforeach
+                                        </optgroup>
+                                    </select>
+                                </div>
+                            @endif
 
                             <a href="javascript:void(0);" class="btn btn-primary pull-right" id="create-class">Create Class <i class="icon-book" style="margin-left: 5px;"></i></a>
                         </div>
 
                         <div class="col-md-6">
-                            <label>Your classes:</label>
+                            <label class="display-block text-bold">Your classes:</label>
                             <div class="table-responsive" style="display: none;">
                                 <table class="table table-bordered table-striped table-hover">
                                     <thead>
                                         <tr>
                                             <th>Class Name</th>
                                             <th>Subject</th>
-                                            <th>Room</th>
+                                            <th>Class Room</th>
                                             <th>Action</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         @if (sizeOf($classes) > 0)
                                             @foreach ($classes as $class)
-                                                <tr>
-                                                    <td>{{ $class->class_name }}</td>
-                                                    <td>{{ $class->class_subject }}</td>
-                                                    <td>{{ $class->class_room }}</td>
-                                                    <td>
-                                                        <div class="btn-group">
-                                                            <button type="button" class="btn btn-danger delete-class" class-id="{{ $class->id }}">Delete</span></button>
-                                                        </div>
-                                                    </td>
-                                                </tr>
+                                                @if ($class->institution_id === null)
+                                                    <tr>
+                                                        <td>{{ $class->class_name }}</td>
+                                                        <td>{{ $class->class_subject or 'N/A' }}</td>
+                                                        <td>{{ $class->class_room or 'N/A' }}</td>
+                                                        <td>
+                                                            <div class="btn-group">
+                                                                <button type="button" class="btn btn-danger delete-class" class-id="{{ $class->id }}">Delete</span></button>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                @endif
                                             @endforeach
                                         @endif
                                     </tbody>
@@ -185,31 +208,11 @@
     <script type="text/javascript" src="{{ asset('assets/js/plugins/forms/styling/uniform.min.js') }}"></script>
     <script type="text/javascript" src="{{ asset('assets/js/plugins/forms/validation/validate.min.js') }}"></script>
 
-    <script type="text/javascript" src="{{ asset('assets/js/plugins/forms/tags/tagsinput.min.js') }}"></script>
-    <script type="text/javascript" src="{{ asset('assets/js/plugins/forms/inputs/typeahead/typeahead.bundle.min.js') }}"></script>
-
     <script>
         // Show form
         var form = $(".steps-validation").show();
         var token = '{{ csrf_token() }}';
         var hasErrorOccured = false;
-
-        var roomsAvailable = [
-            // roomsAvailable and subjectsAvailable will always return nothing until we setup something else later
-            @if (isset($roomsAvailable))
-                @foreach ($roomsAvailable as $roomAvailable)
-                    '{{ $roomAvailable }}',
-                @endforeach
-            @endif
-        ];
-
-        var subjectsAvailable = [
-            @if (isset($subjectsAvailable))
-                @foreach ($subjectsAvailable as $subjectAvailable)
-                    '{{ $subjectAvailable }}',
-                @endforeach
-            @endif
-        ];
 
         $(".steps-validation").steps({
             headerTag: "h6",
@@ -337,73 +340,6 @@
                 }
 
                 return form.valid();
-            },
-            onInit: function(event, currentIndex) { 
-                $(function() {
-                    var substringMatcher = function(strs) {
-                        return function findMatches(q, cb) {
-                            var matches, substringRegex;
-
-                            if (q.length <= 30) {
-                                // an array that will be populated with substring matches
-                                matches = [];
-
-                                // regex used to determine if a string contains the substring `q`
-                                substrRegex = new RegExp(q, 'i');
-
-                                // iterate through the pool of strings and for any string that
-                                // contains the substring `q`, add it to the `matches` array
-                                $.each(strs, function(i, str) {
-                                    if (substrRegex.test(str)) {
-
-                                        // the typeahead jQuery plugin expects suggestions to a
-                                        // JavaScript object, refer to typeahead docs for more info
-                                        matches.push({ value: str });
-
-                                        if (matches.length >= 3) {
-                                            return false;
-                                        }
-                                    }
-                                });
-                                cb(matches);
-                            }
-                        };
-                    };
-
-                    // Attach typeahead
-                    $('.subject-typeahead').tagsinput('input').typeahead(
-                        {
-                            hint: true,
-                            highlight: true,
-                            minLength: 1,
-                        },
-                        {
-                            name: 'states',
-                            displayKey: 'value',
-                            source: substringMatcher(subjectsAvailable)
-                        }
-                    ).bind('typeahead:selected', $.proxy(function (obj, datum) {  
-                        this.tagsinput('add', datum.value);
-                        this.tagsinput('input').typeahead('val', '');
-                    }, $('.subject-typeahead')));
-
-                    $('.room-typeahead').tagsinput('input').typeahead(
-                        {
-                            hint: true,
-                            highlight: true,
-                            minLength: 1,
-                            maxTags: 1
-                        },
-                        {
-                            name: 'states',
-                            displayKey: 'value',
-                            source: substringMatcher(roomsAvailable)
-                        }
-                    ).bind('typeahead:selected', $.proxy(function (obj, datum) {  
-                        this.tagsinput('add', datum.value);
-                        this.tagsinput('input').typeahead('val', '');
-                    }, $('.room-typeahead')));
-                });
             }
         });
     
@@ -431,10 +367,6 @@
                 triggerNameChange();
             });
 
-            $('input').on('beforeItemAdd', function(event) {
-                $(this).tagsinput('removeAll');
-            });
-
             $('#create-class').on('click', function() {
                 var className    = $('input[name=class_name]'),
                     classSubject = $('input[name=class_subject]'),
@@ -450,14 +382,6 @@
 
                 if (classSubject.val().length > 30) {
                     classSubject.parent().append('<label id="position-error" class="validation-error-label" for="position">The subject name must be less than 30 characters.</label>');
-                } else {
-                    $('.subject-typeahead').tagsinput('add', $('.tt-input:first').val());
-                }
-
-                if (classRoom.val().length > 30) {
-                    classRoom.parent().append('<label id="position-error" class="validation-error-label" for="position">The room name must be less than 30 characters.</label>');
-                } else {
-                    $('.room-typeahead').tagsinput('add', $('.tt-input:last').val());
                 }
 
                 if ($('.validation-error-label').length == 0) {
@@ -562,21 +486,19 @@
                 data: {
                     class_name:    formData['class_name'],
                     class_subject: formData['class_subject'],
-                    class_room:    formData['class_room']
+                    class_id:      formData['class_id']
                 },
                 success: function(jsonResponse) {
                     handleNotification(jsonResponse.message, 'success');
 
                     if (formData['class_subject'] === "") {
                         formData['class_subject'] = 'N/A';
-                    } else if (subjectsAvailable.indexOf(formData['class_subject']) == -1) {
-                        subjectsAvailable.push(formData['class_subject']);
                     }
 
-                    if (formData['class_room'] === "") {
+                    formData['class_room'] = jsonResponse.class.class_room;
+
+                    if (typeof formData['class_room'] === "undefined") {
                         formData['class_room'] = 'N/A';
-                    } else if (roomsAvailable.indexOf(formData['class_room']) == -1) {
-                        roomsAvailable.push(formData['class_room']);
                     }
 
                     $('tbody').append('<tr>' +
@@ -586,7 +508,7 @@
                         '<td>' + 
                             formData['class_subject'] +
                         '</td>' +
-                        '<td>' +
+                        '<td>' + 
                             formData['class_room'] +
                         '</td>' +
                         '<td>' +
@@ -601,8 +523,9 @@
                     });
 
                     $('input[name=class_name]').val('');
-                    $('input[name=class_subject]').tagsinput('removeAll');
-                    $('input[name=class_room]').tagsinput('removeAll');
+
+
+                    $('input[name=class_id]').val('').trigger('change');
                 },
                 error: function(jsonResponse) {
                     $('.steps-validation').steps('previous');

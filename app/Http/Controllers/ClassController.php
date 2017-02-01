@@ -26,6 +26,8 @@ class ClassController extends Controller
         $classSubject   = $request->input('class_subject');
         $forInstitution = $request->input('for_institution');
 
+        $classTemplateId = $request->input('class_id');
+
         $data = [
             'class_name'    => $className,
             'class_subject' => $classSubject
@@ -34,27 +36,31 @@ class ClassController extends Controller
         $validation = $this->validateClass($data);
 
         if (!$validation->fails()) {
-            $storedClass = new SchoolClass;
+            if ($classTemplateId !== null) {
+                $class = $this->duplicateClass($classTemplateId, $className, $classSubject, true);
+            } else {
+                $class = new SchoolClass;
 
-            $storedClass->user_id = Auth::id();
-            $storedClass->class_name = $className;
-            $storedClass->class_subject = $classSubject;
+                $class->user_id = Auth::id();
+                $class->class_name = $className;
+                $class->class_subject = $classSubject;
+            }
 
             if ($forInstitution == 'true') {
-                $storedClass->institution_id = Auth::user()->institution_id;
+                $class->institution_id = Auth::user()->institution_id;
 
-                $storedClass->save();
+                $class->save();
 
                 return response()->json([
-                    'class'   => $storedClass,
+                    'class'   => $class,
                     'error'   => 0,
                     'message' => trans('api.class-room.success.store')
                 ]);
             } else {
-                $storedClass->save();
+                $class->save();
 
                 return response()->json([
-                    'class'   => $storedClass,
+                    'class'   => $class,
                     'error'   => 0,
                     'message' => trans('api.class.success.store')
                 ]);
@@ -95,16 +101,16 @@ class ClassController extends Controller
 
         if (!$validation->fails()) {
             if ($classTemplateId !== null) {
-                $classId = $this->duplicateClass($classTemplateId, $className, $classSubject, $classRoom);
+                $class = $this->duplicateClass($classTemplateId, $className, $classSubject);
             } else {
-                $classId = SchoolClass::create([
+                $class = SchoolClass::create([
                     'user_id'       => Auth::id(),
                     'class_name'    => $className,
                     'class_subject' => $classSubject
-                ])->id;
+                ]);
             }
 
-            return redirect('/dashboard/classes/' . $classId)
+            return redirect('/dashboard/classes/' . $class->id)
                 ->with('successMessage', trans('api.class.success.store'));
         }
 
@@ -265,15 +271,16 @@ class ClassController extends Controller
      *
      * @return $classIdToPaste
      */
-    public function duplicateClass($classId, $className = null, $classSubject = null, $classRoom = null)
+    public function duplicateClass($classId, $className = null, $classSubject = null, $inheritRoomName = false)
     {
         $classToDuplicate = SchoolClass::where('id', $classId)->first();
 
-        $newClassId = SchoolClass::create([
+        $class = SchoolClass::create([
             'user_id'       => Auth::id(),
             'class_name'    => $className === null ? substr($classToDuplicate->class_name, 0, 22) . ' (copy)' : $className,
-            'class_subject' => $classSubject
-        ])->id;
+            'class_subject' => $classSubject,
+            'class_room'    => $inheritRoomName ? $classToDuplicate->class_name : null
+        ]);
 
         $canvasItemsToCopy = CanvasItem::where('class_id', $classId)->get();
 
@@ -282,7 +289,7 @@ class ClassController extends Controller
         foreach ($canvasItemsToCopy as $canvasItemToCopy) {
             array_push($canvasItemsToPaste, [
                 'item_id'    => $canvasItemToCopy->item_id,
-                'class_id'   => $newClassId,
+                'class_id'   => $class->id,
                 'position_x' => $canvasItemToCopy->position_x,
                 'position_y' => $canvasItemToCopy->position_y,
             ]);
@@ -290,7 +297,7 @@ class ClassController extends Controller
 
         CanvasItem::insert($canvasItemsToPaste);
 
-        return $newClassId;
+        return $class;
     }
 
     public function duplicateClassRoom(Request $request)
@@ -330,7 +337,7 @@ class ClassController extends Controller
     }
 
     public function duplicateClassThenRedirect($classId) {
-        $newClassId = $this->duplicateClass($classId);
+        $newClassId = $this->duplicateClass($classId)->id;
 
         return redirect('dashboard/classes/' . $newClassId);
     }

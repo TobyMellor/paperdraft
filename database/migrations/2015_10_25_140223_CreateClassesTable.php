@@ -15,7 +15,8 @@ class CreateClassesTable extends Migration
         Schema::create('classes', function (Blueprint $table) {
             $table->increments('id');
 
-            $table->integer('user_id')->unsigned();
+            $table->integer('user_id')
+                  ->unsigned();
             $table->foreign('user_id')
                   ->references('id')
                   ->on('users')
@@ -36,6 +37,9 @@ class CreateClassesTable extends Migration
             */
 
             $table->string('class_name');
+            $table->string('class_room')
+                  ->nullable();
+
             $table->integer('canvas_action_undo_count')
                   ->unsigned()
                   ->default(1);
@@ -50,17 +54,20 @@ class CreateClassesTable extends Migration
             [
                 'user_id'       => 1,
                 'class_name'    => 'Year 11',
-                'class_subject' => 'Mathematics'
+                'class_subject' => 'Mathematics',
+                'class_room'    => 'Room 101'
             ],
             [
                 'user_id'       => 1,
                 'class_name'    => 'Year 12',
-                'class_subject' => 'Mathematics'
+                'class_subject' => 'Mathematics',
+                'class_room'    => 'Room 102'
             ],
             [
                 'user_id'       => 1,
                 'class_name'    => 'Year 13',
-                'class_subject' => 'ICT'
+                'class_subject' => 'ICT',
+                'class_room'    => 'Room 201'
             ]
         ]);
     }

@@ -841,18 +841,20 @@
                         '</tr>'
                     );
 
-                    $.APIAjax({
-                        url: '{{ url('api/class/duplicate') }}',
-                        type: 'POST',
-                        data: {
-                            new_class_id: jsonResponse.class.id,
-                            copied_class_id: formData['copied_class_id']
-                        },
-                        success: function(jsonResponse) {
-                            handleNotification(jsonResponse.message, 'success');
-                        },
-                        error: function(jsonResponse) {}
-                    });
+                    if (formData['copied_class_id'] !== '') {
+                        $.APIAjax({
+                            url: '{{ url('api/class/duplicate') }}',
+                            type: 'POST',
+                            data: {
+                                new_class_id: jsonResponse.class.id,
+                                copied_class_id: formData['copied_class_id']
+                            },
+                            success: function(jsonResponse) {
+                                handleNotification(jsonResponse.message, 'success');
+                            },
+                            error: function(jsonResponse) {}
+                        });
+                    }
                 },
                 error: function(jsonResponse) {}
             }).always(function() {

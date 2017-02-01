@@ -51,10 +51,17 @@ class IndexController extends Controller
 
     public function getWizardDashboard(ClassController $classController)
     {
-        $classes = $classController->getClasses();
+        $classes    = $classController->getClasses();
+        $classRooms = null;
+
+        if (Auth::user()->institution_id !== null) {
+            $classRooms = SchoolClass::where('institution_id', Auth::user()->institution_id)
+                ->get();
+        }
         
         return view('dashboard.wizard')
-            ->with('classes', $classes);
+            ->with('classes', $classes)
+            ->with('classRooms', $classRooms);
     }
 
     /**
