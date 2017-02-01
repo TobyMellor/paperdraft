@@ -882,7 +882,7 @@
                             $('#remove-seated-students').show();
                         }
                     } else {
-                        $('#selected-students').text('Loading...');
+                        $('#selected-students').text('There are no students in this class.');
                     }
 
                     this.getCanvasItem(selectedBoardItemId).addClass('outline-highlight');
