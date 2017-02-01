@@ -655,8 +655,8 @@
             $(document).delegate('.delete-student', 'click', function() {
                 var tableRow = $(this).closest('tr');
 
-                deleteStudent(tableRow.attr('student-id'));
                 deleteClassStudent(tableRow.attr('class-student-id'));
+                deleteStudent(tableRow.attr('student-id'));
             });
 
             $(document).delegate('.edit-student', 'click', function() {
