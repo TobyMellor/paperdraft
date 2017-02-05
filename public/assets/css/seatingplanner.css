@@ -312,3 +312,17 @@
 #institution {
     display: none;
 }
+
+.navbar-brand > img {
+    height: 15px;
+    margin-top: 7px;
+}
+
+.send-confirm {
+    text-decoration: underline;
+    color: inherit !important;
+}
+
+.validation-error-label {
+    cursor: pointer;
+}

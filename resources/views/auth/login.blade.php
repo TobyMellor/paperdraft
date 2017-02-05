@@ -19,7 +19,7 @@
         <div class="tab-content panel-body">
             <div class="tab-pane fade in active" id="basic-tab1">
                 <form action="{{ url('login') }}" method="POST">
-                    <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                    {{ csrf_field() }}
 
                     <div class="text-center">
                         <div class="icon-object border-slate-300 text-slate-300">

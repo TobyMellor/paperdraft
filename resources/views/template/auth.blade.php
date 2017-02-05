@@ -28,17 +28,6 @@
 
 	<script type="text/javascript" src="{{ asset('assets/js/core/app.js') }}"></script>
 	<!-- /theme JS files -->
-
-	<style>
-		.send-confirm {
-			text-decoration: underline;
-			color: inherit !important;
-		}
-
-		.validation-error-label {
-			cursor: pointer;
-		}
-	</style>
 </head>
 <body class="login-container login-cover">
 	<div class="page-container">

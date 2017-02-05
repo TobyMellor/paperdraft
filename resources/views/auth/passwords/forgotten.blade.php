@@ -3,13 +3,12 @@
 @section('title', 'Request Password Reset')
 @section('main')
     <form action="{{ url('/password/link') }}" method="POST">
+        {{ csrf_field() }}
         <div class="panel panel-body login-form">
             <div class="text-center">
                 <div class="icon-object border-slate-300 text-slate-300"><i class="icon-reading"></i></div>
                 <h5 class="content-group">Reset Password <small class="display-block">Enter your email below</small></h5>
             </div>
-
-            <input type="hidden" name="_token" value="{{ csrf_token() }}">
 
             <div class="form-group has-feedback has-feedback-left">
                 <input type="text" name="email" class="form-control" placeholder="Email" value="{{ old('email') }}">

@@ -42,7 +42,7 @@
     <body>
         <div class="navbar navbar-inverse">
             <div class="navbar-header">
-                <a class="navbar-brand" href="{{ url('/') }}"><img src="{{ asset('assets/images/logo_light.png') }}"></a>
+                <a class="navbar-brand" href="{{ url('/') }}"><img src="{{ asset('assets/images/logo.png') }}"></a>
                 <ul class="nav navbar-nav visible-xs-block">
                     <li>
                         <a data-toggle="collapse" data-target="#navbar-mobile">

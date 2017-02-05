@@ -3,7 +3,7 @@
 @section('title', 'Set New Password')
 @section('main')
     <form action="{{ url('/force_password_reset') }}" method="POST">
-        <input name="_token" value="{{ csrf_token() }}" hidden />
+        {{ csrf_field() }}
 
         <div class="panel panel-body login-form">
             <div class="text-center">

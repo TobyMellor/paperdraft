@@ -3,7 +3,7 @@
 @section('title', 'Set New Password')
 @section('main')
     <form action="{{ url('/password/reset') }}" method="POST">
-        <input name="_token" value="{{ csrf_token() }}" hidden/>
+        {{ csrf_field() }}
         <input name="token" value="{{ $token }}" hidden/>
 
         <div class="panel panel-body login-form">
@@ -11,8 +11,6 @@
                 <div class="icon-object border-slate-300 text-slate-300"><i class="icon-reading"></i></div>
                 <h5 class="content-group">Reset Password <small class="display-block">Set your new password below</small></h5>
             </div>
-
-            <input type="hidden" name="_token" value="{{ csrf_token() }}">
 
             <div class="form-group has-feedback has-feedback-left">
                 <input type="text" name="email" class="form-control" placeholder="Email" value="{{ old('email') }}">
