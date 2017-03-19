@@ -39,14 +39,16 @@ class VerifyParametersMiddleware
         $validation = $this->validator($data);
 
         $validation->after(function($validation) use ($data) {
+            $loggedInUser = Auth::guard('api');
+
             if ($data['class_id'] !== null) {
                 $class = SchoolClass::where('id', $data['class_id'])
-                    ->where(function($query) use ($data) {
+                    ->where(function($query) use ($data, $loggedInUser) {
                         if ($query->where('id', $data['class_id'])->first()->institution_id !== null) {
-                            $query->where('user_id', Auth::id())
-                                  ->orWhere('institution_id', Auth::user()->institution_id);
+                            $query->where('user_id', $loggedInUser->id())
+                                  ->orWhere('institution_id', $loggedInUser->user()->institution_id);
                         } else {
-                            $query->where('user_id', Auth::id());
+                            $query->where('user_id', $loggedInUser->id());
                         }
                     });
 

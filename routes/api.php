@@ -14,7 +14,7 @@ use Illuminate\Http\Request;
 */
 
 // The user needs to be authenticated to perform these actions
-Route::group(['middleware' => ['auth']], function () {
+Route::group(['middleware' => ['auth:api']], function () {
     Route::resource('canvas-item', 'CanvasItemController',
         [
             'only' => [
