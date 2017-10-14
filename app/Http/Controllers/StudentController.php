@@ -45,8 +45,8 @@ class StudentController extends Controller
     {
         $studentName    = $request->input('student_name');
         $gender         = $request->input('gender');
-        $pupilPremium   = $request->input('pupil_premium');
-        $forInstitution = $request->input('use_institution_data') == 'true' ? true : false;
+        $pupilPremium   = $request->input('pupil_premium') == 'on';
+        $forInstitution = $request->input('use_institution_data') == 'true';
 
         $data = [
             'student_name'  => $studentName,
@@ -59,7 +59,7 @@ class StudentController extends Controller
         if ($forInstitution) {
             $validation->after(function($validation) {
                 if (Auth::user()->institution_id === null || Auth::user()->priviledge === 0) {
-                    $validation->errors()->add('student', trans('api.student.failure.no-access'));
+                    $validation->errors()->add('student', trans('api.student.failure.store.no-access'));
                 }
             });
         }
@@ -110,21 +110,15 @@ class StudentController extends Controller
 
         $validation = $this->validator($data);
 
-        $validation->after(function($validation) {
-            if (Auth::user()->institution_id === null || Auth::user()->priviledge === 0) {
-                $validation->errors()->add('student', trans('api.student.failure.no-access'));
-            }
-        });
-
         $validation->after(function($validation) use ($student) {
             $student = $student->first();
             
             if ($student->institution_id !== null) {
                 if ($student->institution_id !== Auth::user()->institution_id) {
-                    $validation->errors()->add('student', trans('api.student.failure.no-access'));
+                    $validation->errors()->add('student', trans('api.student.failure.update.no-access'));
                 }
             } else if ($student->user_id !== Auth::id()) {
-                $validation->errors()->add('student', trans('api.student.failure.no-access'));
+                $validation->errors()->add('student', trans('api.student.failure.update.no-access'));
             }
         });
 

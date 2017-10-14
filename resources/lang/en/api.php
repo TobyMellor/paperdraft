@@ -58,6 +58,9 @@ return [
             'guess-gender' => 'The students gender could not be guessed.',
             'store'        => [
                 'no-access' => 'You don\'t have access create that student.',
+            ],
+            'update' => [
+                'no-access' => 'You don\'t have access to update that student.'
             ]
         ]
     ],
@@ -70,7 +73,7 @@ return [
         ],
         'failure' => [
             'store' => [
-                'no-access'      => 'You don\'t have access to that student or they doesn\'t exist.',
+                'no-access'      => 'You don\'t have access to that student or they don\'t exist.',
                 'already-exists' => 'You already have that student in your class.'
             ]
         ]
