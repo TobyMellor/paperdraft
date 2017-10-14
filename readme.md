@@ -11,7 +11,24 @@ The project aims to automate seating plan creation for teachers by:
  3. Applying algorithms, including boy-girl layouts and behavioral exemptions, to assign students seats within the classroom template
  4. Emailing teachers the final plans for each lesson, giving them the option to edit or create plans.
  
-# Table of Contents
+ 
+## Video Examples
+
+**Canvas Basics**
+Creating a replica of a classroom has never been easier; it even supports keyboard shortcuts for power users. The best part, you can assign students to desks in a boy-girl layout with one click. If you don't want two students sitting next to eachother, there's a solution for that.
+https://youtu.be/oOyzv_53dUg
+
+**Getting Started**
+Here's what it looks like to register and go through the setup wizard.
+https://youtu.be/FIcNM0LivUE
+
+**Institutions**
+You can become an admin of your school/institution. This means you can create room templates, create students, then allow any teachers you invited to use them.
+https://youtu.be/zHbWIYSmzZs
+
+**Student Management**
+This is how easy it is to create, read, update and delete students.
+https://youtu.be/z5CzoZfX3W4
 
 # Getting Started
 
