@@ -269,7 +269,7 @@ class View {
         var canvasItem = this.getCanvasItem(canvasItemId),
             nameSplit  = studentName.split(' ');
 
-        if (nameSplit.length > 0) {
+        if (nameSplit.length > 1) {
             studentName = nameSplit[0] + ' ' + nameSplit[1].charAt(0);
         }
 
