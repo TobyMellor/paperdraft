@@ -46,7 +46,7 @@ class StudentController extends Controller
         $studentName    = $request->input('student_name');
         $gender         = $request->input('gender');
         $pupilPremium   = $request->input('pupil_premium');
-        $forInstitution = $request->input('use_institution_data') == 'true' ? true : false;
+        $forInstitution = $request->input('use_institution_data') == 'true';
 
         $data = [
             'student_name'  => $studentName,
