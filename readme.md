@@ -11,6 +11,16 @@ The project aims to automate seating plan creation for teachers by:
  3. Applying algorithms, including boy-girl layouts and behavioral exemptions, to assign students seats within the classroom template
  4. Emailing teachers the final plans for each lesson, giving them the option to edit or create plans.
  
+ -----
+ 
+## Unique problems during development and their Algorithm walk-through
+
+ [Wiki Homepage](https://bitbucket.org/TobyMellor/paperdraft/wiki/Home)
+ 
+ - [How Connectable Desks Work](https://bitbucket.org/TobyMellor/paperdraft/wiki/How%20connectable%20desks%20work)
+ - [Seating Algorithms - Boy/Girl and Student Exemptions](https://bitbucket.org/TobyMellor/paperdraft/wiki/Seating%20Algorithms%20-%20Boy-Girl%20and%20Student%20Exemptions)
+ 
+ -----
  
 ## Video Examples
 
